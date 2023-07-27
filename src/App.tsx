@@ -3,30 +3,8 @@ import logo from './logo.svg';
 import './App.css';
 import { Web3Auth } from "@web3auth/modal";
 import { CHAIN_NAMESPACES, SafeEventEmitterProvider } from "@web3auth/base";
-
-// const web3auth = new Web3Auth({
-//   clientId: "YOUR_WEB3AUTH_CLIENT_ID", // get it from Web3Auth Dashboard
-//   web3AuthNetwork: "cyan",
-//   chainConfig: {
-//     chainNamespace: CHAIN_NAMESPACES.EIP155,
-//     chainId: "0x89", // hex of 137, polygon mainnet
-//     rpcTarget: "https://rpc.ankr.com/polygon",
-//     // Avoid using public rpcTarget in production.
-//     // Use services like Infura, Quicknode etc
-//     displayName: "Polygon Mainnet",
-//     blockExplorer: "https://polygonscan.com",
-//     ticker: "MATIC",
-//     tickerName: "Matic",
-//   },
-// });
-// await web3auth.initModal();
-
-// const web3authProvider = web3auth.connect();
-
-// const signer = await getZeroDevSigner({
-//   projectId: "<project id>",
-//   owner: getRPCProviderOwner(web3auth.provider),
-// })
+import { getZeroDevSigner, getRPCProviderOwner } from '@zerodevapp/sdk'
+import { Signer } from '@ethersproject/abstract-signer';
 
 const clientId = "BLawc_CSIedtl9Rt2J6XJidEmc5CF_ZHk538Rp8V1sBlv_sllZEOPZqginP7t0KLcLPrqhACT0B_pS3pNlv_cfQ";
 
@@ -35,6 +13,7 @@ function App() {
   const [web3auth, setWeb3auth] = useState<Web3Auth | null>(null);
   const [provider, setProvider] = useState<SafeEventEmitterProvider | null>(null);
   const [loggedIn, setLoggedIn] = useState(false);
+  const [signer, setSigner] = useState<Signer | null>(null); // initialize with empty function
 
 
   useEffect(() => {
@@ -77,6 +56,14 @@ function App() {
     const web3authProvider = await web3auth.connect();
     setProvider(web3authProvider);
     setLoggedIn(true);
+
+    const _signer = await getZeroDevSigner({
+      projectId: "5682ee04-d8d3-436a-ae63-479e063a23c4",
+      owner: getRPCProviderOwner(web3auth.provider),
+    })
+
+    setSigner(_signer);
+    console.log("signer created: ", signer);
   };
 
   const logout = async () => {
