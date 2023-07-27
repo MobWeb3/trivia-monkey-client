@@ -1,20 +1,21 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import logo from './logo.svg';
 import './App.css';
 import { Web3Auth } from "@web3auth/modal";
 import { CHAIN_NAMESPACES, SafeEventEmitterProvider } from "@web3auth/base";
 import { getZeroDevSigner, getRPCProviderOwner } from '@zerodevapp/sdk'
 import { Signer } from '@ethersproject/abstract-signer';
+import { SignerContext } from './components/SignerContext';
 
 const clientId = "BLawc_CSIedtl9Rt2J6XJidEmc5CF_ZHk538Rp8V1sBlv_sllZEOPZqginP7t0KLcLPrqhACT0B_pS3pNlv_cfQ";
 
 function App() {
 
-  const [web3auth, setWeb3auth] = useState<Web3Auth | null>(null);
   const [provider, setProvider] = useState<SafeEventEmitterProvider | null>(null);
   const [loggedIn, setLoggedIn] = useState(false);
-  const [signer, setSigner] = useState<Signer | null>(null); // initialize with empty function
-
+  // const [signer, setSigner] = useState<Signer | null>(null); // initialize with empty function
+  // const [web3auth, setWeb3auth] = useState<Web3Auth | null>(null);
+  const { signer, web3auth, setSigner, setWeb3auth } = useContext(SignerContext);
 
   useEffect(() => {
     const init = async () => {
