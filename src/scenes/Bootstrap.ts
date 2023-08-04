@@ -1,161 +1,123 @@
 import Phaser from 'phaser'
 import { sendMessage, addMessageListener } from '../utils/MessageListener'
+import { Messages } from '../utils/Messages'
 
 
-export class Bootstrap extends Phaser.Scene
-{
+export class Bootstrap extends Phaser.Scene {
     private cursors?: Phaser.Types.Input.Keyboard.CursorKeys
     private buttons: Phaser.GameObjects.Image[] = []
     private selectedButtonIndex = 0
-    private buttonSelector!: Phaser.GameObjects.Image   
-    
-    constructor()
-    {
-        super('main-menu')
+    private buttonSelector!: Phaser.GameObjects.Image  
+  
+    private readonly BUTTON_WIDTH = 150
+    private readonly BUTTON_HEIGHT = 50
+  
+    constructor() {
+      super('main-menu')
     }
-    
-    init()
-    {
-        
-        this.cursors = this.input?.keyboard?.createCursorKeys()
+  
+    init() {
+      const cursors = this.input?.keyboard?.createCursorKeys();
+      this.cursors = cursors
     }
-    
-    preload()
-    {
-        this.load.image('glass-panel', 'assets/glassPanel.png')
-        this.load.image('cursor-hand', 'assets/cursor_hand.png')
+  
+    preload() {
+      this.load.image('glass-panel', 'assets/glassPanel.png')
+      this.load.image('cursor-hand', 'assets/cursor_hand.png')
     }
-    
-    create()
-    {
-        const { width, height } = this.scale
-        
-        // Play button
-        const playButton = this.add.image(width * 0.5, height * 0.6, 'glass-panel')
-        .setDisplaySize(150, 50)
-        
-        this.add.text(playButton.x, playButton.y, 'Play')
-        .setOrigin(0.5)
-        
-        // Settings button
-        const settingsButton = this.add.image(playButton.x, playButton.y + playButton.displayHeight + 10, 'glass-panel')
-        .setDisplaySize(150, 50)
-        
-        this.add.text(settingsButton.x, settingsButton.y, 'Settings')
-        .setOrigin(0.5)
-        
-        // Credits button
-        const connectNow = this.add.image(settingsButton.x, settingsButton.y + settingsButton.displayHeight + 10, 'glass-panel')
-        .setDisplaySize(150, 50)
-        
-        this.add.text(connectNow.x, connectNow.y, 'Connect Now')
-        .setOrigin(0.5)
-
-        // Disconnect button
-        const disconnect = this.add.image(connectNow.x, connectNow.y + connectNow.displayHeight + 10, 'glass-panel')
-        .setDisplaySize(150, 50)
-        
-        this.add.text(disconnect.x, disconnect.y, 'Disconnect')
-        .setOrigin(0.5)
-        
-        this.buttons.push(playButton)
-        this.buttons.push(settingsButton)
-        this.buttons.push(connectNow)
-        this.buttons.push(disconnect)
-        
-        this.buttonSelector = this.add.image(0, 0, 'cursor-hand')
-        this.selectButton(0)
-        
-        playButton.on('selected', () => {
-            console.log('play')
+  
+    create() {
+      const { width, height } = this.scale
+  
+      this.createButtons(width, height)
+      this.createButtonSelector()
+      this.addEventListeners()
+    }
+  
+    createButtons(width: number, height: number) {
+      const buttonData = [
+        { text: 'Play', yOffset: 0 },
+        { text: 'Settings', yOffset: this.BUTTON_HEIGHT + 10 },
+        { text: 'Connect Now', yOffset: (this.BUTTON_HEIGHT + 10) * 2 },
+        { text: 'Disconnect', yOffset: (this.BUTTON_HEIGHT + 10) * 3 },
+      ]
+  
+      buttonData.forEach(({ text, yOffset }, index) => {
+        const buttonX = width * 0.5
+        const buttonY = height * 0.6 + yOffset
+  
+        const button = this.add.image(buttonX, buttonY, 'glass-panel')
+          .setDisplaySize(this.BUTTON_WIDTH, this.BUTTON_HEIGHT)
+  
+        this.add.text(buttonX, buttonY, text).setOrigin(0.5)
+  
+        this.buttons.push(button)
+      })
+    }
+  
+    createButtonSelector() {
+      this.buttonSelector = this.add.image(0, 0, 'cursor-hand')
+      this.selectButton(0)
+    }
+  
+    addEventListeners() {
+      this.buttons.forEach((button, index) => {
+        button.setInteractive()
+        button.on('pointerdown', () => {
+          this.selectButton(index)
+          this.confirmSelection()
         })
-        
-        settingsButton.on('selected', () => {
-            console.log('settings')
-        })
-
-        const persistedData = localStorage.getItem('TryConnection');
-
-        if (persistedData) {
-            const data = JSON.parse(persistedData);
-            // Handle the persisted data from localStorage
-            console.log('Persisted data:', data);
-            // Perform actions based on the persisted data
-          }
-
-        
-        connectNow.on('selected', () => {
-            console.log('Connect Now')
-            sendMessage('TryConnection', true);
-        })
-
-        disconnect.on('selected', () => {
-            console.log('Disconnect Now')
-            sendMessage('Disconnect', true);
-        })
-        
-        // add click event listener to each button
-        this.buttons.forEach((button, index) => {
-            button.setInteractive()
-            button.on('pointerdown', () => {
-                this.selectButton(index)
-                this.confirmSelection()
-            })
-        })
-
-        addMessageListener('Connected', (data) => {
-            // Handle the received data from React
-            console.log('Received data from React -> Phaser:', data);
-            // Perform actions based on the received data
-        });
+      })
+  
+      this.buttons[0].on('selected', () => {
+        console.log('play')
+      })
+  
+      this.buttons[1].on('selected', () => {
+        console.log('settings')
+      })
+  
+      this.buttons[2].on('selected', () => {
+        console.log('Connect Now')
+        sendMessage(Messages.TRY_CONNECTION, true)
+      })
+  
+      this.buttons[3].on('selected', () => {
+        console.log('Disconnect Now')
+        sendMessage(Messages.TRY_DISCONNECT, true)
+      })
     }
-    
-    selectButton(index: number)
-    {
-        const currentButton = this.buttons[this.selectedButtonIndex]
-        
-        // set the current selected button to a white tint
-        currentButton.setTint(0xffffff)
-        
-        const button = this.buttons[index]
-        
-        // set the newly selected button to a green tint
-        button.setTint(0x66ff7f)
-        
-        // move the hand cursor to the right edge
-        this.buttonSelector.x = button.x + button.displayWidth * 0.5
-        this.buttonSelector.y = button.y + 10
-        
-        // store the new selected index
-        this.selectedButtonIndex = index   
+  
+    selectButton(index: number) {
+      const currentButton = this.buttons[this.selectedButtonIndex]
+      const button = this.buttons[index]
+  
+      currentButton.setTint(0xffffff)
+      button.setTint(0x66ff7f)
+  
+      this.buttonSelector.x = button.x + button.displayWidth * 0.5
+      this.buttonSelector.y = button.y + 10
+  
+      this.selectedButtonIndex = index   
     }
-    
-    selectNextButton(change = 1)
-    {
-        let index = this.selectedButtonIndex + change
-        
-        // wrap the index to the front or end of array
-        if (index >= this.buttons.length)
-        {
-            index = 0
-        }
-        else if (index < 0)
-        {
-            index = this.buttons.length - 1
-        }
-        
-        this.selectButton(index)
+  
+    selectNextButton(change = 1) {
+      let index = this.selectedButtonIndex + change
+  
+      if (index >= this.buttons.length) {
+        index = 0
+      } else if (index < 0) {
+        index = this.buttons.length - 1
+      }
+  
+      this.selectButton(index)
     }
-    
-    confirmSelection()
-    {
-        // get the currently selected button
-        const button = this.buttons[this.selectedButtonIndex]
-        
-        // emit the 'selected' event
-        button.emit('selected')
+  
+    confirmSelection() {
+      const button = this.buttons[this.selectedButtonIndex]
+      button.emit('selected')
     }
-    
+      
     update()
     {
         const upJustPressed = Phaser.Input.Keyboard.JustDown(this.cursors?.up!)

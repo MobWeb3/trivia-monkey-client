@@ -5,6 +5,7 @@ import { addMessageListener, removeMessageListener, sendMessage } from './utils/
 import { SignerContext } from './components/SignerContext';
 import { getRPCProviderOwner, getZeroDevSigner } from '@zerodevapp/sdk';
 import { SafeEventEmitterProvider } from "@web3auth/base";
+import { Messages } from './utils/Messages';
 
 
 function App() {
@@ -28,14 +29,14 @@ function App() {
 		};
 		
 		// Add a listener for the 'dataEvent' from Phaser
-		addMessageListener('TryConnection', tryConnection);
+		addMessageListener(Messages.TRY_CONNECTION, tryConnection);
 		
 		// Add a listener for the 'dataEvent' from Phaser
-		addMessageListener('Disconnect', disconnect);
+		addMessageListener(Messages.TRY_DISCONNECT, disconnect);
 		
 		// Clean up the listener when the component unmounts
 		return () => {
-			removeMessageListener('TryConnection', tryConnection);
+			removeMessageListener(Messages.TRY_CONNECTION, tryConnection);
 		};
 	}, []);
 	
@@ -58,7 +59,7 @@ function App() {
 		console.log("signer address", await _signer.getAddress());
 		
 		// Send phaser the logged in status
-		sendMessage('Connected', true);
+		sendMessage(Messages.IS_CONNECTED, true);
 	};
 	
 	const logout = async () => {
