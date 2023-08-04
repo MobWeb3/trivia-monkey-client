@@ -33,27 +33,29 @@ export class Bootstrap extends Phaser.Scene {
       this.createButtonSelector()
       this.addEventListeners()
     }
-  
     createButtons(width: number, height: number) {
-      const buttonData = [
-        { text: 'Play', yOffset: 0 },
-        { text: 'Settings', yOffset: this.BUTTON_HEIGHT + 10 },
-        { text: 'Connect Now', yOffset: (this.BUTTON_HEIGHT + 10) * 2 },
-        { text: 'Disconnect', yOffset: (this.BUTTON_HEIGHT + 10) * 3 },
-      ]
-  
-      buttonData.forEach(({ text, yOffset }, index) => {
-        const buttonX = width * 0.5
-        const buttonY = height * 0.6 + yOffset
-  
-        const button = this.add.image(buttonX, buttonY, 'glass-panel')
-          .setDisplaySize(this.BUTTON_WIDTH, this.BUTTON_HEIGHT)
-  
-        this.add.text(buttonX, buttonY, text).setOrigin(0.5)
-  
-        this.buttons.push(button)
-      })
-    }
+        const buttonData = [
+          { text: 'Play', yOffset: 0 },
+          { text: 'Settings', yOffset: this.BUTTON_HEIGHT + 10 },
+          { text: 'Connect Now', yOffset: (this.BUTTON_HEIGHT + 10) * 2 },
+          { text: 'Disconnect', yOffset: (this.BUTTON_HEIGHT + 10) * 3 },
+        ]
+      
+        const bottomMargin = 100;
+        const totalButtonHeight = (this.BUTTON_HEIGHT + 10) * buttonData.length - 10;
+      
+        buttonData.forEach(({ text, yOffset }, index) => {
+          const buttonX = width * 0.5
+          const buttonY = height - bottomMargin - totalButtonHeight + yOffset
+      
+          const button = this.add.image(buttonX, buttonY, 'glass-panel')
+            .setDisplaySize(this.BUTTON_WIDTH, this.BUTTON_HEIGHT)
+      
+          this.add.text(buttonX, buttonY, text).setOrigin(0.5)
+      
+          this.buttons.push(button)
+        })
+      }
   
     createButtonSelector() {
       this.buttonSelector = this.add.image(0, 0, 'cursor-hand')
