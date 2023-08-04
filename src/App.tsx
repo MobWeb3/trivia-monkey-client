@@ -1,53 +1,16 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useState } from 'react';
 import logo from './logo.svg';
 import './App.css';
-import { Web3Auth } from "@web3auth/modal";
-import { CHAIN_NAMESPACES, SafeEventEmitterProvider } from "@web3auth/base";
+import { SafeEventEmitterProvider } from "@web3auth/base";
 import { getZeroDevSigner, getRPCProviderOwner } from '@zerodevapp/sdk'
-import { Signer } from '@ethersproject/abstract-signer';
 import { SignerContext } from './components/SignerContext';
-
-const clientId = "BLawc_CSIedtl9Rt2J6XJidEmc5CF_ZHk538Rp8V1sBlv_sllZEOPZqginP7t0KLcLPrqhACT0B_pS3pNlv_cfQ";
+import { Contract } from 'ethers'
 
 function App() {
 
-  const [provider, setProvider] = useState<SafeEventEmitterProvider | null>(null);
+  const [, setProvider] = useState<SafeEventEmitterProvider | null>(null);
   const [loggedIn, setLoggedIn] = useState(false);
-  // const [signer, setSigner] = useState<Signer | null>(null); // initialize with empty function
-  // const [web3auth, setWeb3auth] = useState<Web3Auth | null>(null);
-  const { signer, web3auth, setSigner, setWeb3auth } = useContext(SignerContext);
-
-  useEffect(() => {
-    const init = async () => {
-      try {
-        const web3auth = new Web3Auth({
-          clientId,
-          chainConfig: {
-            chainNamespace: CHAIN_NAMESPACES.EIP155,
-            chainId: "0x13881",
-            rpcTarget: "https://rpc.ankr.com/polygon_mumbai", // This is the public RPC we have added, please pass on your own endpoint while creating an app
-          },
-          uiConfig: {
-            appName: "W3A",
-            appLogo: "https://web3auth.io/images/w3a-L-Favicon-1.svg", // Your App Logo Here
-            theme: "light",
-            loginMethodsOrder: ["google", "facebook", "twitter", "reddit", "discord", "twitch", "apple", "line", "github", "kakao", "linkedin", "weibo", "wechat", "email_passwordless"],
-            defaultLanguage: "en", // en, de, ja, ko, zh, es, fr, pt, nl
-            loginGridCol: 3,
-            primaryButton: "externalLogin", // "externalLogin" | "socialLogin" | "emailLogin"
-          },
-          web3AuthNetwork: "cyan",
-        });
-
-        setWeb3auth(web3auth);
-        await web3auth.initModal();
-
-      } catch (error) {
-        console.error(error);
-      }
-    }
-    init();
-  }, [])
+  const { signer, web3auth, setSigner } = useContext(SignerContext);
 
   const login = async () => {
     if (!web3auth) {
@@ -65,7 +28,30 @@ function App() {
 
     setSigner(_signer);
     console.log("signer created: ", signer);
+    console.log("signer address", await _signer.getAddress());
   };
+
+  const mint = async () => {
+
+    const address = await signer?.getAddress();
+    const contractAddress = '0x34bE7f35132E97915633BC1fc020364EA5134863'
+    const contractABI = [
+      'function mint(address _to) public',
+      'function balanceOf(address owner) external view returns (uint256 balance)'
+    ]
+
+    if (!signer) {
+      console.log("signer not initialized yet");
+      return;
+    }
+    const nftContract = new Contract(contractAddress, contractABI, signer);
+
+    const receipt = await nftContract.mint(address)
+    await receipt.wait()
+    console.log(`NFT balance: ${await nftContract.balanceOf(address)}`)
+
+
+  }
 
   const logout = async () => {
     if (!web3auth) {
@@ -78,13 +64,18 @@ function App() {
   };
 
   return (
+
     <div className="App">
       <header className="App-header">
+        {/* <SponsoredGasExample /> */}
         <img src={logo} className="App-logo" alt="logo" />
         {!loggedIn ? (
           <button onClick={login}>Login</button>
         ) : (
-          <button onClick={logout}>Logout</button>
+          <>
+            <button onClick={mint}>Mint</button>
+            <button onClick={logout}>Logout</button>
+          </>
         )}
 
       </header>
