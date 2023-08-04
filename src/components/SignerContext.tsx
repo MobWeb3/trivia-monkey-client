@@ -1,11 +1,10 @@
 import React, { createContext, useState, PropsWithChildren, useEffect } from 'react';
 import { Signer } from 'ethers';
-import { Web3Auth, IWeb3AuthModal } from "@web3auth/modal";
-import { WagmiConfig, createConfig, configureChains, Chain, PublicClient, WebSocketPublicClient, Config } from 'wagmi'
+import { Web3Auth } from "@web3auth/modal";
+import { configureChains, Chain, PublicClient, WebSocketPublicClient, Config } from 'wagmi'
 import { publicProvider } from 'wagmi/providers/public'
 import { Web3AuthConnector } from "@web3auth/web3auth-wagmi-connector";
-import { CHAIN_NAMESPACES, SafeEventEmitterProvider } from "@web3auth/base";
-import { InjectedConnector } from "wagmi/connectors/injected";
+import { CHAIN_NAMESPACES } from "@web3auth/base";
 
 
 interface SignerContextType {
@@ -71,7 +70,7 @@ const polygonMumbai = {
 };
 
 
-const { chains, publicClient, webSocketPublicClient } = configureChains([polygonMumbai as Chain], [publicProvider()]);
+const { chains } = configureChains([polygonMumbai as Chain], [publicProvider()]);
 
 
 
@@ -86,44 +85,43 @@ export const SignerProvider: React.FC<PropsWithChildren<Props>> = ({ children })
 
   const [config, setConfig] = useState<Config<PublicClient, WebSocketPublicClient>>()
 
+  const init = async () => {
+    try {
+      const _web3auth = new Web3Auth({
+        clientId,
+        chainConfig: {
+          chainNamespace: CHAIN_NAMESPACES.EIP155,
+          chainId: "0x13881",
+          rpcTarget: "https://rpc.ankr.com/polygon_mumbai", // This is the public RPC we have added, please pass on your own endpoint while creating an app
+        },
+        uiConfig: {
+          appName: "Monkey Trivia",
+          appLogo: "https://web3auth.io/images/w3a-L-Favicon-1.svg", // Your App Logo Here
+          theme: "light",
+          loginMethodsOrder: ["google", "facebook", "twitter", "reddit", "discord", "twitch", "apple", "line", "github", "kakao", "linkedin", "weibo", "wechat", "email_passwordless"],
+          defaultLanguage: "en", // en, de, ja, ko, zh, es, fr, pt, nl
+          loginGridCol: 3,
+          primaryButton: "externalLogin", // "externalLogin" | "socialLogin" | "emailLogin"
+        },
+        web3AuthNetwork: "cyan",
+      });
+      await _web3auth.initModal();
 
-  useEffect(() => {
-    const init = async () => {
-      try {
-        const _web3auth = new Web3Auth({
-          clientId,
-          chainConfig: {
-            chainNamespace: CHAIN_NAMESPACES.EIP155,
-            chainId: "0x13881",
-            rpcTarget: "https://rpc.ankr.com/polygon_mumbai", // This is the public RPC we have added, please pass on your own endpoint while creating an app
+
+
+
+      if (_web3auth) {
+        setWeb3auth(_web3auth);
+        console.log("web3auth: ", _web3auth);
+        setWeb3AuthConnector(new Web3AuthConnector({
+          chains,
+          options: {
+            web3AuthInstance: _web3auth,
           },
-          uiConfig: {
-            appName: "Monkey Trivia",
-            appLogo: "https://web3auth.io/images/w3a-L-Favicon-1.svg", // Your App Logo Here
-            theme: "light",
-            loginMethodsOrder: ["google", "facebook", "twitter", "reddit", "discord", "twitch", "apple", "line", "github", "kakao", "linkedin", "weibo", "wechat", "email_passwordless"],
-            defaultLanguage: "en", // en, de, ja, ko, zh, es, fr, pt, nl
-            loginGridCol: 3,
-            primaryButton: "externalLogin", // "externalLogin" | "socialLogin" | "emailLogin"
-          },
-          web3AuthNetwork: "cyan",
-        });
-        await _web3auth.initModal();
+        }))
 
-        
-        
+        // console.log("connected account", await _web3auth.getUserInfo());
 
-        if (_web3auth) {
-          setWeb3auth(_web3auth);
-          console.log("web3auth: ", _web3auth);
-          setWeb3AuthConnector(new Web3AuthConnector({
-            chains,
-            options: {
-              web3AuthInstance: _web3auth,
-            },
-          }))
-
-          console.log("connected account", await _web3auth.getUserInfo());
 
 
         //   if (web3AuthConnector) {
@@ -150,37 +148,28 @@ export const SignerProvider: React.FC<PropsWithChildren<Props>> = ({ children })
 
 
         //   }
-        }
-
-      } catch (error) {
-        console.error(error);
       }
+
+    } catch (error) {
+      console.error(error);
     }
+  };
 
 
-
-
+  useEffect(() => {
     init();
   }, [])
 
-
-  if (!config) {
-    // handle the case where config is undefined
-    console.log("config is undefined");
-    return (
-      <SignerContext.Provider value={{ signer, web3auth, setSigner, setWeb3auth }}>
-        {children}
-      </SignerContext.Provider>
-    );
+  if (!web3auth) {
+    // handle the case where web3auth is null
+    console.log("web3auth is null");
+    return null;
   }
 
-
   return (
-    <WagmiConfig config={config}>
-      <SignerContext.Provider value={{ signer, web3auth, setSigner, setWeb3auth }}>
-        {children}
-      </SignerContext.Provider>
-    </WagmiConfig>
-
+    <SignerContext.Provider value={{ signer, web3auth, setSigner, setWeb3auth }}>
+      {children}
+    </SignerContext.Provider>
   );
+
 };

@@ -1,4 +1,6 @@
 import Phaser from 'phaser'
+import { sendMessage, addMessageListener } from '../utils/MessageListener'
+
 
 export class Bootstrap extends Phaser.Scene
 {
@@ -43,15 +45,23 @@ export class Bootstrap extends Phaser.Scene
         .setOrigin(0.5)
         
         // Credits button
-        const creditsButton = this.add.image(settingsButton.x, settingsButton.y + settingsButton.displayHeight + 10, 'glass-panel')
+        const connectNow = this.add.image(settingsButton.x, settingsButton.y + settingsButton.displayHeight + 10, 'glass-panel')
         .setDisplaySize(150, 50)
         
-        this.add.text(creditsButton.x, creditsButton.y, 'Credits')
+        this.add.text(connectNow.x, connectNow.y, 'Connect Now')
+        .setOrigin(0.5)
+
+        // Disconnect button
+        const disconnect = this.add.image(connectNow.x, connectNow.y + connectNow.displayHeight + 10, 'glass-panel')
+        .setDisplaySize(150, 50)
+        
+        this.add.text(disconnect.x, disconnect.y, 'Disconnect')
         .setOrigin(0.5)
         
         this.buttons.push(playButton)
         this.buttons.push(settingsButton)
-        this.buttons.push(creditsButton)
+        this.buttons.push(connectNow)
+        this.buttons.push(disconnect)
         
         this.buttonSelector = this.add.image(0, 0, 'cursor-hand')
         this.selectButton(0)
@@ -63,9 +73,25 @@ export class Bootstrap extends Phaser.Scene
         settingsButton.on('selected', () => {
             console.log('settings')
         })
+
+        const persistedData = localStorage.getItem('TryConnection');
+
+        if (persistedData) {
+            const data = JSON.parse(persistedData);
+            // Handle the persisted data from localStorage
+            console.log('Persisted data:', data);
+            // Perform actions based on the persisted data
+          }
+
         
-        creditsButton.on('selected', () => {
-            console.log('credits')
+        connectNow.on('selected', () => {
+            console.log('Connect Now')
+            sendMessage('TryConnection', true);
+        })
+
+        disconnect.on('selected', () => {
+            console.log('Disconnect Now')
+            sendMessage('Disconnect', true);
         })
         
         // add click event listener to each button
@@ -76,6 +102,12 @@ export class Bootstrap extends Phaser.Scene
                 this.confirmSelection()
             })
         })
+
+        addMessageListener('Connected', (data) => {
+            // Handle the received data from React
+            console.log('Received data from React -> Phaser:', data);
+            // Perform actions based on the received data
+        });
     }
     
     selectButton(index: number)
