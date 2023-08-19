@@ -1,6 +1,7 @@
 import Phaser from 'phaser'
 
 import { Bootstrap } from './scenes'
+import { PlayScene } from './scenes/playScene'
 
 const config: Phaser.Types.Core.GameConfig = {
 	type: Phaser.AUTO,
@@ -19,7 +20,7 @@ const config: Phaser.Types.Core.GameConfig = {
 			debug: true,
 		},
 	},
-	scene: [Bootstrap],
+	scene: [Bootstrap, PlayScene],
 }
 // eslint-disable-next-line import/no-anonymous-default-export
 export default new Phaser.Game(config)

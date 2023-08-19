@@ -1,6 +1,7 @@
 import Phaser from 'phaser'
 import { sendMessage } from '../utils/MessageListener'
 import { Messages } from '../utils/Messages'
+import { PlayScene } from './playScene'
 
 
 export class Bootstrap extends Phaser.Scene {
@@ -13,7 +14,7 @@ export class Bootstrap extends Phaser.Scene {
     private readonly BUTTON_HEIGHT = 50
   
     constructor() {
-      super('main-menu')
+      super('Bootstrap')
     }
   
     init() {
@@ -73,6 +74,8 @@ export class Bootstrap extends Phaser.Scene {
   
       this.buttons[0].on('selected', () => {
         console.log('play')
+        // this.game.scene.start('PlayScene', PlayScene);
+        this.scene.stop('Bootstrap').launch('PlayScene', { x: 0, y: 0 });
       })
   
       this.buttons[1].on('selected', () => {
