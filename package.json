@@ -7,6 +7,8 @@
     "@mantine/core": "^6.0.17",
     "@mantine/hooks": "^6.0.17",
     "@mantine/notifications": "^6.0.17",
+    "@metaplex-foundation/js": "^0.19.4",
+    "@project-serum/anchor": "^0.26.0",
     "@rainbow-me/rainbowkit": "^1.0.7",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",

@@ -1,5 +1,5 @@
 import Phaser from 'phaser'
-import { sendMessage, addMessageListener } from '../utils/MessageListener'
+import { sendMessage } from '../utils/MessageListener'
 import { Messages } from '../utils/Messages'
 
 
