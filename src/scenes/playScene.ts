@@ -72,7 +72,7 @@ export class PlayScene extends BaseScene {
         this.buttons[0].on('selected', () => {
             console.log('Create Game')
             // this.game.scene.start('PlayScene', PlayScene);
-            this.scene.stop('Bootstrap').launch('PlayScene');
+            this.scene.switch('CreateGame');
         })
 
         this.buttons[1].on('selected', () => {
@@ -80,5 +80,4 @@ export class PlayScene extends BaseScene {
         })
 
     }
-
 }
