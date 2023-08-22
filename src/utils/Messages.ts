@@ -7,4 +7,7 @@ export enum Messages {
     TRY_DISCONNECT = 'TryDisconnect',
     IS_CONNECTED = 'IsConnected',
     IS_DISCONNECTED = 'IsDisconnected',
+    CREATE_CHANNEL = 'CreateChannel',
+    CHANNEL_CREATED = 'ChannelCreated',
+    ENTER_CHANNEL = 'EnterChannel',
   }

@@ -9,6 +9,7 @@ import { Messages } from '../utils/Messages';
 import { SolanaWallet } from "@web3auth/solana-provider";
 import { MySolanaWallet } from '../solana/MySolanaWallet';
 import { Connection } from '@solana/web3.js'
+import { createChannelListener } from '../ably/channelListener';
 
 function App() {
   const { signer, web3auth, setSigner } = useContext(SignerContext);
@@ -27,12 +28,14 @@ function App() {
 
     addMessageListener(Messages.TRY_CONNECTION, tryConnection);
     addMessageListener(Messages.TRY_DISCONNECT, disconnect);
+    addMessageListener(Messages.CREATE_CHANNEL, createChannelListener);
 
     return () => {
       removeMessageListener(Messages.TRY_CONNECTION, tryConnection);
       removeMessageListener(Messages.TRY_DISCONNECT, disconnect);
+      removeMessageListener(Messages.CREATE_CHANNEL, createChannelListener);
     };
-  }, []);
+  });
 
   const login = async () => {
     if (!web3auth) {
