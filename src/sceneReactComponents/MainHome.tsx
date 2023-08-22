@@ -1,13 +1,13 @@
 import { useContext, useEffect, useState } from 'react';
-import './App.css';
-import './PhaserGame';
-import { addMessageListener, removeMessageListener } from './utils/MessageListener';
-import { SignerContext } from './components/SignerContext';
+import './MainHome.css';
+import '../PhaserGame';
+import { addMessageListener, removeMessageListener } from '../utils/MessageListener';
+import { SignerContext } from '../components/SignerContext';
 import { getRPCProviderOwner, getZeroDevSigner } from '@zerodevapp/sdk';
 import { SafeEventEmitterProvider } from '@web3auth/base';
-import { Messages } from './utils/Messages';
+import { Messages } from '../utils/Messages';
 import { SolanaWallet } from "@web3auth/solana-provider";
-import { MySolanaWallet } from './solana/MySolanaWallet';
+import { MySolanaWallet } from '../solana/MySolanaWallet';
 import { Connection } from '@solana/web3.js'
 
 function App() {

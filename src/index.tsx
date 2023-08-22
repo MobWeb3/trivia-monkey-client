@@ -4,7 +4,7 @@ import './index.css';
 import * as serviceWorkerRegistration from './serviceWorkerRegistration';
 import reportWebVitals from './reportWebVitals';
 import { SignerProvider } from './components/SignerContext';
-import App from './MainHome';
+import App from './sceneReactComponents/MainHome';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
