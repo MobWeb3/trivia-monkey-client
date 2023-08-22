@@ -1,77 +1,43 @@
-export class Example extends Phaser.Scene
-{
+export class Example extends Phaser.Scene {
 
     constructor() {
         super({ key: "CreateGame" });
     }
 
-    preload ()
-    {
+    preload() {
         this.load.html('nameform', 'assets/nameform.html');
-        this.load.atlas('cards', 'assets/cards.png', 'assets/cards.json');
+        
     }
 
-    create ()
-    {
-        //  Create a stack of random cards
+    create() {
+        const text = this.add.text(this.cameras.main.width / 4, 10, 'Please enter your name', { color: 'white', fontSize: '20px ' });
+        text.setPosition(this.cameras.main.width / 2, this.cameras.main.height / 4);
+        text.setOrigin(0.5);
 
-        const frames = this.textures.get('cards').getFrameNames();
-
-        let x = 100;
-        let y = 100;
-
-        for (let i = 0; i < 64; i++)
-        {
-            const image = this.add.image(x, y, 'cards', Phaser.Math.RND.pick(frames)).setInteractive({ draggable: true });
-
-            x += 4;
-            y += 4;
-        }
-
-        this.input.on('dragstart',  (pointer:any, gameObject:any) =>
-        {
-
-            this.children.bringToTop(gameObject);
-
-        }, this);
-
-        this.input.on('drag', (pointer: any, gameObject: { x: any; y: any; }, dragX: any, dragY: any) =>
-        {
-
-            gameObject.x = dragX;
-            gameObject.y = dragY;
-
-        });
-
-        const text = this.add.text(300, 10, 'Please enter your name', { color: 'white', fontSize: '20px '});
-
-        const element = this.add.dom(400, 0).createFromCache('nameform');
+        const element = this.add.dom(this.cameras.main.width / 2, 0).createFromCache('nameform');
 
         element.addListener('click');
 
-        element.on('click',  (event:any) =>
-        {
-            if (event.target.name === 'playButton')
-            {
-                const domElement = this as unknown as Phaser.GameObjects.DOMElement;
-                // const inputText = domElement.getChildByName('nameField');
-                const inputText = domElement.getChildByName('nameField') as HTMLInputElement;
-
+        element.on('click', (event: any) => {
+            if (event.target.name === 'playButton') {
+                const inputText = element.getChildByName('nameField') as HTMLInputElement;
+                console.log("inputText: ", inputText);
 
                 //  Have they entered anything?
-                if (inputText?.value !== '')
-                {
+                if (inputText?.value !== '') {
                     //  Turn off the click events
-                    domElement.removeListener('click');
+                    element.removeListener('click');
 
                     //  Hide the login element
-                    domElement.setVisible(false);
+                    element.setVisible(false);
 
+                    text.setPosition(this.cameras.main.width / 2, this.cameras.main.height / 2);
+                    text.setOrigin(0.5);
+                    
                     //  Populate the text with whatever they typed in
-                    text.setText(`Welcome ${inputText.value}`);
+                    text.setText(`Welcome ${inputText.value}!`);
                 }
-                else
-                {
+                else {
                     //  Flash the prompt
                     this.tweens.add({
                         targets: text,
@@ -83,28 +49,18 @@ export class Example extends Phaser.Scene
                 }
             }
 
-        });
-     
+        }, this);
+
         this.tweens.add({
             targets: element,
-            y: 300,
+            y: this.cameras.main.height / 2,
             duration: 3000,
             ease: 'Power3'
         });
 
+        const backButton = this.add.text(20, 20, 'Back to PlayScene', { color: 'white', fontSize: '20px ' });
+        backButton.setInteractive();
+        backButton.on('pointerdown', () => this.scene.switch('PlayScene').stop("CreateGame"));
+
     }
 }
-
-// const config = {
-//     type: Phaser.AUTO,
-//     parent: 'phaser-example',
-//     width: 800,
-//     height: 600,
-//     backgroundColor: '#222288',
-//     dom: {
-//         createContainer: true
-//     },
-//     scene: Example
-// };
-
-// const game = new Phaser.Game(config);

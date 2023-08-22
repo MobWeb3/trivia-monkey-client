@@ -1,7 +1,6 @@
 import Phaser from 'phaser'
 import { sendMessage } from '../utils/MessageListener'
 import { Messages } from '../utils/Messages'
-import { PlayScene } from './playScene'
 
 
 export class Bootstrap extends Phaser.Scene {
