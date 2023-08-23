@@ -9,12 +9,13 @@ import { Messages } from '../utils/Messages';
 import { SolanaWallet } from "@web3auth/solana-provider";
 import { MySolanaWallet } from '../solana/MySolanaWallet';
 import { Connection } from '@solana/web3.js'
-import { createChannelListener } from '../ably/channelListener';
+import { createChannelListener, enterChannelListener } from '../ably/channelListener';
 
 function App() {
   const { signer, web3auth, setSigner } = useContext(SignerContext);
   const [, setProvider] = useState<SafeEventEmitterProvider | null>(null);
   const [loggedIn, setLoggedIn] = useState(false);
+  const [publicKey, setPublicKey] = useState<string | null>(null);
 
   useEffect(() => {
     const tryConnection = async (data: any) => {
@@ -26,14 +27,27 @@ function App() {
       await logout();
     };
 
+    const enterChannelListenerWrapper = async (data: any) => {
+
+      if (!publicKey) {
+        console.log('publicKey not initialized yet');
+        return;
+      }
+      data.publicKey = publicKey;
+      console.log('enterChannelListenerWrapper data:', data);
+      // enterChannelListener(data);
+    }; 
+
     addMessageListener(Messages.TRY_CONNECTION, tryConnection);
     addMessageListener(Messages.TRY_DISCONNECT, disconnect);
     addMessageListener(Messages.CREATE_CHANNEL, createChannelListener);
+    addMessageListener(Messages.ENTER_CHANNEL, enterChannelListenerWrapper);
 
     return () => {
       removeMessageListener(Messages.TRY_CONNECTION, tryConnection);
       removeMessageListener(Messages.TRY_DISCONNECT, disconnect);
       removeMessageListener(Messages.CREATE_CHANNEL, createChannelListener);
+      removeMessageListener(Messages.ENTER_CHANNEL, enterChannelListenerWrapper);
     };
   });
 
@@ -72,9 +86,9 @@ function App() {
   
           const connection = new Connection(connectionConfig.rpcTarget);
           const mySolanaWallet = new MySolanaWallet(solanaWallet, connection);
-          const publicKey = await mySolanaWallet.getPublicKey();
+          setPublicKey((await mySolanaWallet.getPublicKey()).toString());
           console.log("web3auth account info: ", await web3auth.getUserInfo());
-          console.log("solana publicKey: ", publicKey.toString());
+          console.log("solana publicKey: ", publicKey);
           // console.log("private key: ", await mySolanaWallet.getPrivateKey());
         }
         

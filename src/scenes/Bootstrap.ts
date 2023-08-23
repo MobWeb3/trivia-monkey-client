@@ -74,7 +74,7 @@ export class Bootstrap extends Phaser.Scene {
     this.buttons[0].on('selected', () => {
       console.log('play')
       // this.game.scene.start('PlayScene', PlayScene);
-      this.scene.stop('Bootstrap').launch('PlayScene');
+      this.scene.sleep('Bootstrap').switch('PlayScene');
     })
 
     this.buttons[1].on('selected', () => {

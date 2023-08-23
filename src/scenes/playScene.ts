@@ -32,7 +32,10 @@ export class PlayScene extends BaseScene {
 
         const { width, height } = this.scale
 
-        this.createButtons(width, height)
+        this.createButtons(width, height);
+        const backButton = this.add.text(20, 20, 'Back', { color: 'white', fontSize: '20px ' });
+        backButton.setInteractive();
+        backButton.on('pointerdown', () => this.scene.switch('Bootstrap').sleep("PlayScene"));
     }
 
     private readonly BUTTON_WIDTH = 150
@@ -58,6 +61,7 @@ export class PlayScene extends BaseScene {
 
             this.buttons.push(button)
         })
+        
     }
 
     addEventListeners() {
@@ -77,6 +81,7 @@ export class PlayScene extends BaseScene {
 
         this.buttons[1].on('selected', () => {
             console.log('Join Game')
+            this.scene.switch('JoinGame');
         })
 
     }

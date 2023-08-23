@@ -10,4 +10,5 @@ export enum Messages {
     CREATE_CHANNEL = 'CreateChannel',
     CHANNEL_CREATED = 'ChannelCreated',
     ENTER_CHANNEL = 'EnterChannel',
+    CHANNEL_JOINED = 'ChannelJoined',
   }
