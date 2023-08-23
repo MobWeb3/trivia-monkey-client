@@ -33,9 +33,9 @@ function App() {
         console.log('publicKey not initialized yet');
         return;
       }
-      data.publicKey = publicKey;
+      data.clientId = publicKey;
       console.log('enterChannelListenerWrapper data:', data);
-      // enterChannelListener(data);
+      enterChannelListener(data);
     }; 
 
     addMessageListener(Messages.TRY_CONNECTION, tryConnection);

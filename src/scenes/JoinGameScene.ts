@@ -27,17 +27,20 @@ export class JoinGame extends Phaser.Scene {
 
         element.on('click', (event: any) => {
             if (event.target.name === 'playButton') {
-                const inputText = element.getChildByName('nameField') as HTMLInputElement;
+                const channelTextInput = element.getChildByName('channelField') as HTMLInputElement;
+                const nameTextInput = element.getChildByName('nameField') as HTMLInputElement;
 
-                if (inputText?.value !== '') {
+                if (channelTextInput?.value !== '' && nameTextInput?.value !== '') {
                     element.removeListener('click');
                     element.setVisible(false);
 
                     this.text?.setPosition(this.cameras.main.width / 2, this.cameras.main.height / 2);
                     this.text?.setOrigin(0.5);
-                    sendMessage(Messages.ENTER_CHANNEL, {"channelId": inputText.value});
+                    sendMessage(Messages.ENTER_CHANNEL, 
+                        {"channelId": channelTextInput.value,
+                         "nickname": nameTextInput.value});
 
-                    this.text?.setText(`Joining channel ${inputText.value}...`);
+                    this.text?.setText(`Joining channel ${channelTextInput.value}...`);
                 }
                 else {
                     this.tweens.add({
@@ -62,7 +65,7 @@ export class JoinGame extends Phaser.Scene {
         backButton.setInteractive();
         backButton.on('pointerdown', () => this.scene.switch('PlayScene').stop("JoinGame"));
 
-        window.addEventListener(Messages.CHANNEL_JOINED, this.channelJoinedListenerHandler.bind(this));
+        window.addEventListener(Messages.CHANNEL_JOINED, this.channelJoinedListenerHandler.bind(this), { once: true });
     }
 
     channelJoinedListenerHandler(event: any) {

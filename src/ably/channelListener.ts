@@ -24,19 +24,19 @@ export const createChannelListener = async (data: any) => {
 };
 
 export const enterChannelListener = async (data: any) => {
+    const { channelId, clientId, nickname } = data;
   
-    // const axios = require('axios');
-    const channelId = data.channelId;
-  
+    console.log(`data-enterChannelListener: ${data}`);
     try {
       const postResponse = await axios.post('http://localhost:3333/api/ably/enterChannel', {
-        channelId: channelId,
-  
+        clientId,
+        channelId,
+        nickname
       });
       const connectionStatus = postResponse.data.state.connectionStatus;
       console.log(`Connection status: ${connectionStatus}`);
       // window.dispatchEvent(new CustomEvent(Messages.CHANNEL_CREATED));
-      const eventData = { channelInfo: "postResponse.data", channelId: channelId };
+      const eventData = { nickname, channelId, clientId };
       window.dispatchEvent(new CustomEvent(Messages.CHANNEL_JOINED, { detail: eventData }));
       
     } catch (error) {
