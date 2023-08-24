@@ -3,9 +3,12 @@ import { Messages } from "../utils/Messages";
 
 export class CreateGame extends Phaser.Scene {
     text?: Phaser.GameObjects.Text;
+    waitingForPlayers?: Phaser.GameObjects.Text;
+    boundChannelCreatedListenerHandler: any;
 
     constructor() {
         super({ key: "CreateGame" });
+        this.boundChannelCreatedListenerHandler = this.channelCreatedListenerHandler.bind(this);
     }
 
     preload() {
@@ -15,6 +18,14 @@ export class CreateGame extends Phaser.Scene {
             fontSize: '20px',
             wordWrap: { width: this.cameras.main.width, useAdvancedWrap: true }
         });
+        this.waitingForPlayers = this.add.text(this.cameras.main.width / 4, 10, 'Waiting for players...', {
+            color: 'white',
+            fontSize: '20px',
+            wordWrap: { width: this.cameras.main.width, useAdvancedWrap: true }
+        });
+        this.waitingForPlayers?.setVisible(false);
+        this.waitingForPlayers?.setPosition(this.cameras.main.width / 2, this.cameras.main.height / 2 + 4* this.text?.height);
+        this.waitingForPlayers?.setOrigin(0.5);
     }
 
     create() {
@@ -74,7 +85,7 @@ export class CreateGame extends Phaser.Scene {
         backButton.on('pointerdown', () => this.scene.switch('PlayScene').stop("CreateGame"));
 
         // Listen to channel creation completion
-        window.addEventListener(Messages.CHANNEL_CREATED, this.channelCreatedListenerHandler.bind(this));
+        window.addEventListener(Messages.CHANNEL_CREATED, this.boundChannelCreatedListenerHandler, {once: true});
 
     }
 
@@ -82,11 +93,12 @@ export class CreateGame extends Phaser.Scene {
         // Handle the event here
         let data = event.detail;
         console.log('Channel created with data:', data);
-        this.text?.appendText(`\nChannel created with data: ${JSON.stringify(data)}`);
+        // this.text?.setText(`\nChannel created with data: ${JSON.stringify(data)}`);
+        this.waitingForPlayers?.setVisible(true);
     }
 
     destroy() {
-        window.removeEventListener(Messages.CHANNEL_CREATED, this.channelCreatedListenerHandler.bind(this));
+        window.removeEventListener(Messages.CHANNEL_CREATED, this.boundChannelCreatedListenerHandler);
     }
 
 }
