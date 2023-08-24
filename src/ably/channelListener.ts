@@ -3,11 +3,12 @@ import { generateUniqueId } from "./uniqueId";
 import axios from "axios";
 import {AblyHandler} from "./AblyHandler";
 
-const baseUrl = "https://a0a7-2600-100f-a104-648-5969-6475-cb53-c247.ngrok-free.app/api/ably";
+const baseUrl = "https://helpful-knowing-ghost.ngrok-free.app/api/ably";
 
 let ablyInstance: AblyHandler;
 
 export const createChannelListener = async (data: any) => {
+  const { clientId, nickname } = data;
   const channelId = `trivia-monkey-${generateUniqueId()}`;
 
   try {
@@ -20,6 +21,8 @@ export const createChannelListener = async (data: any) => {
     // window.dispatchEvent(new CustomEvent(Messages.CHANNEL_CREATED));
     const eventData = { channelInfo: "postResponse.data", channelId: channelId };
     window.dispatchEvent(new CustomEvent(Messages.CHANNEL_CREATED, { detail: eventData }));
+
+    await ablyInstance.enterChannel(channelId, clientId, nickname);
 
   } catch (error) {
     console.error(`Error: ${error}`);

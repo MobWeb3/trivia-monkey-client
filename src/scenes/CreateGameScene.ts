@@ -41,7 +41,9 @@ export class Example extends Phaser.Scene {
 
                     this.text?.setPosition(this.cameras.main.width / 2, this.cameras.main.height / 2);
                     this.text?.setOrigin(0.5);
-                    sendMessage(Messages.CREATE_CHANNEL, true);
+                    sendMessage(Messages.CREATE_CHANNEL, {
+                        "nickname": inputText.value,
+                    });
 
                     //  Populate the text with whatever they typed in
                     this.text?.setText(`Welcome ${inputText.value}!`);

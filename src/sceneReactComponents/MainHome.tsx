@@ -27,6 +27,20 @@ function App() {
       await logout();
     };
 
+    const createChannelListenerWrapper = async (data: any) => {
+
+      if (!publicKey) {
+        console.log('publicKey not initialized yet');
+        return;
+      }
+      
+      data.clientId = publicKey;
+      await initAblyHandler(publicKey);
+      // console.log('enterChannelListenerWrapper data:', data);
+      await createChannelListener(data);
+    };
+
+
     const enterChannelListenerWrapper = async (data: any) => {
 
       if (!publicKey) {
@@ -42,13 +56,13 @@ function App() {
 
     addMessageListener(Messages.TRY_CONNECTION, tryConnection);
     addMessageListener(Messages.TRY_DISCONNECT, disconnect);
-    addMessageListener(Messages.CREATE_CHANNEL, createChannelListener);
+    addMessageListener(Messages.CREATE_CHANNEL, createChannelListenerWrapper);
     addMessageListener(Messages.ENTER_CHANNEL, enterChannelListenerWrapper);
 
     return () => {
       removeMessageListener(Messages.TRY_CONNECTION, tryConnection);
       removeMessageListener(Messages.TRY_DISCONNECT, disconnect);
-      removeMessageListener(Messages.CREATE_CHANNEL, createChannelListener);
+      removeMessageListener(Messages.CREATE_CHANNEL, createChannelListenerWrapper);
       removeMessageListener(Messages.ENTER_CHANNEL, enterChannelListenerWrapper);
     };
   });
