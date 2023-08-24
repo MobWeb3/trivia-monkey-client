@@ -2,7 +2,7 @@ import Phaser from 'phaser'
 
 import { Bootstrap } from './scenes'
 import { PlayScene } from './scenes/playScene'
-import { Example } from './scenes/CreateGameScene'
+import { CreateGame } from './scenes/CreateGameScene'
 import { JoinGame } from './scenes/JoinGameScene'
 
 const config: Phaser.Types.Core.GameConfig = {
@@ -25,7 +25,7 @@ const config: Phaser.Types.Core.GameConfig = {
 	dom: {
         createContainer: true
     },
-	scene: [Bootstrap, PlayScene, Example, JoinGame],
+	scene: [Bootstrap, PlayScene, CreateGame, JoinGame],
 }
 // eslint-disable-next-line import/no-anonymous-default-export
 export default new Phaser.Game(config)

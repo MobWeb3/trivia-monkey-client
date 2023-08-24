@@ -1,7 +1,7 @@
 import { sendMessage } from "../utils/MessageListener";
 import { Messages } from "../utils/Messages";
 
-export class Example extends Phaser.Scene {
+export class CreateGame extends Phaser.Scene {
     text?: Phaser.GameObjects.Text;
 
     constructor() {
