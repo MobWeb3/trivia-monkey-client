@@ -9,7 +9,7 @@ import { Messages } from '../utils/Messages';
 import { SolanaWallet } from "@web3auth/solana-provider";
 import { MySolanaWallet } from '../solana/MySolanaWallet';
 import { Connection } from '@solana/web3.js'
-import { createChannelListener, enterChannelListener } from '../ably/channelListener';
+import { createChannelListener, enterChannelListener, initAblyHandler } from '../ably/channelListener';
 
 function App() {
   const { signer, web3auth, setSigner } = useContext(SignerContext);
@@ -35,9 +35,9 @@ function App() {
       }
       
       data.clientId = publicKey;
-      // await requestToken(publicKey);
+      await initAblyHandler(publicKey);
       // console.log('enterChannelListenerWrapper data:', data);
-      enterChannelListener(data);
+      await enterChannelListener(data);
     }; 
 
     addMessageListener(Messages.TRY_CONNECTION, tryConnection);
@@ -91,7 +91,6 @@ function App() {
           setPublicKey((await mySolanaWallet.getPublicKey()).toBase58());
           console.log("web3auth account info: ", await web3auth.getUserInfo());
           console.log("solana publicKey: ", publicKey);
-          // console.log("private key: ", await mySolanaWallet.getPrivateKey());
         }
         
       }

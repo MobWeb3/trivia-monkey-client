@@ -4,15 +4,20 @@ export class AblyHandler {
     public ablyInstance;
     private static instance: AblyHandler;
 
-    constructor(apiKey: string) {
-        this.ablyInstance = new Ably.Realtime.Promise({
-            key: apiKey
-        });
+    constructor(apiKey?: string, token?: string) {
+        this.ablyInstance = new Ably.Realtime.Promise(apiKey ?? token ?? "");
     }
 
     public static getInstance(apiKey: string): AblyHandler {
         if (!AblyHandler.instance) {
           AblyHandler.instance = new AblyHandler(apiKey);
+        }
+        return AblyHandler.instance;
+    }
+
+    public static getInstanceWithToken(token: string): AblyHandler {
+        if (!AblyHandler.instance) {
+          AblyHandler.instance = new AblyHandler(undefined, token);
         }
         return AblyHandler.instance;
     }

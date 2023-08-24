@@ -5,8 +5,7 @@ import {AblyHandler} from "./AblyHandler";
 
 const baseUrl = "https://a0a7-2600-100f-a104-648-5969-6475-cb53-c247.ngrok-free.app/api/ably";
 
-const YOUR_ABLY_API_KEY = process.env.REACT_APP_ABLY_API_KEY ?? "";
-const ablyInstance = AblyHandler.getInstance(YOUR_ABLY_API_KEY);
+let ablyInstance: AblyHandler;
 
 export const createChannelListener = async (data: any) => {
   const channelId = `trivia-monkey-${generateUniqueId()}`;
@@ -41,50 +40,29 @@ export const enterChannelListener = async (data: any) => {
   }
 }
 
-// export const enterChannelListenerV2 = async (data: any) => {
-//   const { channelId, clientId, nickname } = data;
+export const initAblyHandler = async (clientId: string) => {
+  try {
+    const response = await axios.post(`${baseUrl}/getToken`, {
+      clientId
+    });
+    const token = response.data.token;
 
-//   console.log(`data-enterChannelListener: ${data}`);
-//   try {
-//     const postResponse = await axios.post(`${baseUrl}/enterChannel`, {
-//       clientId,
-//       channelId,
-//       nickname
-//     });
+    console.log(`Token: ${token}`);
+    ablyInstance = AblyHandler.getInstanceWithToken(token);
 
+    // const channel = ablyInstance.ablyInstance.channels.get("monkey0");
+    // const attached = await channel.attach();
 
-//     const connectionStatus = postResponse.data.state.connectionStatus;
-//     console.log(`Connection status: ${connectionStatus}`);
-//     // window.dispatchEvent(new CustomEvent(Messages.CHANNEL_CREATED));
-//     const eventData = { nickname, channelId, clientId };
-//     window.dispatchEvent(new CustomEvent(Messages.CHANNEL_JOINED, { detail: eventData }));
+    // console.log("Initialized AblyHandler");
 
-//   } catch (error) {
-//     console.error(`Error: ${error}`);
-//   }
-
-// }
-
-// export const requestToken = async (clientId: string) => {
-//   try {
-//     // const response = await axios.post(, {
-//     //   clientId
-//     // });
-//     // const token = response.data.token;
-//     ablyInstance = AblyHandler.getInstance(`${baseUrl}/getAuthToken`);
-//     console.log(`Ably instance initialized`);
-
-//     const channel = ablyInstance.ablyInstance.channels.get("monkey0");
-//     const attached = await channel.attach();
-
-//     if (attached === null) {
-//         return console.error("Error attaching to the channel.");
-//     }
-//     const members = await channel.presence.get();
-//     console.log(`Members: ${members}`);
-//     // return token;
-//   } catch (error) {
-//     console.error(`Error: ${error}`);
-//   }
-// }
+    // if (attached === null) {
+    //     return console.error("Error attaching to the channel.");
+    // }
+    // const members = await channel.presence.get();
+    // console.log(`Members: ${members}`);
+    // return token;
+  } catch (error) {
+    console.error(`Error: ${error}`);
+  }
+}
 
