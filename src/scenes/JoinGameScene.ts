@@ -71,7 +71,7 @@ export class JoinGame extends Phaser.Scene {
     channelJoinedListenerHandler(event: any) {
         let data = event.detail;
         console.log('Channel joined with data:', data);
-        this.text?.appendText(`\nChannel joined with data: ${JSON.stringify(data)}`);
+        this.text?.setText(`\nChannel joined with data: ${JSON.stringify(data)}`);
     }
 
     destroy() {

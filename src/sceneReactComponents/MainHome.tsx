@@ -33,8 +33,10 @@ function App() {
         console.log('publicKey not initialized yet');
         return;
       }
+      
       data.clientId = publicKey;
-      console.log('enterChannelListenerWrapper data:', data);
+      // await requestToken(publicKey);
+      // console.log('enterChannelListenerWrapper data:', data);
       enterChannelListener(data);
     }; 
 
@@ -86,7 +88,7 @@ function App() {
   
           const connection = new Connection(connectionConfig.rpcTarget);
           const mySolanaWallet = new MySolanaWallet(solanaWallet, connection);
-          setPublicKey((await mySolanaWallet.getPublicKey()).toString());
+          setPublicKey((await mySolanaWallet.getPublicKey()).toBase58());
           console.log("web3auth account info: ", await web3auth.getUserInfo());
           console.log("solana publicKey: ", publicKey);
           // console.log("private key: ", await mySolanaWallet.getPrivateKey());
