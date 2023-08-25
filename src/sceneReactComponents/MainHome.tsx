@@ -10,6 +10,7 @@ import { SolanaWallet } from "@web3auth/solana-provider";
 import { MySolanaWallet } from '../solana/MySolanaWallet';
 import { Connection } from '@solana/web3.js'
 import { createChannelListener, enterChannelListener, initAblyHandler } from '../ably/channelListener';
+import { createUser, userExists } from '../polybase/UserHandler';
 
 function App() {
   const { signer, web3auth, setSigner } = useContext(SignerContext);
@@ -17,10 +18,26 @@ function App() {
   const [loggedIn, setLoggedIn] = useState(false);
   const [publicKey, setPublicKey] = useState<string | null>(null);
 
+   // this should be the email associated with the account
+  // const [email, setEmail] = useState<string | null>(null);
+  // const [name, setName] = useState<string | null>(null);
+
   useEffect(() => {
     const tryConnection = async (data: any) => {
       console.log('tryConnection data:', data);
-      await login();
+      const {name, publicKey, email }= await login();
+      // check if user exist in polybase
+      // if not, create user
+      if (!publicKey || !email) {
+        console.log('publicKey not initialized yet');
+        return;
+      }
+      const userExist = await userExists(email);
+      if (!userExist) {
+        console.log('user does not exist, creating user');
+        // create user
+        await createUser({name: "name4", clientId: "email4"});
+      }
     };
 
     const disconnect = async (data: any) => {
@@ -36,7 +53,6 @@ function App() {
       
       data.clientId = publicKey;
       await initAblyHandler(publicKey);
-      // console.log('enterChannelListenerWrapper data:', data);
       await createChannelListener(data);
     };
 
@@ -70,7 +86,7 @@ function App() {
   const login = async () => {
     if (!web3auth) {
       console.log("web3auth not initialized yet");
-      return;
+      return {};
     }
     const web3authProvider = await web3auth.connect();
     setProvider(web3authProvider);
@@ -102,15 +118,19 @@ function App() {
   
           const connection = new Connection(connectionConfig.rpcTarget);
           const mySolanaWallet = new MySolanaWallet(solanaWallet, connection);
-          setPublicKey((await mySolanaWallet.getPublicKey()).toBase58());
-          console.log("web3auth account info: ", await web3auth.getUserInfo());
-          console.log("solana publicKey: ", publicKey);
+          const pk58 = (await mySolanaWallet.getPublicKey()).toString();
+          setPublicKey(pk58);
+          const userInfo = await web3auth.getUserInfo();
+          // setEmail(userInfo.email ?? "no email");
+          // setName(userInfo.name ?? "no name");
+          console.log("web3auth account info: ", userInfo);
+          console.log("solana publicKey: ", pk58);
+          return { email: userInfo.email ?? "", name: userInfo.name ?? "", publicKey: pk58 ?? ""}
         }
-        
       }
 
     }
-
+    return {}
   };
 
   const logout = async () => {
