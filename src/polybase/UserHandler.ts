@@ -14,12 +14,9 @@ export const userExists = async (clientId: string) => {
 }
 
 export const createUser = async (data: any) => {
-    const { clientId, name } = data;
+    // const { clientId, name } = data;
     try {
-        const response = await axios.post(`${BASE_URL}/api/polybase/addUser`, {
-            clientId,
-            name
-        });
+        const response = await axios.post(`${BASE_URL}/api/polybase/addUser`, data);
         return response.data;
     } catch (error) {
         console.error(error);

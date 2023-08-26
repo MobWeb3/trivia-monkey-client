@@ -23,20 +23,20 @@ function App() {
   // const [name, setName] = useState<string | null>(null);
 
   useEffect(() => {
-    const tryConnection = async (data: any) => {
-      console.log('tryConnection data:', data);
-      const {name, publicKey, email }= await login();
+    const tryConnection = async (_data: any) => {
+      // console.log('tryConnection data:', _data);
+      const userData= await login();
       // check if user exist in polybase
       // if not, create user
-      if (!publicKey || !email) {
+      if (!publicKey || !userData.clientId) {
         console.log('publicKey not initialized yet');
         return;
       }
-      const userExist = await userExists(email);
+      const userExist = await userExists(userData.clientId);
       if (!userExist) {
         console.log('user does not exist, creating user');
         // create user
-        await createUser({name: "name4", clientId: "email4"});
+        await createUser(userData);
       }
     };
 
@@ -125,7 +125,7 @@ function App() {
           // setName(userInfo.name ?? "no name");
           console.log("web3auth account info: ", userInfo);
           console.log("solana publicKey: ", pk58);
-          return { email: userInfo.email ?? "", name: userInfo.name ?? "", publicKey: pk58 ?? ""}
+          return { clientId: userInfo.email ?? "", name: userInfo.name ?? "", publicKey: pk58 ?? ""}
         }
       }
 

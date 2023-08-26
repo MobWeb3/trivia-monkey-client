@@ -12,7 +12,7 @@ export class CreateGame extends Phaser.Scene {
     }
 
     preload() {
-        this.load.html('nameform', 'assets/nameform.html');
+        this.load.html('createGameForm', 'assets/createGameForm.html');
         this.text = this.add.text(this.cameras.main.width / 4, 10, 'Please enter your name', {
             color: 'white',
             fontSize: '20px',
@@ -33,7 +33,7 @@ export class CreateGame extends Phaser.Scene {
         this.text?.setPosition(this.cameras.main.width / 2, this.cameras.main.height / 4);
         this.text?.setOrigin(0.5);
 
-        const element = this.add.dom(this.cameras.main.width / 2, 0).createFromCache('nameform');
+        const element = this.add.dom(this.cameras.main.width / 2, 0).createFromCache('createGameForm');
 
         element.addListener('click');
 
