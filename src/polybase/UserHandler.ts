@@ -3,7 +3,7 @@ import { BASE_URL } from '../MonkeyTriviaServiceConstants';
 
 export const userExists = async (clientId: string) => {
     try {
-        const response = await axios.post(`${BASE_URL}/api/polybase/userExist`, {
+        const response = await axios.post(`${BASE_URL}/api/polybase/userExists`, {
             clientId
         });
         return response.data;

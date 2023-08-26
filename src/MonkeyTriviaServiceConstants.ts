@@ -1,1 +1,1 @@
-export const BASE_URL = 'https://helpful-knowing-ghost.ngrok-free.app';
+export const BASE_URL = 'http://localhost:3333';

@@ -28,7 +28,7 @@ function App() {
       const userData= await login();
       // check if user exist in polybase
       // if not, create user
-      if (!publicKey || !userData.clientId) {
+      if (!userData.clientId) {
         console.log('publicKey not initialized yet');
         return;
       }
@@ -36,7 +36,7 @@ function App() {
       if (!userExist) {
         console.log('user does not exist, creating user');
         // create user
-        await createUser(userData);
+        // await createUser(userData);
       }
     };
 
