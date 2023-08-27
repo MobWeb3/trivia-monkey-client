@@ -3,7 +3,7 @@ import { generateUniqueId } from "./uniqueId";
 import axios from "axios";
 import {AblyHandler} from "./AblyHandler";
 
-const baseUrl = "https://helpful-knowing-ghost.ngrok-free.app/api/ably";
+const baseUrl = "http://localhost:3333/api/ably";
 
 let ablyInstance: AblyHandler;
 
@@ -53,17 +53,6 @@ export const initAblyHandler = async (clientId: string) => {
     console.log(`Token: ${token}`);
     ablyInstance = AblyHandler.getInstanceWithToken(token);
 
-    // const channel = ablyInstance.ablyInstance.channels.get("monkey0");
-    // const attached = await channel.attach();
-
-    // console.log("Initialized AblyHandler");
-
-    // if (attached === null) {
-    //     return console.error("Error attaching to the channel.");
-    // }
-    // const members = await channel.presence.get();
-    // console.log(`Members: ${members}`);
-    // return token;
   } catch (error) {
     console.error(`Error: ${error}`);
   }

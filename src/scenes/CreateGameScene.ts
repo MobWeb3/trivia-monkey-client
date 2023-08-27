@@ -40,7 +40,9 @@ export class CreateGame extends Phaser.Scene {
         element.on('click', (event: any) => {
             if (event.target.name === 'playButton') {
                 const inputText = element.getChildByName('nameField') as HTMLInputElement;
+                const numberPlayers = element.getChildByName('numberPlayers') as HTMLInputElement;
                 console.log("inputText: ", inputText);
+                console.log("numberPlayers: ", numberPlayers);
 
                 //  Have they entered anything?
                 if (inputText?.value !== '') {
@@ -54,10 +56,11 @@ export class CreateGame extends Phaser.Scene {
                     this.text?.setOrigin(0.5);
                     sendMessage(Messages.CREATE_CHANNEL, {
                         "nickname": inputText.value,
+                        "numberPlayers": numberPlayers.value,
                     });
 
                     //  Populate the text with whatever they typed in
-                    this.text?.setText(`Welcome ${inputText.value}!`);
+                    this.text?.setText(`Welcome ${inputText.value}! Number of players: ${numberPlayers.value}`);
                 }
                 else {
                     //  Flash the prompt

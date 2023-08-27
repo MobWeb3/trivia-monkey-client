@@ -11,6 +11,7 @@ import { MySolanaWallet } from '../solana/MySolanaWallet';
 import { Connection } from '@solana/web3.js'
 import { createChannelListener, enterChannelListener, initAblyHandler } from '../ably/channelListener';
 import { createUser, userExists } from '../polybase/UserHandler';
+import { createSession } from '../polybase/SessionHandler';
 
 function App() {
   const { signer, web3auth, setSigner } = useContext(SignerContext);
@@ -19,7 +20,7 @@ function App() {
   const [publicKey, setPublicKey] = useState<string | null>(null);
 
    // this should be the email associated with the account
-  // const [email, setEmail] = useState<string | null>(null);
+  const [email, setEmail] = useState<string | null>(null);
   // const [name, setName] = useState<string | null>(null);
 
   useEffect(() => {
@@ -36,7 +37,7 @@ function App() {
       if (!userExist) {
         console.log('user does not exist, creating user');
         // create user
-        // await createUser(userData);
+        await createUser(userData);
       }
     };
 
@@ -50,10 +51,14 @@ function App() {
         console.log('publicKey not initialized yet');
         return;
       }
-      
-      data.clientId = publicKey;
-      await initAblyHandler(publicKey);
+      // const clientId = email;
+      data.clientId = email;
+      await initAblyHandler(data.clientId);
       await createChannelListener(data);
+      
+      // Create polybase game session
+      const response = await createSession({ clientId: data.clientId, numberPlayers: 8, pointsToWin: 50});
+      console.log('createSession response:', response);
     };
 
 
@@ -121,7 +126,7 @@ function App() {
           const pk58 = (await mySolanaWallet.getPublicKey()).toString();
           setPublicKey(pk58);
           const userInfo = await web3auth.getUserInfo();
-          // setEmail(userInfo.email ?? "no email");
+          setEmail(userInfo.email ?? "no email");
           // setName(userInfo.name ?? "no name");
           console.log("web3auth account info: ", userInfo);
           console.log("solana publicKey: ", pk58);
