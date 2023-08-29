@@ -1,7 +1,7 @@
 import Phaser from 'phaser'
 
 import { Bootstrap } from './scenes'
-import { PlayScene } from './scenes/playScene'
+import { PlayScene } from './scenes/PlayLobbyScene'
 import { CreateGame } from './scenes/CreateGameScene'
 import { JoinGame } from './scenes/JoinGameScene'
 

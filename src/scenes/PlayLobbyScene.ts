@@ -45,6 +45,7 @@ export class PlayScene extends BaseScene {
         const buttonData = [
             { text: 'Create Game', yOffset: 0 },
             { text: 'Join Game', yOffset: this.BUTTON_HEIGHT + 10 },
+            { text: 'Mock Game (test)', yOffset: (this.BUTTON_HEIGHT + 10) * 2 },
         ]
 
         const bottomMargin = 100;
@@ -81,6 +82,11 @@ export class PlayScene extends BaseScene {
 
         this.buttons[1].on('selected', () => {
             console.log('Join Game')
+            this.scene.switch('JoinGame');
+        })
+
+        this.buttons[1].on('selected', () => {
+            console.log('Mock game')
             this.scene.switch('JoinGame');
         })
 
