@@ -7,9 +7,9 @@ const baseUrl = "http://localhost:3333/api/ably";
 
 let ablyInstance: AblyHandler;
 
-export const createChannelListener = async (data: any) => {
+export const createChannel = async (data: any) => {
   const { clientId, nickname } = data;
-  const channelId = `trivia-monkey-${generateUniqueId()}`;
+  const channelId = `tm-chid-${generateUniqueId()}`;
 
   try {
     const postResponse = await axios.post(`${baseUrl}/subscribeToChannel`, {
@@ -19,13 +19,14 @@ export const createChannelListener = async (data: any) => {
     const connectionStatus = postResponse.data.state.connectionStatus;
     console.log(`Connection status: ${connectionStatus}`);
     // window.dispatchEvent(new CustomEvent(Messages.CHANNEL_CREATED));
-    const eventData = { channelInfo: "postResponse.data", channelId: channelId };
+    const eventData = { channelInfo: data, channelId: channelId };
     window.dispatchEvent(new CustomEvent(Messages.CHANNEL_CREATED, { detail: eventData }));
-
     await ablyInstance.enterChannel(channelId, clientId, nickname);
+    return channelId;
 
   } catch (error) {
     console.error(`Error: ${error}`);
+    return false;
   }
 };
 

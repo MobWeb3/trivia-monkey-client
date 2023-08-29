@@ -9,7 +9,7 @@ import { Messages } from '../utils/Messages';
 import { SolanaWallet } from "@web3auth/solana-provider";
 import { MySolanaWallet } from '../solana/MySolanaWallet';
 import { Connection } from '@solana/web3.js'
-import { createChannelListener, enterChannelListener, initAblyHandler } from '../ably/channelListener';
+import { createChannel, enterChannelListener, initAblyHandler } from '../ably/ChannelHandler';
 import { createUser, userExists } from '../polybase/UserHandler';
 import { createSession } from '../polybase/SessionHandler';
 
@@ -19,14 +19,14 @@ function App() {
   const [loggedIn, setLoggedIn] = useState(false);
   const [publicKey, setPublicKey] = useState<string | null>(null);
 
-   // this should be the email associated with the account
+  // this should be the email associated with the account
   const [email, setEmail] = useState<string | null>(null);
   // const [name, setName] = useState<string | null>(null);
 
   useEffect(() => {
     const tryConnection = async (_data: any) => {
       // console.log('tryConnection data:', _data);
-      const userData= await login();
+      const userData = await login();
       // check if user exist in polybase
       // if not, create user
       if (!userData.clientId) {
@@ -54,10 +54,15 @@ function App() {
       // const clientId = email;
       data.clientId = email;
       await initAblyHandler(data.clientId);
-      await createChannelListener(data);
-      
+      const channelId = await createChannel(data);
+
       // Create polybase game session
-      const response = await createSession({ clientId: data.clientId, numberPlayers: 8, pointsToWin: 50});
+      const response = await createSession({
+        clientId: data.clientId,
+        numberPlayers: data.numberPlayers,
+        pointsToWin: data.pointsToWin,
+        channelId,
+      });
       console.log('createSession response:', response);
     };
 
@@ -68,12 +73,12 @@ function App() {
         console.log('publicKey not initialized yet');
         return;
       }
-      
+
       data.clientId = publicKey;
       await initAblyHandler(publicKey);
       // console.log('enterChannelListenerWrapper data:', data);
       await enterChannelListener(data);
-    }; 
+    };
 
     addMessageListener(Messages.TRY_CONNECTION, tryConnection);
     addMessageListener(Messages.TRY_DISCONNECT, disconnect);
@@ -104,7 +109,7 @@ function App() {
         projectId: "5682ee04-d8d3-436a-ae63-479e063a23c4",
         owner: getRPCProviderOwner(web3auth.provider),
       })
-  
+
       setSigner(_signer);
       console.log("signer created: ", signer);
       console.log("signer address", await _signer.getAddress());
@@ -120,7 +125,7 @@ function App() {
             method: "solana_provider_config",
             params: [],
           });
-  
+
           const connection = new Connection(connectionConfig.rpcTarget);
           const mySolanaWallet = new MySolanaWallet(solanaWallet, connection);
           const pk58 = (await mySolanaWallet.getPublicKey()).toString();
@@ -130,7 +135,7 @@ function App() {
           // setName(userInfo.name ?? "no name");
           console.log("web3auth account info: ", userInfo);
           console.log("solana publicKey: ", pk58);
-          return { clientId: userInfo.email ?? "", name: userInfo.name ?? "", publicKey: pk58 ?? ""}
+          return { clientId: userInfo.email ?? "", name: userInfo.name ?? "", publicKey: pk58 ?? "" }
         }
       }
 

@@ -41,6 +41,7 @@ export class CreateGame extends Phaser.Scene {
             if (event.target.name === 'playButton') {
                 const inputText = element.getChildByName('nameField') as HTMLInputElement;
                 const numberPlayers = element.getChildByName('numberPlayers') as HTMLInputElement;
+                const numberLevels = element.getChildByName('numLevels') as HTMLInputElement;
                 console.log("inputText: ", inputText);
                 console.log("numberPlayers: ", numberPlayers);
 
@@ -57,6 +58,7 @@ export class CreateGame extends Phaser.Scene {
                     sendMessage(Messages.CREATE_CHANNEL, {
                         "nickname": inputText.value,
                         "numberPlayers": numberPlayers.value,
+                        "pointsToWin": numberLevels.value
                     });
 
                     //  Populate the text with whatever they typed in
