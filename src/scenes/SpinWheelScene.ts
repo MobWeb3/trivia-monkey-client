@@ -48,6 +48,10 @@ export class SpinWheelScene extends Phaser.Scene {
         this.canSpin = true;
         // waiting for your input, then calling "spin" function
         this.input.on('pointerdown', this.spin, this);
+
+        const backButton = this.add.text(20, 20, 'Back', { color: 'white', fontSize: '20px ' });
+        backButton.setInteractive();
+        backButton.on('pointerdown', () => this.scene.switch('Bootstrap').sleep("SpinWheelScene"));
     }
 
     // function to spin the wheel

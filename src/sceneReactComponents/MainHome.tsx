@@ -9,19 +9,22 @@ import { Messages } from '../utils/Messages';
 import { SolanaWallet } from "@web3auth/solana-provider";
 import { MySolanaWallet } from '../solana/MySolanaWallet';
 import { Connection } from '@solana/web3.js'
-import { createChannel, enterChannelListener, initAblyHandler } from '../ably/ChannelHandler';
 import { createUser, userExists } from '../polybase/UserHandler';
 import { createSession } from '../polybase/SessionHandler';
+import { AblyHandler } from '../ably/AblyHandler';
+import { ChannelHandler } from '../ably/ChannelHandler';
 
 function App() {
   const { signer, web3auth, setSigner } = useContext(SignerContext);
   const [, setProvider] = useState<SafeEventEmitterProvider | null>(null);
   const [loggedIn, setLoggedIn] = useState(false);
   const [publicKey, setPublicKey] = useState<string | null>(null);
+  // const [ablyInstance, setAblyInstance] = useState<any>(null);
 
   // this should be the email associated with the account
   const [email, setEmail] = useState<string | null>(null);
   // const [name, setName] = useState<string | null>(null);
+  const [ablyChannelInstance, setAblyChannelInstance] = useState<AblyHandler | null>(null);
 
   useEffect(() => {
     const tryConnection = async (_data: any) => {
@@ -51,19 +54,31 @@ function App() {
         console.log('publicKey not initialized yet');
         return;
       }
-      // const clientId = email;
       data.clientId = email;
-      await initAblyHandler(data.clientId);
-      const channelId = await createChannel(data);
+      console.log('createChannelListenerWrapper data:', data);
+      const channelHandler = await new ChannelHandler().initChannelHandler(data.clientId);
+      // setAblyInstance(await initAblyHandler(data.clientId) ?? null);
+      const channelId =  await channelHandler?.createChannel(data);
 
-      // Create polybase game session
-      const response = await createSession({
-        clientId: data.clientId,
-        numberPlayers: data.numberPlayers,
-        pointsToWin: data.pointsToWin,
-        channelId,
-      });
-      console.log('createSession response:', response);
+      if (channelId && data) {
+        // Create polybase game session
+        const response = await createSession({
+          clientId: data.clientId,
+          numberPlayers: data.numberPlayers,
+          pointsToWin: data.pointsToWin,
+          channelId,
+        });
+
+        if (response) {
+          console.log('createSession response:', response);
+          const channel = ChannelHandler.ablyInstance?.ablyInstance.channels.get(channelId);
+          channel?.presence.subscribe('enter', function (member) {
+            console.log(member.clientId + ' entered realtime-chat');
+
+          });
+
+        }
+      }
     };
 
 
@@ -73,11 +88,13 @@ function App() {
         console.log('publicKey not initialized yet');
         return;
       }
-
       data.clientId = publicKey;
-      await initAblyHandler(publicKey);
+      const channelHandler = await new ChannelHandler().initChannelHandler(data.clientId);
+      await channelHandler?.enterChannel(data);
+
+      // setAblyInstance(await initAblyHandler(data.clientId) ?? null)
       // console.log('enterChannelListenerWrapper data:', data);
-      await enterChannelListener(data);
+      // await enterChannelListener(data);
     };
 
     addMessageListener(Messages.TRY_CONNECTION, tryConnection);
@@ -91,7 +108,7 @@ function App() {
       removeMessageListener(Messages.CREATE_CHANNEL, createChannelListenerWrapper);
       removeMessageListener(Messages.ENTER_CHANNEL, enterChannelListenerWrapper);
     };
-  });
+  }, [publicKey, email]);
 
   const login = async () => {
     if (!web3auth) {

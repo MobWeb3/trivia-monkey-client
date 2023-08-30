@@ -5,57 +5,61 @@ import {AblyHandler} from "./AblyHandler";
 
 const baseUrl = "http://localhost:3333/api/ably";
 
-let ablyInstance: AblyHandler;
+export class ChannelHandler {
+  static ablyInstance?: AblyHandler;
 
-export const createChannel = async (data: any) => {
-  const { clientId, nickname } = data;
-  const channelId = `tm-chid-${generateUniqueId()}`;
+  public async createChannel(data: any) {
+    const { clientId, nickname } = data;
+    const channelId = `tm-chid-${generateUniqueId()}`;
 
-  try {
-    const postResponse = await axios.post(`${baseUrl}/subscribeToChannel`, {
-      channelId: channelId,
+    console.log(`data-createChannelListener:`, data);
 
-    });
-    const connectionStatus = postResponse.data.state.connectionStatus;
-    console.log(`Connection status: ${connectionStatus}`);
-    // window.dispatchEvent(new CustomEvent(Messages.CHANNEL_CREATED));
-    const eventData = { channelInfo: data, channelId: channelId };
-    window.dispatchEvent(new CustomEvent(Messages.CHANNEL_CREATED, { detail: eventData }));
-    await ablyInstance.enterChannel(channelId, clientId, nickname);
-    return channelId;
+    try {
+      const postResponse = await axios.post(`${baseUrl}/subscribeToChannel`, {
+        channelId: channelId,
 
-  } catch (error) {
-    console.error(`Error: ${error}`);
-    return false;
+      });
+      const connectionStatus = postResponse.data.state.connectionStatus;
+      console.log(`Connection status: ${connectionStatus}`);
+      // window.dispatchEvent(new CustomEvent(Messages.CHANNEL_CREATED));
+      const eventData = { channelInfo: data, channelId: channelId };
+      window.dispatchEvent(new CustomEvent(Messages.CHANNEL_CREATED, { detail: eventData }));
+      await ChannelHandler.ablyInstance?.enterChannel(channelId, clientId, nickname);
+      return channelId;
+
+    } catch (error) {
+      console.error(`Error: ${error}`);
+      return undefined;
+    }
   }
-};
 
-export const enterChannelListener = async (data: any) => {
-  const { channelId, clientId, nickname } = data;
+  public async enterChannel(data: any) {
+    const { channelId, clientId, nickname } = data;
 
-  console.log(`data-enterChannelListener: ${data}`);
-  try {
-    await ablyInstance.enterChannel(channelId, clientId, nickname);
-    const eventData = { nickname, channelId, clientId };
-    window.dispatchEvent(new CustomEvent(Messages.CHANNEL_JOINED, { detail: eventData }));
+    console.log(`data-enterChannelListener: ${data}`);
+    try {
+      await ChannelHandler.ablyInstance?.enterChannel(channelId, clientId, nickname);
+      const eventData = { nickname, channelId, clientId };
+      window.dispatchEvent(new CustomEvent(Messages.CHANNEL_JOINED, { detail: eventData }));
 
-  } catch (error) {
-    console.error(`Error: ${error}`);
+    } catch (error) {
+      console.error(`Error: ${error}`);
+    }
+  }
+  public async initChannelHandler(clientId: string): Promise<ChannelHandler|undefined> {
+    try {
+      const response = await axios.post(`${baseUrl}/getToken`, {
+        clientId
+      });
+      const token = response.data.token;
+
+      console.log(`Token: ${token}`);
+      ChannelHandler.ablyInstance = AblyHandler.getInstanceWithToken(token);
+      return this;
+
+    } catch (error) {
+      console.error(`Error: ${error}`);
+      return undefined;
+    }
   }
 }
-
-export const initAblyHandler = async (clientId: string) => {
-  try {
-    const response = await axios.post(`${baseUrl}/getToken`, {
-      clientId
-    });
-    const token = response.data.token;
-
-    console.log(`Token: ${token}`);
-    ablyInstance = AblyHandler.getInstanceWithToken(token);
-
-  } catch (error) {
-    console.error(`Error: ${error}`);
-  }
-}
-
