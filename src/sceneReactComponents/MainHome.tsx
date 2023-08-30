@@ -10,9 +10,7 @@ import { SolanaWallet } from "@web3auth/solana-provider";
 import { MySolanaWallet } from '../solana/MySolanaWallet';
 import { Connection } from '@solana/web3.js'
 import { createUser, userExists } from '../polybase/UserHandler';
-import { createSession } from '../polybase/SessionHandler';
-import { AblyHandler } from '../ably/AblyHandler';
-import { ChannelHandler } from '../ably/ChannelHandler';
+import { createChannelListenerWrapper, enterChannelListenerWrapper } from '../ably/ChannelListener';
 
 function App() {
   const { signer, web3auth, setSigner } = useContext(SignerContext);
@@ -23,8 +21,6 @@ function App() {
 
   // this should be the email associated with the account
   const [email, setEmail] = useState<string | null>(null);
-  // const [name, setName] = useState<string | null>(null);
-  const [ablyChannelInstance, setAblyChannelInstance] = useState<AblyHandler | null>(null);
 
   useEffect(() => {
     const tryConnection = async (_data: any) => {
@@ -48,67 +44,28 @@ function App() {
       await logout();
     };
 
-    const createChannelListenerWrapper = async (data: any) => {
-
-      if (!publicKey) {
-        console.log('publicKey not initialized yet');
-        return;
-      }
-      data.clientId = email;
-      console.log('createChannelListenerWrapper data:', data);
-      const channelHandler = await new ChannelHandler().initChannelHandler(data.clientId);
-      // setAblyInstance(await initAblyHandler(data.clientId) ?? null);
-      const channelId =  await channelHandler?.createChannel(data);
-
-      if (channelId && data) {
-        // Create polybase game session
-        const response = await createSession({
-          clientId: data.clientId,
-          numberPlayers: data.numberPlayers,
-          pointsToWin: data.pointsToWin,
-          channelId,
-        });
-
-        if (response) {
-          console.log('createSession response:', response);
-          const channel = ChannelHandler.ablyInstance?.ablyInstance.channels.get(channelId);
-          channel?.presence.subscribe('enter', function (member) {
-            console.log(member.clientId + ' entered realtime-chat');
-
-          });
-
-        }
-      }
+    const handleCreateChannel = async (data: any) => {
+       if (web3auth) {
+           await createChannelListenerWrapper(web3auth, data);
+       }
     };
-
-
-    const enterChannelListenerWrapper = async (data: any) => {
-
-      if (!publicKey) {
-        console.log('publicKey not initialized yet');
-        return;
-      }
-      data.clientId = email;
-      const channelHandler = await new ChannelHandler().initChannelHandler(data.clientId);
-      await channelHandler?.enterChannel(data);
-
-      // setAblyInstance(await initAblyHandler(data.clientId) ?? null)
-      // console.log('enterChannelListenerWrapper data:', data);
-      // await enterChannelListener(data);
+  
+    const handleEnterChannel = async (data: any) => {
+      if (web3auth) await enterChannelListenerWrapper(web3auth, data); 
     };
 
     addMessageListener(Messages.TRY_CONNECTION, tryConnection);
     addMessageListener(Messages.TRY_DISCONNECT, disconnect);
-    addMessageListener(Messages.CREATE_CHANNEL, createChannelListenerWrapper);
-    addMessageListener(Messages.ENTER_CHANNEL, enterChannelListenerWrapper);
+    addMessageListener(Messages.CREATE_CHANNEL, handleCreateChannel);
+    addMessageListener(Messages.ENTER_CHANNEL, handleEnterChannel);
 
     return () => {
       removeMessageListener(Messages.TRY_CONNECTION, tryConnection);
       removeMessageListener(Messages.TRY_DISCONNECT, disconnect);
-      removeMessageListener(Messages.CREATE_CHANNEL, createChannelListenerWrapper);
-      removeMessageListener(Messages.ENTER_CHANNEL, enterChannelListenerWrapper);
+      removeMessageListener(Messages.CREATE_CHANNEL, handleCreateChannel);
+      removeMessageListener(Messages.ENTER_CHANNEL, handleEnterChannel);
     };
-  }, [publicKey, email]);
+  }, [email, publicKey]);
 
   const login = async () => {
     if (!web3auth) {
