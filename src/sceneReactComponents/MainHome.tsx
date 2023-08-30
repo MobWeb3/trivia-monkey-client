@@ -88,7 +88,7 @@ function App() {
         console.log('publicKey not initialized yet');
         return;
       }
-      data.clientId = publicKey;
+      data.clientId = email;
       const channelHandler = await new ChannelHandler().initChannelHandler(data.clientId);
       await channelHandler?.enterChannel(data);
 

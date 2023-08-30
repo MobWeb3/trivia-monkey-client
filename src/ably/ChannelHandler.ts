@@ -2,8 +2,9 @@ import { Messages } from "../utils/Messages";
 import { generateUniqueId } from "./uniqueId";
 import axios from "axios";
 import {AblyHandler} from "./AblyHandler";
+import { BASE_URL } from "../MonkeyTriviaServiceConstants";
 
-const baseUrl = "http://localhost:3333/api/ably";
+const baseUrl = `${BASE_URL}/api/ably`;
 
 export class ChannelHandler {
   static ablyInstance?: AblyHandler;
