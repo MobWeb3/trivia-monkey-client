@@ -85,9 +85,9 @@ export class PlayScene extends BaseScene {
             this.scene.switch('JoinGame');
         })
 
-        this.buttons[1].on('selected', () => {
+        this.buttons[2].on('selected', () => {
             console.log('Mock game')
-            this.scene.switch('JoinGame');
+            this.scene.switch('SpinWheelScene');
         })
 
     }

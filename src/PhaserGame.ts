@@ -4,6 +4,7 @@ import { Bootstrap } from './scenes'
 import { PlayScene } from './scenes/PlayLobbyScene'
 import { CreateGame } from './scenes/CreateGameScene'
 import { JoinGame } from './scenes/JoinGameScene'
+import { SpinWheelScene } from './scenes/SpinWheelScene'
 
 const config: Phaser.Types.Core.GameConfig = {
 	type: Phaser.AUTO,
@@ -25,7 +26,7 @@ const config: Phaser.Types.Core.GameConfig = {
 	dom: {
         createContainer: true
     },
-	scene: [Bootstrap, PlayScene, CreateGame, JoinGame],
+	scene: [Bootstrap, PlayScene, CreateGame, JoinGame, SpinWheelScene],
 }
 // eslint-disable-next-line import/no-anonymous-default-export
 export default new Phaser.Game(config)
