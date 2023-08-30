@@ -31,15 +31,15 @@ export class SpinWheelScene extends Phaser.Scene {
         this.cameras.main.setBackgroundColor('#880044');
 
         // adding the wheel in the middle of the canvas
-        this.wheel = this.add.sprite(this.cameras.main.width / 2, this.cameras.main.width / 2, "wheel");
-        // setting wheel registration point in its center
+        this.wheel = this.add.sprite(this.cameras.main.width / 2, this.cameras.main.height / 2, "wheel");        // setting wheel registration point in its center
         this.wheel.setOrigin(0.5);
+        this.wheel.setScale(0.75);
         // adding the pin in the middle of the canvas
-        var pin = this.add.sprite(this.cameras.main.width / 2, this.cameras.main.width / 2, "pin");
+        var pin = this.add.sprite(this.cameras.main.width / 2, this.cameras.main.height / 2, "pin");
         // setting pin registration point in its center
         pin.setOrigin(0.5);
         // adding the text field
-        this.prizeText = this.add.text(this.cameras.main.centerX, this.cameras.main.width / 2 - 300, "not spinned", { align: 'center' });
+        this.prizeText = this.add.text(this.cameras.main.centerX, this.cameras.main.centerY / 2 - 100, "not spinned", { align: 'center' });
         // setting text field registration point in its center
         this.prizeText.setOrigin(0.5);
         // aligning the text to center
