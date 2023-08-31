@@ -13,7 +13,7 @@ const getUserInfo = async (web3auth: Web3Auth) => {
     return userInfo;
 }
 
-const getConnectedPublicKey = async (web3auth: Web3Auth) => {
+export const getConnectedPublicKey = async (web3auth: Web3Auth) => {
     const web3authProvider = await web3auth?.connect();
     if (web3authProvider) {
         const solanaWallet = new SolanaWallet(web3authProvider);
