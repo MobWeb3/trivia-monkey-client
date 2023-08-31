@@ -6,6 +6,7 @@ import { SolanaWallet } from "@web3auth/solana-provider";
 import { MySolanaWallet } from "../solana/MySolanaWallet";
 import { Connection } from '@solana/web3.js'
 import { Web3Auth } from "@web3auth/modal";
+import { Messages } from "../utils/Messages";
 
 const getUserInfo = async (web3auth: Web3Auth) => {
     const userInfo = await web3auth?.getUserInfo();
@@ -60,9 +61,14 @@ export const createChannelListenerWrapper = async (web3auth: Web3Auth, data: any
         if (response) {
             console.log('createSession response:', response);
             const channel = ChannelHandler.ablyInstance?.ablyInstance.channels.get(channelId);
-            channel?.presence.subscribe('enter', function (member) {
+            channel?.presence.subscribe('enter', async function (member) {
                 console.log(member.clientId + ' entered realtime-chat');
-
+                const presence = await channel?.presence.get();
+                console.log('presence: ', presence);
+                if (presence.length == data.numberPlayers) {
+                    console.log('All players are here!!');
+                    window.dispatchEvent(new CustomEvent(Messages.ALL_PLAYERS_JOINED, {}));
+                }
             });
 
         }

@@ -5,10 +5,12 @@ export class CreateGame extends Phaser.Scene {
     text?: Phaser.GameObjects.Text;
     waitingForPlayers?: Phaser.GameObjects.Text;
     boundChannelCreatedListenerHandler: any;
+    boundAllPlayersJoinedListenerHandler: any;
 
     constructor() {
         super({ key: "CreateGame" });
         this.boundChannelCreatedListenerHandler = this.channelCreatedListenerHandler.bind(this);
+        this.boundAllPlayersJoinedListenerHandler = this.allPlayersJoinedListenerHandler.bind(this);
     }
 
     preload() {
@@ -91,7 +93,7 @@ export class CreateGame extends Phaser.Scene {
 
         // Listen to channel creation completion
         window.addEventListener(Messages.CHANNEL_CREATED, this.boundChannelCreatedListenerHandler, {once: true});
-
+        window.addEventListener(Messages.ALL_PLAYERS_JOINED, this.boundAllPlayersJoinedListenerHandler, {once: true});
     }
 
     channelCreatedListenerHandler(event: any) {
@@ -102,8 +104,14 @@ export class CreateGame extends Phaser.Scene {
         this.waitingForPlayers?.setVisible(true);
     }
 
+    allPlayersJoinedListenerHandler(event: any) {
+        // Handle the event here
+        this.scene.switch('SpinWheelScene').stop('CreateGame');
+    }
+
     destroy() {
         window.removeEventListener(Messages.CHANNEL_CREATED, this.boundChannelCreatedListenerHandler);
+        window.removeEventListener(Messages.ALL_PLAYERS_JOINED, this.boundAllPlayersJoinedListenerHandler);
     }
 
 }
