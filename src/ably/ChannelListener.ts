@@ -1,12 +1,11 @@
-import { useContext } from "react";
-import { createSession } from "../polybase/SessionHandler";
+import { createSession, updateSessionPhase } from "../polybase/SessionHandler";
 import { ChannelHandler } from "./ChannelHandler";
-import { SignerContext } from "../components/SignerContext";
 import { SolanaWallet } from "@web3auth/solana-provider";
 import { MySolanaWallet } from "../solana/MySolanaWallet";
 import { Connection } from '@solana/web3.js'
 import { Web3Auth } from "@web3auth/modal";
 import { Messages } from "../utils/Messages";
+import { SessionPhase } from "../game-domain/SessionPhase";
 
 const getUserInfo = async (web3auth: Web3Auth) => {
     const userInfo = await web3auth?.getUserInfo();
@@ -68,6 +67,10 @@ export const createChannelListenerWrapper = async (web3auth: Web3Auth, data: any
                 if (presence.length == data.numberPlayers) {
                     console.log('All players are here!!');
                     window.dispatchEvent(new CustomEvent(Messages.ALL_PLAYERS_JOINED, {}));
+
+                    
+                    // Change game state to TURN_ORDER
+                    updateSessionPhase({id: response?.recordData?.data?.id, newPhase: SessionPhase.TURN_ORDER});
                 }
             });
 
