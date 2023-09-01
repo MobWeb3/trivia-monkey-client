@@ -3,9 +3,11 @@ import { Messages } from "../utils/Messages";
 
 export class JoinGame extends Phaser.Scene {
     text?: Phaser.GameObjects.Text;
+    boundAllPlayersJoinedListenerHandler: any;
 
     constructor() {
         super({ key: "JoinGame" });
+        this.boundAllPlayersJoinedListenerHandler = this.allPlayersJoinedListenerHandler.bind(this);
     }
 
     preload() {
@@ -66,12 +68,19 @@ export class JoinGame extends Phaser.Scene {
         backButton.on('pointerdown', () => this.scene.switch('PlayScene').stop("JoinGame"));
 
         window.addEventListener(Messages.CHANNEL_JOINED, this.channelJoinedListenerHandler.bind(this), { once: true });
+        window.addEventListener(Messages.ALL_PLAYERS_JOINED, this.boundAllPlayersJoinedListenerHandler, { once: true });
     }
 
     channelJoinedListenerHandler(event: any) {
         let data = event.detail;
         console.log('Channel joined with data:', data);
         this.text?.setText(`\nChannel joined with data: ${JSON.stringify(data)}`);
+    }
+
+    allPlayersJoinedListenerHandler(event: any) {
+        const { channelId, sessionId } = event;
+        // Handle the event here
+        this.scene.start('SpinWheelScene', { channelId, sessionId} ).stop('JoinGame');
     }
 
     destroy() {

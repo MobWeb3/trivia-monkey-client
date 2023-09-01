@@ -1,4 +1,4 @@
-import { BaseScene } from "./shared/BaseScene";
+import axios from 'axios';
 
 export class SpinWheelScene extends Phaser.Scene {
 
@@ -26,28 +26,7 @@ export class SpinWheelScene extends Phaser.Scene {
     }
 
     create() {
-
-        // giving some color to background
-        this.cameras.main.setBackgroundColor('#880044');
-
-        // adding the wheel in the middle of the canvas
-        this.wheel = this.add.sprite(this.cameras.main.width / 2, this.cameras.main.height / 2, "wheel");        // setting wheel registration point in its center
-        this.wheel.setOrigin(0.5);
-        this.wheel.setScale(0.75);
-        // adding the pin in the middle of the canvas
-        var pin = this.add.sprite(this.cameras.main.width / 2, this.cameras.main.height / 2, "pin");
-        // setting pin registration point in its center
-        pin.setOrigin(0.5);
-        // adding the text field
-        this.prizeText = this.add.text(this.cameras.main.centerX, this.cameras.main.centerY / 2 - 100, "not spinned", { align: 'center' });
-        // setting text field registration point in its center
-        this.prizeText.setOrigin(0.5);
-        // aligning the text to center
-        this.prizeText.setAlign('center');
-        // the game has just started = we can spin the wheel
-        this.canSpin = true;
-        // waiting for your input, then calling "spin" function
-        this.input.on('pointerdown', this.spin, this);
+        this.setupSpinWheel();
 
         const backButton = this.add.text(20, 20, 'Back', { color: 'white', fontSize: '20px ' });
         backButton.setInteractive();
@@ -88,6 +67,30 @@ export class SpinWheelScene extends Phaser.Scene {
         // writing the prize you just won
         if (this.prize)
             this.prizeText?.setText( this.slicePrizes[this.prize]);
+    }
+
+    setupSpinWheel() {
+
+        // giving some color to background
+        this.cameras.main.setBackgroundColor('#880041');
+        // adding the wheel in the middle of the canvas
+        this.wheel = this.add.sprite(this.cameras.main.width / 2, this.cameras.main.height / 2, "wheel");        // setting wheel registration point in its center
+        this.wheel.setOrigin(0.5);
+        this.wheel.setScale(0.75);
+        // adding the pin in the middle of the canvas
+        var pin = this.add.sprite(this.cameras.main.width / 2, this.cameras.main.height / 2, "pin");
+        // setting pin registration point in its center
+        pin.setOrigin(0.5);
+        // adding the text field
+        this.prizeText = this.add.text(this.cameras.main.centerX, this.cameras.main.centerY / 2 - 100, "not spinned", { align: 'center' });
+        // setting text field registration point in its center
+        this.prizeText.setOrigin(0.5);
+        // aligning the text to center
+        this.prizeText.setAlign('center');
+        // the game has just started = we can spin the wheel
+        this.canSpin = true;
+        // waiting for your input, then calling "spin" function
+        this.input.on('pointerdown', this.spin, this);
     }
 
 }

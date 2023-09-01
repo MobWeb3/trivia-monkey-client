@@ -65,12 +65,14 @@ export const createChannelListenerWrapper = async (web3auth: Web3Auth, data: any
                 const presence = await channel?.presence.get();
                 console.log('presence: ', presence);
                 if (presence.length == data.numberPlayers) {
+
+                    const pbSessionId = response?.recordData?.data?.id;
                     console.log('All players are here!!');
                     window.dispatchEvent(new CustomEvent(Messages.ALL_PLAYERS_JOINED, {}));
 
-                    
+                    channel.publish("start-game", {sessionId: pbSessionId});
                     // Change game state to TURN_ORDER
-                    updateSessionPhase({id: response?.recordData?.data?.id, newPhase: SessionPhase.TURN_ORDER});
+                    updateSessionPhase({id: pbSessionId, newPhase: SessionPhase.TURN_ORDER});
                 }
             });
 
@@ -79,6 +81,8 @@ export const createChannelListenerWrapper = async (web3auth: Web3Auth, data: any
 };
 
 export const enterChannelListenerWrapper = async (web3auth: Web3Auth, data: any) => {
+
+    console.log('enterChannelListenerWrapper data:', data);
 
     const publicKey = await getConnectedPublicKey(web3auth);
     if (!publicKey) {
@@ -89,4 +93,9 @@ export const enterChannelListenerWrapper = async (web3auth: Web3Auth, data: any)
     data.clientId = userInfo?.email;
     const channelHandler = await new ChannelHandler().initChannelHandler(data.clientId);
     await channelHandler?.enterChannel(data);
+    const channel = ChannelHandler.ablyInstance?.ablyInstance.channels.get(data.channelId);
+    channel?.subscribe('start-game', async function (message) {
+        console.log('start-game event received with id:', message);
+        window.dispatchEvent(new CustomEvent(Messages.ALL_PLAYERS_JOINED, {}));
+    });
 };
