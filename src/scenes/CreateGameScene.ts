@@ -105,8 +105,10 @@ export class CreateGame extends Phaser.Scene {
     }
 
     allPlayersJoinedListenerHandler(event: any) {
+        const { channelId, sessionId } = event.detail;
+        console.log("allPlayersJoinedListenerHandler event: ", event);
         // Handle the event here
-        this.scene.switch('SpinWheelScene').stop('CreateGame');
+        this.scene.start('SpinWheelScene', { channelId, sessionId }).stop('CreateGame');
     }
 
     destroy() {

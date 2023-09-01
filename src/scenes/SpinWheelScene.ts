@@ -1,5 +1,9 @@
 import axios from 'axios';
 
+import { BASE_URL } from '../MonkeyTriviaServiceConstants';
+const POLYBASE_URL = `${BASE_URL}/api/polybase`;
+
+
 export class SpinWheelScene extends Phaser.Scene {
 
     // the spinning wheel
@@ -7,22 +11,43 @@ export class SpinWheelScene extends Phaser.Scene {
     // can the wheel spin?
     canSpin?: boolean;
     // slices (prizes) placed in the wheel
-    slices = 8;
+    slices = 12;
     // prize names, starting from 12 o'clock going clockwise
-    slicePrizes = ["A KEY!!!", "50 STARS", "500 STARS", "BAD LUCK!!!", "200 STARS", "100 STARS", "150 STARS", "BAD LUCK!!!"];
+    slicePrizes = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"];
     // the prize you are about to win
     prize?: number;
     // text field where to show the prize
     prizeText?: Phaser.GameObjects.Text;
 
+    sessionId?: string;
+    channelId?: string;
+
+    currentPhase?: string;
+
+    init(data:any) {
+        this.sessionId = data.sessionId;
+        this.channelId = data.channelId;
+        
+        console.log("data: ", data); // 'value1'
+    }
+
     constructor() {
         super({ key: "SpinWheelScene" });
     }
 
-    preload() {
-        this.load.image("wheel", "assets/sprites/wheel.png");
+    async preload() {
+        this.load.image("wheel", "assets/sprites/wheel2.png");
         this.load.image("pin", "assets/sprites/pin.png");
-
+    
+        try {
+            const response = await axios.post(`${POLYBASE_URL}/session/getGamePhase`, { id: this.sessionId });
+            console.log("response.data: ", response.data);
+            if (response.data.phase === 'TURN_ORDER') {
+                this.canSpin = true;
+            }
+        } catch (error) {
+            console.error(error);
+        }
     }
 
     create() {
@@ -42,9 +67,10 @@ export class SpinWheelScene extends Phaser.Scene {
             // the wheel will spin round from 2 to 4 times. This is just coreography
             var rounds = Phaser.Math.Between(2, 4);
             // then will rotate by a random number from 0 to 360 degrees. This is the actual spin
-            var degrees = Phaser.Math.Between(0, 360);
+            var degrees = Phaser.Math.Between(0, 1000) % 360;
             // before the wheel ends spinning, we already know the prize according to "degrees" rotation and the number of slices
             this.prize = this.slices - 1 - Math.floor(degrees / (360 / this.slices));
+            console.log("prize: ", this.prize);
             // now the wheel cannot spin because it's already spinning
             this.canSpin = false;
             // animation tweeen for the spin: duration 3s, will rotate by (360 * rounds + degrees) degrees
@@ -88,7 +114,7 @@ export class SpinWheelScene extends Phaser.Scene {
         // aligning the text to center
         this.prizeText.setAlign('center');
         // the game has just started = we can spin the wheel
-        this.canSpin = true;
+        this.canSpin = false;
         // waiting for your input, then calling "spin" function
         this.input.on('pointerdown', this.spin, this);
     }

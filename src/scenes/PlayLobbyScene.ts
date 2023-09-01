@@ -87,7 +87,7 @@ export class PlayScene extends BaseScene {
 
         this.buttons[2].on('selected', () => {
             console.log('Mock game')
-            this.scene.switch('SpinWheelScene');
+            this.scene.start('SpinWheelScene', { channelId: 'tm-chid-98c28599-4175-4b2e-a6fe-e56d928b8074', sessionId: 'mk-pbid-4e540627-a6b4-46aa-82c7-aa204997fc08' });
         })
 
     }

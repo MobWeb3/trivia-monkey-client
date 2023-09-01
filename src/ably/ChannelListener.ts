@@ -68,7 +68,7 @@ export const createChannelListenerWrapper = async (web3auth: Web3Auth, data: any
 
                     const pbSessionId = response?.recordData?.data?.id;
                     console.log('All players are here!!');
-                    window.dispatchEvent(new CustomEvent(Messages.ALL_PLAYERS_JOINED, {}));
+                    window.dispatchEvent(new CustomEvent(Messages.ALL_PLAYERS_JOINED, { detail: { channelId, sessionId: pbSessionId } }));
 
                     channel.publish("start-game", {sessionId: pbSessionId});
                     // Change game state to TURN_ORDER
@@ -96,6 +96,6 @@ export const enterChannelListenerWrapper = async (web3auth: Web3Auth, data: any)
     const channel = ChannelHandler.ablyInstance?.ablyInstance.channels.get(data.channelId);
     channel?.subscribe('start-game', async function (message) {
         console.log('start-game event received with id:', message);
-        window.dispatchEvent(new CustomEvent(Messages.ALL_PLAYERS_JOINED, {}));
+        window.dispatchEvent(new CustomEvent(Messages.ALL_PLAYERS_JOINED, {detail: data}));
     });
 };
