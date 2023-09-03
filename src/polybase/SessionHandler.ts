@@ -41,3 +41,14 @@ export const updateInitialTurnPosition = async (data: any) => {
     }
     return false;
 }
+
+export const getHostId = async (data: any) => {
+    try {
+        const response = await axios.post(`${BASE_URL}/api/polybase/session/getHostPlayerId`, data);
+        const { hostPlayerId } = response.data;
+        return hostPlayerId;
+    } catch (error) {
+        console.error(error);
+    }
+    return false;
+}

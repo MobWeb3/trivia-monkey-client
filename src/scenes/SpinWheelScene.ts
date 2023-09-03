@@ -1,8 +1,9 @@
-import axios from 'axios';
 
 import { BASE_URL } from '../MonkeyTriviaServiceConstants';
-import { getSessionPhase, updateInitialTurnPosition } from '../polybase/SessionHandler';
+import { getHostId, getSessionPhase, updateInitialTurnPosition } from '../polybase/SessionHandler';
 import { SessionPhase } from '../game-domain/SessionPhase';
+import { ChannelHandler } from '../ably/ChannelHandler';
+import { Types } from 'ably';
 const POLYBASE_URL = `${BASE_URL}/api/polybase`;
 
 
@@ -24,10 +25,10 @@ export class SpinWheelScene extends Phaser.Scene {
     sessionId?: string;
     channelId?: string;
     clientId?: string;
-
     currentPhase?: string;
-
-   
+    channel?: Types.RealtimeChannelPromise;
+    isHost?: boolean = false;
+    name?: string;
 
     constructor() {
         super({ key: "SpinWheelScene" });
@@ -37,16 +38,20 @@ export class SpinWheelScene extends Phaser.Scene {
         this.channelId = this.data.get('channelId');
         this.sessionId = this.data.get('sessionId');
         this.clientId = this.data.get('clientId');
+        this.name = this.data.get('name');
         this.load.image("wheel", "assets/sprites/wheel2.png");
         this.load.image("pin", "assets/sprites/pin.png");
         const {phase} = await getSessionPhase({ id: this.sessionId });
         if ( phase === SessionPhase.TURN_ORDER) this.canSpin = true;
-        
+        const isHost = await getHostId({ id: this.sessionId }) === this.clientId;
+        if (isHost) this.isHost = true;
+        console.log('isHost: ', this.isHost);
     }
 
-    create() {
+    async create() {
 
         console.log("SpinWheelScene data: ", this.data.list);
+        
         // console.log("sessionId: ", this.sessionId);
         this.setupSpinWheel();
 
@@ -55,6 +60,19 @@ export class SpinWheelScene extends Phaser.Scene {
         backButton.on('pointerdown', () => {
             this.scene.switch('Bootstrap');
         });
+
+        if (this.channelId && this.clientId && this.name) {
+            const channelHandler = await new ChannelHandler().initChannelHandler(this.clientId);
+            await channelHandler?.enterChannel({ channelId: this.channelId, clientId: this.clientId, nickname: this.name});
+            this.channel = ChannelHandler.ablyInstance?.ablyInstance.channels.get(this.channelId);
+            console.log('HERE: ', this.channelId);
+            if(this.isHost && this.channel) {
+                this.channel.subscribe('turn-selected', async (message) => {
+                    console.log('turn selected by: ', message.clientId);
+                });
+            }
+
+        }
     }
 
     // function to spin the wheel
@@ -97,6 +115,8 @@ export class SpinWheelScene extends Phaser.Scene {
         updateInitialTurnPosition({ initialTurnPosition: this.selectedSlice, id: this.sessionId, clientId: this.clientId});
 
         // report through ably that we are done choosing our turn.
+        this.channel?.publish('turn-selected', { turn: this.selectedSlice });
+
     }
 
     setupSpinWheel() {
