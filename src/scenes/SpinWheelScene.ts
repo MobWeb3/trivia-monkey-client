@@ -23,6 +23,7 @@ export class SpinWheelScene extends Phaser.Scene {
 
     sessionId?: string;
     channelId?: string;
+    clientId?: string;
 
     currentPhase?: string;
 
@@ -35,6 +36,7 @@ export class SpinWheelScene extends Phaser.Scene {
     async preload() {
         this.channelId = this.data.get('channelId');
         this.sessionId = this.data.get('sessionId');
+        this.clientId = this.data.get('clientId');
         this.load.image("wheel", "assets/sprites/wheel2.png");
         this.load.image("pin", "assets/sprites/pin.png");
         const {phase} = await getSessionPhase({ id: this.sessionId });
@@ -44,8 +46,8 @@ export class SpinWheelScene extends Phaser.Scene {
 
     create() {
 
-        console.log("channelId: ", this.channelId);
-        console.log("sessionId: ", this.sessionId);
+        console.log("SpinWheelScene data: ", this.data.list);
+        // console.log("sessionId: ", this.sessionId);
         this.setupSpinWheel();
 
         const backButton = this.add.text(20, 20, 'Back', { color: 'white', fontSize: '20px ' });
@@ -67,7 +69,7 @@ export class SpinWheelScene extends Phaser.Scene {
             var degrees = Phaser.Math.Between(0, 1000) % 360;
             // before the wheel ends spinning, we already know the prize according to "degrees" rotation and the number of slices
             this.selectedSlice = this.sliceValues[this.slices - 1 - Math.floor(degrees / (360 / this.slices))];
-            console.log("prize: ", this.sliceValues[this.selectedSlice]);
+            console.log("prize: ", this.selectedSlice);
             // now the wheel cannot spin because it's already spinning
             this.canSpin = false;
             // animation tweeen for the spin: duration 3s, will rotate by (360 * rounds + degrees) degrees
@@ -86,13 +88,15 @@ export class SpinWheelScene extends Phaser.Scene {
     // function to assign the prize
     handleSelectedSlice() {
         // now we can only spin once
-        this.canSpin = true;
+        this.canSpin = false;
         // writing the prize you just won
         if (this.selectedSlice)
             this.messageGameText?.setText( this.selectedSlice.toString() );
 
         // report to our polybase server our turn position.
-        updateInitialTurnPosition({ initialTurnPosition: this.selectedSlice, id: this.sessionId});
+        updateInitialTurnPosition({ initialTurnPosition: this.selectedSlice, id: this.sessionId, clientId: this.clientId});
+
+        // report through ably that we are done choosing our turn.
     }
 
     setupSpinWheel() {
