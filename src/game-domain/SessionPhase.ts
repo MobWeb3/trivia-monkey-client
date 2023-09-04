@@ -1,5 +1,5 @@
 export const SessionPhase = {
     TURN_ORDER: "TURN_ORDER",
-    Pending: "pending",
+    GAME_ACTIVE: "GAME_ACTIVE",
     Failed: "failed"
 }

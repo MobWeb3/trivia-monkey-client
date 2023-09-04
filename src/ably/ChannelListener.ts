@@ -68,11 +68,17 @@ export const createChannelListenerWrapper = async (web3auth: Web3Auth, data: any
 
                     const pbSessionId = response?.recordData?.data?.id;
                     console.log('All players are here!!');
-                    window.dispatchEvent(new CustomEvent(Messages.ALL_PLAYERS_JOINED, { detail: { channelId, sessionId: pbSessionId } }));
-
-                    channel.publish("start-game", {sessionId: pbSessionId});
+                    data.sessionId = pbSessionId;
+                    data.channelId = channelId;
+                    
                     // Change game state to TURN_ORDER
-                    updateSessionPhase({id: pbSessionId, newPhase: SessionPhase.TURN_ORDER});
+                    await updateSessionPhase({id: pbSessionId, newPhase: SessionPhase.TURN_ORDER});
+
+                    // Send event to SpinWheelScene, do this last so that update session phase is reflected in the scene
+                    window.dispatchEvent(new CustomEvent(Messages.ALL_PLAYERS_JOINED, { detail: data }));
+
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                    await channel.publish("start-game", {sessionId: pbSessionId});
                 }
             });
 
@@ -96,6 +102,8 @@ export const enterChannelListenerWrapper = async (web3auth: Web3Auth, data: any)
     const channel = ChannelHandler.ablyInstance?.ablyInstance.channels.get(data.channelId);
     channel?.subscribe('start-game', async function (message) {
         console.log('start-game event received with id:', message);
+        data.sessionId = message.data.sessionId;
+        await new Promise(resolve => setTimeout(resolve, 500));
         window.dispatchEvent(new CustomEvent(Messages.ALL_PLAYERS_JOINED, {detail: data}));
     });
 };

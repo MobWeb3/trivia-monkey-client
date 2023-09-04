@@ -88,8 +88,8 @@ export class PlayScene extends BaseScene {
 
         this.buttons[2].on('selected', () => {
             console.log('Mock game')
-            this.scene.get('SpinWheelScene').data.set('channelId', 'tm-chid-d13cf177-c0c5-4e7a-b6eb-629fabe4a5ed');
-            this.scene.get('SpinWheelScene').data.set('sessionId', 'mk-pbid-89f8958d-9f9a-4267-81c5-35274f321573');
+            this.scene.get('SpinWheelScene').data.set('channelId', 'tm-chid-f29f3d57-8352-46d4-a265-575bdabbdb04');
+            this.scene.get('SpinWheelScene').data.set('sessionId', 'mk-pbid-6f26d497-9314-477c-8ed8-411dbc7f77ba');
             this.scene.get('SpinWheelScene').data.set('clientId', 'norman.lopez.krypto@gmail.com');
             this.scene.get('SpinWheelScene').data.set('name', 'normano');
             this.scene.switch('SpinWheelScene');

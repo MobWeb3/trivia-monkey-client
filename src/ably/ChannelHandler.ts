@@ -37,7 +37,7 @@ export class ChannelHandler {
   public async enterChannel(data: any) {
     const { channelId, clientId, nickname } = data;
 
-    console.log(`data-enterChannelListener: ${data}`);
+    console.log("data-enterChannelListener:",  data);
     try {
       await ChannelHandler.ablyInstance?.enterChannel(channelId, clientId, nickname);
       const eventData = { nickname, channelId, clientId };

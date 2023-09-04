@@ -78,9 +78,14 @@ export class JoinGame extends Phaser.Scene {
     }
 
     allPlayersJoinedListenerHandler(event: any) {
-        const { channelId, sessionId } = event;
-        // Handle the event here
-        this.scene.start('SpinWheelScene', { channelId, sessionId} ).stop('JoinGame');
+        const { channelId, sessionId, clientId, nickname } = event.detail;
+
+        console.log('JoinGame: allPlayersJoinedListenerHandler: ', event.detail);
+        this.scene.get('SpinWheelScene').data.set('channelId', channelId);
+        this.scene.get('SpinWheelScene').data.set('sessionId', sessionId);
+        this.scene.get('SpinWheelScene').data.set('clientId', clientId);
+        this.scene.get('SpinWheelScene').data.set('name', nickname);
+        this.scene.switch('SpinWheelScene');
     }
 
     destroy() {

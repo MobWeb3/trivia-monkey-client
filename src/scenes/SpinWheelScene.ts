@@ -1,6 +1,6 @@
 
 import { BASE_URL } from '../MonkeyTriviaServiceConstants';
-import { getHostId, getSessionPhase, updateInitialTurnPosition } from '../polybase/SessionHandler';
+import { getHostId, getSession, getSessionPhase, updateInitialTurnPosition, updateSessionPhase } from '../polybase/SessionHandler';
 import { SessionPhase } from '../game-domain/SessionPhase';
 import { ChannelHandler } from '../ably/ChannelHandler';
 import { Types } from 'ably';
@@ -12,7 +12,7 @@ export class SpinWheelScene extends Phaser.Scene {
     // the spinning wheel
     wheel?: Phaser.GameObjects.Sprite;
     // can the wheel spin?
-    canSpin?: boolean;
+    canSpin = false;
     // slices (prizes) placed in the wheel
     slices = 12;
     // prize names, starting from 12 o'clock going clockwise
@@ -29,6 +29,9 @@ export class SpinWheelScene extends Phaser.Scene {
     channel?: Types.RealtimeChannelPromise;
     isHost?: boolean = false;
     name?: string;
+    initialTurnPositions?: Map<string, number>;
+    numberPlayers?: number;
+    gamePhase?: string;
 
     constructor() {
         super({ key: "SpinWheelScene" });
@@ -41,11 +44,23 @@ export class SpinWheelScene extends Phaser.Scene {
         this.name = this.data.get('name');
         this.load.image("wheel", "assets/sprites/wheel2.png");
         this.load.image("pin", "assets/sprites/pin.png");
-        const {phase} = await getSessionPhase({ id: this.sessionId });
-        if ( phase === SessionPhase.TURN_ORDER) this.canSpin = true;
+        const {gamePhase, initialTurnPosition, numberPlayers} = await getSession({ id: this.sessionId });
+
+        this.gamePhase = gamePhase;
+
+        console.log('gamePhase: ', this.gamePhase);
+        console.log('gamePhase in preload: ', this.gamePhase);
+        if ( this.gamePhase === SessionPhase.TURN_ORDER){
+            console.log('can turn!');
+            this.canSpin = true;
+        } 
+        
         const isHost = await getHostId({ id: this.sessionId }) === this.clientId;
         if (isHost) this.isHost = true;
+        if (initialTurnPosition) this.initialTurnPositions = initialTurnPosition;
+        if (numberPlayers) this.numberPlayers = numberPlayers;
         console.log('isHost: ', this.isHost);
+        console.log('initialTurnPosition: ', this.initialTurnPositions);
     }
 
     async create() {
@@ -65,10 +80,20 @@ export class SpinWheelScene extends Phaser.Scene {
             const channelHandler = await new ChannelHandler().initChannelHandler(this.clientId);
             await channelHandler?.enterChannel({ channelId: this.channelId, clientId: this.clientId, nickname: this.name});
             this.channel = ChannelHandler.ablyInstance?.ablyInstance.channels.get(this.channelId);
-            console.log('HERE: ', this.channelId);
+            console.log('HERE channelId: ', this.channelId);
+            console.log('HERE channel: ', this.channel);
             if(this.isHost && this.channel) {
                 this.channel.subscribe('turn-selected', async (message) => {
                     console.log('turn selected by: ', message.clientId);
+
+                    // check if all other players have already selected their turn. To do this we must check the length of 
+                    // initialTurnPosition in the Polybase server
+                    if (this.initialTurnPositions && this.numberPlayers &&
+                        this.initialTurnPositions.size >= this.numberPlayers) {
+                        // if all players have selected their turn, then we can proceed to the next phase.
+                        await updateSessionPhase({ id: this.sessionId, gamePhase: SessionPhase.GAME_ACTIVE });
+                        console.log('GAME_ACTIVE!');
+                    }
                 });
             }
 
@@ -137,8 +162,6 @@ export class SpinWheelScene extends Phaser.Scene {
         this.messageGameText.setOrigin(0.5);
         // aligning the text to center
         this.messageGameText.setAlign('center');
-        // we can spin while the TURN_ORDER phase is active
-        this.canSpin = false;
         // waiting for your input, then calling "spin" function
         this.input.on('pointerdown', this.spin, this);
     }
