@@ -46,7 +46,8 @@ export class PlayScene extends BaseScene {
         const buttonData = [
             { text: 'Create Game', yOffset: 0 },
             { text: 'Join Game', yOffset: this.BUTTON_HEIGHT + 10 },
-            { text: 'Mock Game (test)', yOffset: (this.BUTTON_HEIGHT + 10) * 2 },
+            { text: 'Choose turn (test)', yOffset: (this.BUTTON_HEIGHT + 10) * 2 },
+            { text: 'Game AI (test)', yOffset: (this.BUTTON_HEIGHT + 10) * 3 }
         ]
 
         const bottomMargin = 100;
@@ -87,12 +88,21 @@ export class PlayScene extends BaseScene {
         })
 
         this.buttons[2].on('selected', () => {
-            console.log('Mock game')
-            this.scene.get('SpinWheelScene').data.set('channelId', 'tm-chid-f29f3d57-8352-46d4-a265-575bdabbdb04');
-            this.scene.get('SpinWheelScene').data.set('sessionId', 'mk-pbid-6f26d497-9314-477c-8ed8-411dbc7f77ba');
+            console.log('Choose Turn')
+            this.scene.get('SpinWheelScene').data.set('channelId', 'tm-chid-2f74a671-3af9-4c84-8faa-a4a7dc7ea27f');
+            this.scene.get('SpinWheelScene').data.set('sessionId', 'mk-pbid-32d25ffc-db2d-4e0f-acc2-55ac331426af');
             this.scene.get('SpinWheelScene').data.set('clientId', 'norman.lopez.krypto@gmail.com');
             this.scene.get('SpinWheelScene').data.set('name', 'normano');
             this.scene.switch('SpinWheelScene');
+        })
+
+        this.buttons[3].on('selected', () => {
+            console.log('Mock game AI')
+            this.scene.get('AIGameScene').data.set('channelId', 'tm-chid-2f74a671-3af9-4c84-8faa-a4a7dc7ea27f');
+            this.scene.get('AIGameScene').data.set('sessionId', 'mk-pbid-32d25ffc-db2d-4e0f-acc2-55ac331426af');
+            this.scene.get('AIGameScene').data.set('clientId', 'norman.lopez.krypto@gmail.com');
+            this.scene.get('AIGameScene').data.set('name', 'normano');
+            this.scene.switch('AIGameScene');
         })
 
     }
