@@ -5,6 +5,7 @@ import * as serviceWorkerRegistration from './shenanigans/serviceWorkerRegistrat
 import reportWebVitals from './shenanigans/reportWebVitals';
 import { SignerProvider } from './components/SignerContext';
 import App from './sceneReactComponents/MainHome';
+import Bootstrap from './sceneReactComponents/Bootstrap';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -12,7 +13,7 @@ const root = ReactDOM.createRoot(
 root.render(
   <React.StrictMode>
     <SignerProvider>
-      <App />
+      <Bootstrap />
     </SignerProvider>
   </React.StrictMode>
 );

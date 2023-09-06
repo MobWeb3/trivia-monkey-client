@@ -63,6 +63,11 @@ export class JoinGame extends Phaser.Scene {
             ease: 'Power3'
         });
 
+        const button = this.add.text(this.cameras.main.width / 2, this.cameras.main.height / 2 + 50, 'Button', { color: 'white', fontSize: '20px ' });
+        button.setInteractive();
+        button.on('pointerdown', () => console.log('Button clicked'));
+        
+
         const backButton = this.add.text(20, 20, 'Back to PlayScene', { color: 'white', fontSize: '20px ' });
         backButton.setInteractive();
         backButton.on('pointerdown', () => this.scene.switch('PlayScene').stop("JoinGame"));
