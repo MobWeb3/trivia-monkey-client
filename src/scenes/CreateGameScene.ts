@@ -80,6 +80,13 @@ export class CreateGame extends Phaser.Scene {
 
         }, this);
 
+        const topicButton = this.add.text(this.cameras.main.width / 2, this.cameras.main.height / 2 + 100, 'Add Topic', { color: 'white', fontSize: '20px ' });
+        topicButton.setInteractive();
+        topicButton.on('pointerdown', () => {
+            console.log('Button clicked');
+            this.scene.switch('PickTopicScene');
+        });
+
         this.tweens.add({
             targets: element,
             y: this.cameras.main.height / 2,
