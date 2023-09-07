@@ -1,18 +1,19 @@
-import { useContext, useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { SafeEventEmitterProvider } from '@web3auth/base';
 import { SignerContext } from '../components/SignerContext';
 import { getRPCProviderOwner, getZeroDevSigner } from '@zerodevapp/sdk';
 import { getConnectedPublicKey } from '../ably/ChannelListener';
 import { createUser, userExists } from '../polybase/UserHandler';
-
+import { useNavigate } from 'react-router-dom';
 
 export const Bootstrap = () => {
     const { signer, web3auth, setSigner } = useContext(SignerContext);
     const [, setProvider] = useState<SafeEventEmitterProvider | null>(null);
     const [loggedIn, setLoggedIn] = useState(false);
+    const navigate = useNavigate();
 
     const handlePlayClick = async () => {
-        // Add your logic here for when the 'Play' button is selected
+        navigate("/playlobby");
     }
 
     const handleSettingsClick = async () => {
@@ -89,7 +90,33 @@ export const Bootstrap = () => {
     };
 
     return (
-        
+            <ControlButtons
+                loggedIn={loggedIn}
+                handlePlayClick={handlePlayClick}
+                handleSettingsClick={handleSettingsClick}
+                handleConnectNowClick={handleConnectNowClick}
+                handleDisconnectClick={handleDisconnectClick}
+            />
+    );
+}
+
+
+interface ControlButtonsProps {
+    loggedIn: boolean;
+    handlePlayClick: () => void;
+    handleSettingsClick: () => void;
+    handleConnectNowClick: () => void;
+    handleDisconnectClick: () => void;
+}
+
+export const ControlButtons: React.FC<ControlButtonsProps> = ({
+    loggedIn,
+    handlePlayClick,
+    handleSettingsClick,
+    handleConnectNowClick,
+    handleDisconnectClick
+}) => {
+    return (
         <div>
             <h1 style={{ textAlign: 'center' }}>{!loggedIn ? 'Site is not connected' : 'Site is connected'}</h1>
             <button
@@ -122,6 +149,6 @@ export const Bootstrap = () => {
             </button>
         </div>
     );
-}
+};
 
 export default Bootstrap;

@@ -4,8 +4,9 @@ import './index.css';
 import * as serviceWorkerRegistration from './shenanigans/serviceWorkerRegistration';
 import reportWebVitals from './shenanigans/reportWebVitals';
 import { SignerProvider } from './components/SignerContext';
-import App from './sceneReactComponents/MainHome';
 import Bootstrap from './sceneReactComponents/Bootstrap';
+import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
+import PlayLobby from './sceneReactComponents/PlayLobby';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -13,7 +14,14 @@ const root = ReactDOM.createRoot(
 root.render(
   <React.StrictMode>
     <SignerProvider>
-      <Bootstrap />
+      <Router>
+        <Routes>
+          <Route path="/playlobby" element={<PlayLobby />} />
+          <Route path="*" element={<Bootstrap />} />
+          {/* other routes... */}
+        </Routes>
+        {/* <Bootstrap /> */}
+      </Router>
     </SignerProvider>
   </React.StrictMode>
 );
