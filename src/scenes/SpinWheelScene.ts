@@ -63,7 +63,7 @@ export class SpinWheelScene extends Phaser.Scene {
 
 
 
-        if (this.channelId && this.clientId && this.name) {
+        if (this.channelId && this.clientId) {
             const channelHandler = await new ChannelHandler().initChannelHandler(this.clientId);
             await channelHandler?.enterChannel({ channelId: this.channelId, clientId: this.clientId, nickname: this.name});
             this.channel = ChannelHandler.ablyInstance?.ablyInstance.channels.get(this.channelId);
