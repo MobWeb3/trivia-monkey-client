@@ -1,19 +1,22 @@
-import React, { useState } from 'react';
-import { sendMessage } from "../utils/MessageListener";
-import { Messages } from "../utils/Messages";
+import { useContext, useState } from 'react';
+import { createChannelListenerWrapper } from '../ably/ChannelListener';
+import { SignerContext } from '../components/SignerContext';
 
 const CreateGame = () => {
     const [nickname, setNickname] = useState('');
     const [numberPlayers, setNumberPlayers] = useState('');
     const [pointsToWin, setPointsToWin] = useState('');
+    const { web3auth } = useContext(SignerContext);
+
+    const handleCreateChannel = async (data: any) => {
+        if (web3auth) {
+            await createChannelListenerWrapper(web3auth, data);
+        }
+    };
 
     const handlePlayButtonClick = () => {
-        if (nickname !== '') {
-            sendMessage(Messages.CREATE_CHANNEL, {
-                "nickname": nickname,
-                "numberPlayers": numberPlayers,
-                "pointsToWin": pointsToWin
-            });
+        if (nickname !== '' && numberPlayers !== '' && pointsToWin !== '') {
+            handleCreateChannel({ nickname, numberPlayers, pointsToWin });
         }
     };
 

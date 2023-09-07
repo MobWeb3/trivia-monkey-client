@@ -8,6 +8,7 @@ import Bootstrap from './sceneReactComponents/Bootstrap';
 import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 import PlayLobby from './sceneReactComponents/PlayLobby';
 import CreateGame from './sceneReactComponents/CreateGame';
+import { ConnectionStatus } from './components/ConnectionStatus';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -16,6 +17,7 @@ root.render(
   <React.StrictMode>
     <SignerProvider>
       <Router>
+      <ConnectionStatus image={''} name={''} email={'connecgted'} />
         <Routes>
           <Route path="/playlobby" element={<PlayLobby />} />
           <Route path="*" element={<Bootstrap />} />

@@ -3092,30 +3092,30 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@mantine/core@npm:^6.0.17":
-  version: 6.0.17
-  resolution: "@mantine/core@npm:6.0.17"
+"@mantine/core@npm:^6.0.20":
+  version: 6.0.20
+  resolution: "@mantine/core@npm:6.0.20"
   dependencies:
     "@floating-ui/react": ^0.19.1
-    "@mantine/styles": 6.0.17
-    "@mantine/utils": 6.0.17
+    "@mantine/styles": 6.0.20
+    "@mantine/utils": 6.0.20
     "@radix-ui/react-scroll-area": 1.0.2
     react-remove-scroll: ^2.5.5
     react-textarea-autosize: 8.3.4
   peerDependencies:
-    "@mantine/hooks": 6.0.17
+    "@mantine/hooks": 6.0.20
     react: ">=16.8.0"
     react-dom: ">=16.8.0"
-  checksum: a73418fbfa58dd50678be24eb4d06237e859e56421b564d4b9d280989171dc13867c95d15f81c62d02d2cf5ad8a0ffec23edfe121bb645e1afaace332b393616
+  checksum: 49849e07773625e69ffb00f8130b7edd54dcb712c6b91dcba54b774fd7c9bf137571d808156f34f148738fb4c6777221035e508edc5075e5e17874ece991739c
   languageName: node
   linkType: hard
 
-"@mantine/hooks@npm:^6.0.17":
-  version: 6.0.17
-  resolution: "@mantine/hooks@npm:6.0.17"
+"@mantine/hooks@npm:^6.0.20":
+  version: 6.0.20
+  resolution: "@mantine/hooks@npm:6.0.20"
   peerDependencies:
     react: ">=16.8.0"
-  checksum: bcd8c0ffa848972f181b014eb8fd5c015116a64a9c1e3b2db3814f449bbe1cc796c8dedaf2a29be3bd8913fed4217459b5594de55d025f6d8c2e5743d83ed999
+  checksum: 3e4d8ca3df321fb9e43117c39686610397aada1c46d9ecb843381d2bc3bedeb83aa87ee709e658b0998087490c93aa6c20634e62ce46ce1f18c3a544faac8ee4
   languageName: node
   linkType: hard
 
@@ -3134,9 +3134,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@mantine/styles@npm:6.0.17":
-  version: 6.0.17
-  resolution: "@mantine/styles@npm:6.0.17"
+"@mantine/styles@npm:6.0.20":
+  version: 6.0.20
+  resolution: "@mantine/styles@npm:6.0.20"
   dependencies:
     clsx: 1.1.1
     csstype: 3.0.9
@@ -3144,7 +3144,7 @@ __metadata:
     "@emotion/react": ">=11.9.0"
     react: ">=16.8.0"
     react-dom: ">=16.8.0"
-  checksum: b3495220074d95fa8864d1e5a512f17e07443c1ac2a84315252057615473b54d87006e693e2c4191d2c0ae0d7d2b1e0dd14dd2da477aa7e9ed57377ba5a12bf6
+  checksum: 4eba35317432ac65ea585d73186d115d0cc818b58f8afbcf22bdcd6ab651815ef58c827700d10313adeb5a56e2940db220be99dc1938f298ecfdeec428f53a2f
   languageName: node
   linkType: hard
 
@@ -3154,6 +3154,15 @@ __metadata:
   peerDependencies:
     react: ">=16.8.0"
   checksum: 393869f22cfea70ff5b7483b7e23bc79fb39f1be7079baa388235a9ccf648845e10ef7c70a47081728ef09df682484bedfcf00c375bcd21a524fd114f892c9b5
+  languageName: node
+  linkType: hard
+
+"@mantine/utils@npm:6.0.20":
+  version: 6.0.20
+  resolution: "@mantine/utils@npm:6.0.20"
+  peerDependencies:
+    react: ">=16.8.0"
+  checksum: 16fe713c0c6063c5e3980ec9eb70404e4e65d92580f7e7d90753922940663fc429969e1b585d8b249af1c103794410f7b8a8ae7d9bf53c1ca4deada6128194db
   languageName: node
   linkType: hard
 
@@ -3842,6 +3851,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@remix-run/router@npm:1.8.0":
+  version: 1.8.0
+  resolution: "@remix-run/router@npm:1.8.0"
+  checksum: f754f02d3b4fc86791b88acf16065000609e2324b9436027844a76831c7107c0994067cb83abdd6093c282bd518a5c89b5e02aead585782978586e3a04534428
+  languageName: node
+  linkType: hard
+
 "@rollup/plugin-babel@npm:^5.2.0":
   version: 5.3.1
   resolution: "@rollup/plugin-babel@npm:5.3.1"
@@ -4512,6 +4528,25 @@ __metadata:
   dependencies:
     defer-to-connect: ^2.0.0
   checksum: c29df3bcec6fc3bdec2b17981d89d9c9fc9bd7d0c9bcfe92821dc533f4440bc890ccde79971838b4ceed1921d456973c4180d7175ee1d0023ad0562240a58d95
+  languageName: node
+  linkType: hard
+
+"@tabler/icons-react@npm:^2.33.0":
+  version: 2.33.0
+  resolution: "@tabler/icons-react@npm:2.33.0"
+  dependencies:
+    "@tabler/icons": 2.33.0
+    prop-types: ^15.7.2
+  peerDependencies:
+    react: ^16.5.1 || ^17.0.0 || ^18.0.0
+  checksum: 1b610128d6b533520394482646cfdbca662951b8586e67e75e678ea4c9587bfe2b4a4c52aab277cb3fd2d589300ad2122fff2792a2813b030e00921bbe848171
+  languageName: node
+  linkType: hard
+
+"@tabler/icons@npm:2.33.0":
+  version: 2.33.0
+  resolution: "@tabler/icons@npm:2.33.0"
+  checksum: 6bf717251a7ae35aec4496049fefb3f73055678f51c307445ca75e533e29b7beb36cbd8c9efb81cbb33a9544a747a710a67db9653350964a36df565718961fee
   languageName: node
   linkType: hard
 
@@ -14449,12 +14484,13 @@ __metadata:
   resolution: "my-app@workspace:."
   dependencies:
     "@emotion/react": ^11.11.1
-    "@mantine/core": ^6.0.17
-    "@mantine/hooks": ^6.0.17
+    "@mantine/core": ^6.0.20
+    "@mantine/hooks": ^6.0.20
     "@mantine/notifications": ^6.0.17
     "@metaplex-foundation/js": ^0.19.4
     "@project-serum/anchor": ^0.26.0
     "@rainbow-me/rainbowkit": ^1.0.7
+    "@tabler/icons-react": ^2.33.0
     "@testing-library/jest-dom": ^5.17.0
     "@testing-library/react": ^13.4.0
     "@testing-library/user-event": ^13.5.0
@@ -14480,6 +14516,7 @@ __metadata:
     react: ^18.2.0
     react-app-rewired: ^2.2.1
     react-dom: ^18.2.0
+    react-router-dom: ^6.15.0
     react-scripts: 5.0.1
     source-map-loader: ^4.0.1
     stream-browserify: ^3.0.0
@@ -16357,7 +16394,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prop-types@npm:^15.6.2, prop-types@npm:^15.8.1":
+"prop-types@npm:^15.6.2, prop-types@npm:^15.7.2, prop-types@npm:^15.8.1":
   version: 15.8.1
   resolution: "prop-types@npm:15.8.1"
   dependencies:
@@ -16784,6 +16821,30 @@ __metadata:
     "@types/react":
       optional: true
   checksum: 0a31f822136f4d4cde0c34264b68dd3a0432d36e2ca5162cd2df0f205980debb9a5e107843120220a599275af02df7805f0d5f44e54f2bd8b0c39a7fdd304036
+  languageName: node
+  linkType: hard
+
+"react-router-dom@npm:^6.15.0":
+  version: 6.15.0
+  resolution: "react-router-dom@npm:6.15.0"
+  dependencies:
+    "@remix-run/router": 1.8.0
+    react-router: 6.15.0
+  peerDependencies:
+    react: ">=16.8"
+    react-dom: ">=16.8"
+  checksum: 95301837e293654f00934de6a4bdb27bfb06f613503e4cce7a93f19384793729832e7479d50faf3b9457d149014d4df40a3ee3a5193d7e3a3caadb7aaa6ec0f9
+  languageName: node
+  linkType: hard
+
+"react-router@npm:6.15.0":
+  version: 6.15.0
+  resolution: "react-router@npm:6.15.0"
+  dependencies:
+    "@remix-run/router": 1.8.0
+  peerDependencies:
+    react: ">=16.8"
+  checksum: 345b29277e13997f2625f0037f537eaf1955bb9f44ebfea80dd3ff83fc06273f7b64e1be944bfc75945fd2af5af917874133a8a93ed5ecaca523be8f045ae166
   languageName: node
   linkType: hard
 

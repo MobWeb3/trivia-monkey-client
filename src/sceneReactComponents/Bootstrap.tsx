@@ -7,9 +7,8 @@ import { createUser, userExists } from '../polybase/UserHandler';
 import { useNavigate } from 'react-router-dom';
 
 export const Bootstrap = () => {
-    const { signer, web3auth, setSigner } = useContext(SignerContext);
+    const { signer, web3auth, setSigner, loggedIn, setLoggedIn, setUserInfo } = useContext(SignerContext);
     const [, setProvider] = useState<SafeEventEmitterProvider | null>(null);
-    const [loggedIn, setLoggedIn] = useState(false);
     const navigate = useNavigate();
 
     const handlePlayClick = async () => {
@@ -48,6 +47,9 @@ export const Bootstrap = () => {
         setProvider(web3authProvider);
         setLoggedIn(true);
 
+        const userInfo = await web3auth.getUserInfo();
+        setUserInfo(userInfo);
+
         const evmChain = false;
 
         if (evmChain) {
@@ -60,7 +62,6 @@ export const Bootstrap = () => {
             console.log("signer created: ", signer);
             console.log("signer address", await _signer.getAddress());
         } else {
-            const userInfo = await web3auth.getUserInfo();
             const publicKey = await getConnectedPublicKey(web3auth);
             console.log(`publick key: ${publicKey?.toString()}, ${publicKey?.toBase58()}`);
             return {
@@ -118,7 +119,7 @@ export const ControlButtons: React.FC<ControlButtonsProps> = ({
 }) => {
     return (
         <div>
-            <h1 style={{ textAlign: 'center' }}>{!loggedIn ? 'Site is not connected' : 'Site is connected'}</h1>
+            {/* <h1 style={{ textAlign: 'center' }}>{!loggedIn ? 'Site is not connected' : 'Site is connected'}</h1> */}
             <button
                 key={0}
                 style={{ backgroundColor: '#ffffff' }}
