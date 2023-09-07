@@ -41,8 +41,8 @@ export const SignerProvider: React.FC<PropsWithChildren<Props>> = ({ children })
   const [, setWeb3AuthConnector] = useState<Web3AuthConnector>();
   const [loggedIn, setLoggedIn] = useState(false);
   const [userInfo, setUserInfo] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
 
-  // const [config, setConfig] = useState<Config<PublicClient, WebSocketPublicClient>>()
 
   const init = async () => {
     try {
@@ -60,9 +60,10 @@ export const SignerProvider: React.FC<PropsWithChildren<Props>> = ({ children })
           },
         }))
       }
-
+      setLoading(false);
     } catch (error) {
       console.error(error);
+      setLoading(false);
     }
   };
 
@@ -70,6 +71,10 @@ export const SignerProvider: React.FC<PropsWithChildren<Props>> = ({ children })
   useEffect(() => {
     init();
   }, [])
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
   if (!web3auth) {
     // handle the case where web3auth is null

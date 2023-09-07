@@ -1,19 +1,23 @@
 import { useContext, useEffect, useState } from 'react';
-import { createChannelListenerWrapper, enterChannelListenerWrapper } from '../ably/ChannelListener';
+import { enterChannelListenerWrapper } from '../ably/ChannelListener';
 import { SignerContext } from '../components/SignerContext';
 import { Messages } from '../utils/Messages';
 import { useNavigate } from 'react-router-dom';
+import { SessionDataContext } from '../components/SessionDataContext';
 
 const JoinGame = () => {
     const [channelId, setChannelId] = useState('');
     const { web3auth } = useContext(SignerContext);
     const navigate = useNavigate(); 
+    const { setSessionData } = useContext(SessionDataContext);
+
 
     useEffect(() => {
         const handleAllPlayersJoined = (event:any) => {
             console.log('All players have joined', event.detail);
+            setSessionData(event.detail);
             // Handle the event here
-            // navigate('/playlobby');
+            navigate('/spinwheel');
         };
 
         window.addEventListener(Messages.ALL_PLAYERS_JOINED, handleAllPlayersJoined);

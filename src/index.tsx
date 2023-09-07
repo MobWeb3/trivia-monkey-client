@@ -10,6 +10,8 @@ import PlayLobby from './sceneReactComponents/PlayLobby';
 import CreateGame from './sceneReactComponents/CreateGame';
 import { ConnectionStatus } from './components/ConnectionStatus';
 import JoinGame from './sceneReactComponents/JoinGame';
+import SpinWheel from './sceneReactComponents/SpinWheel';
+import { SessionDataProvider } from './components/SessionDataContext';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -17,17 +19,22 @@ const root = ReactDOM.createRoot(
 root.render(
   <React.StrictMode>
     <SignerProvider>
-      <Router>
-      <ConnectionStatus image={''} name={''} email={'connecgted'} />
-        <Routes>
-          <Route path="/playlobby" element={<PlayLobby />} />
-          <Route path="*" element={<Bootstrap />} />
-          <Route path="/creategame" element={<CreateGame />} />
-          <Route path="/joingame" element={<JoinGame />} />
-          {/* other routes... */}
-        </Routes>
-        {/* <Bootstrap /> */}
-      </Router>
+      <SessionDataProvider>
+        <Router>
+          <ConnectionStatus image={''} name={''} email={'connecgted'} />
+          <Routes>
+            <Route path="/playlobby" element={<PlayLobby />} />
+            <Route path="*" element={<Bootstrap />} />
+            <Route path="/creategame" element={<CreateGame />} />
+            <Route path="/joingame" element={<JoinGame />} />
+            <Route path="/spinwheel" element={<SpinWheel />} />
+            {/* other routes... */}
+          </Routes>
+          {/* <Bootstrap /> */}
+        </Router>
+
+      </SessionDataProvider>
+
     </SignerProvider>
   </React.StrictMode>
 );

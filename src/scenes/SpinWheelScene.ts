@@ -37,13 +37,11 @@ export class SpinWheelScene extends Phaser.Scene {
         super({ key: "SpinWheelScene" });
     }
 
-    init() {
-        this.channelId = this.data.get('channelId');
-        this.sessionId = this.data.get('sessionId');
-        this.clientId = this.data.get('clientId');
-        this.name = this.data.get('name');
-    
-
+    init(data: any) {
+        this.channelId = data.channelId
+        this.sessionId = data.sessionId;
+        this.clientId = data.clientId;
+        this.name = data.name;
     }
 
     async preload() {
@@ -52,6 +50,7 @@ export class SpinWheelScene extends Phaser.Scene {
     }
 
     async create() {
+        console.log("SpinWheelScene data: ", this.data);
 
         // console.log("SpinWheelScene data: ", this.data.list);
         
