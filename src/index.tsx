@@ -7,6 +7,7 @@ import { SignerProvider } from './components/SignerContext';
 import Bootstrap from './sceneReactComponents/Bootstrap';
 import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 import PlayLobby from './sceneReactComponents/PlayLobby';
+import CreateGame from './sceneReactComponents/CreateGame';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -18,6 +19,7 @@ root.render(
         <Routes>
           <Route path="/playlobby" element={<PlayLobby />} />
           <Route path="*" element={<Bootstrap />} />
+          <Route path="/creategame" element={<CreateGame />} />
           {/* other routes... */}
         </Routes>
         {/* <Bootstrap /> */}

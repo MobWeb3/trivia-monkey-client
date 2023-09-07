@@ -1,9 +1,12 @@
+import { useNavigate } from "react-router-dom";
 
 const PlayLobbyScene = () => {
+    const navigate = useNavigate();
 
     const handleCreateGameClick = () => {
         console.log('Create Game');
         // Navigate to CreateGame
+        navigate('/creategame');
     };
 
     const handleJoinGameClick = () => {
