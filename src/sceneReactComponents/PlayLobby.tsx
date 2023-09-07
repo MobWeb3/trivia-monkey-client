@@ -12,6 +12,7 @@ const PlayLobbyScene = () => {
     const handleJoinGameClick = () => {
         console.log('Join Game');
         // Navigate to JoinGame
+        navigate('/joingames');
     };
 
     const handleChooseTurnClick = () => {

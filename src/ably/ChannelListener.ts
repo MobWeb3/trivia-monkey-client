@@ -76,7 +76,6 @@ export const createChannelListenerWrapper = async (web3auth: Web3Auth, data: any
 
                     // Send event to SpinWheelScene, do this last so that update session phase is reflected in the scene
                     window.dispatchEvent(new CustomEvent(Messages.ALL_PLAYERS_JOINED, { detail: data }));
-
                     await new Promise(resolve => setTimeout(resolve, 1000));
                     await channel.publish("start-game", {sessionId: pbSessionId});
                 }

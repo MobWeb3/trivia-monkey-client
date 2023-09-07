@@ -9,6 +9,7 @@ import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 import PlayLobby from './sceneReactComponents/PlayLobby';
 import CreateGame from './sceneReactComponents/CreateGame';
 import { ConnectionStatus } from './components/ConnectionStatus';
+import JoinGame from './sceneReactComponents/JoinGame';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -22,6 +23,7 @@ root.render(
           <Route path="/playlobby" element={<PlayLobby />} />
           <Route path="*" element={<Bootstrap />} />
           <Route path="/creategame" element={<CreateGame />} />
+          <Route path="/joingame" element={<JoinGame />} />
           {/* other routes... */}
         </Routes>
         {/* <Bootstrap /> */}
