@@ -1,4 +1,4 @@
-import { Chip, DefaultMantineColor, Group } from '@mantine/core';
+import { Chip, DefaultMantineColor, Group, Select } from '@mantine/core';
 import React from 'react';
 import { GeneralTopics } from '../game-domain/Topics';
 
@@ -21,6 +21,13 @@ export const ModalContent = (props: ModalContentProps) => {
     return (
         <Chip.Group>
             <Group position="center">
+                <Select
+                label="Select topic"
+                placeholder="Search and select"
+                searchable
+                nothingFound="No options"
+                data={['React', 'Angular', 'Svelte', 'Vue']}
+                /> 
                 <Chip
                         key={"customTopic"}
                         color={'teal'}
@@ -28,9 +35,9 @@ export const ModalContent = (props: ModalContentProps) => {
                         radius={'md'}
                         size={'md'}
                         variant="filled"
-                        onClick={() => {console.log("custom select!!")}}>{"Write any topic..."}
+                        onClick={() => handleChipSelect("customTopic")}>{"Write any topic..."}
                 </Chip>
-                {Object.keys(GeneralTopics).map((topicKey, index) => { 
+                {Object.values(GeneralTopics).map((topicKey, index) => { 
                     const sequentialColor = mantineColors[index % mantineColors.length];
                     return <Chip
                         key={index}

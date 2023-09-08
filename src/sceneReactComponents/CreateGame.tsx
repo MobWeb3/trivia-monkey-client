@@ -4,7 +4,7 @@ import { SignerContext } from '../components/SignerContext';
 import { Messages } from '../utils/Messages';
 import { useNavigate } from 'react-router-dom';
 import { SessionDataContext } from '../components/SessionDataContext';
-import { Button, Group, Modal } from '@mantine/core';
+import { Badge, Button, Group, Modal } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import ModalContent from '../components/ModalContent';
 
@@ -59,6 +59,7 @@ const CreateGame = () => {
                 {/* Modal content */}
             </Modal>
             <Group position="center">
+                <Badge size="lg" radius="lg" variant="dot">Selected topic: {selectedChip}</Badge>
                 <Button onClick={open}>Pick a topic</Button>
             </Group>
             <button name="playButton" onClick={handlePlayButtonClick}>Create Game</button>

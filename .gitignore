@@ -24,3 +24,4 @@ yarn-error.log*
 public/kenney_ui-pack-space-expansion
 .yarn
 .yarnrc.yml
+.env
