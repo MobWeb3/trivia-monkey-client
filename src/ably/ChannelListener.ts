@@ -1,4 +1,4 @@
-import { createSession, updateSessionPhase } from "../polybase/SessionHandler";
+import { addTopic, createSession, updateSessionPhase } from "../polybase/SessionHandler";
 import { ChannelHandler } from "./ChannelHandler";
 import { SolanaWallet } from "@web3auth/solana-provider";
 import { MySolanaWallet } from "../solana/MySolanaWallet";
@@ -59,6 +59,7 @@ export const createChannelListenerWrapper = async (web3auth: Web3Auth, data: any
 
         if (response) {
             console.log('createSession response:', response);
+            const pbSessionId = response?.recordData?.data?.id;
             const channel = ChannelHandler.ablyInstance?.ablyInstance.channels.get(channelId);
             channel?.presence.subscribe('enter', async function (member) {
                 console.log(member.clientId + ' entered realtime-chat');
@@ -66,7 +67,7 @@ export const createChannelListenerWrapper = async (web3auth: Web3Auth, data: any
                 console.log('presence: ', presence);
                 if (presence.length == data.numberPlayers) {
 
-                    const pbSessionId = response?.recordData?.data?.id;
+                    
                     console.log('All players are here!!');
                     data.sessionId = pbSessionId;
                     data.channelId = channelId;
@@ -81,6 +82,9 @@ export const createChannelListenerWrapper = async (web3auth: Web3Auth, data: any
                 }
             });
 
+            // Update topics
+            const addTopicResponse= await addTopic({id:pbSessionId, topic: data.topic})
+            console.log('addTopic response:', addTopicResponse);
         }
     }
 };
