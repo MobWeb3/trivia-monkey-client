@@ -1,6 +1,6 @@
 import Phaser from 'phaser'
 
-import { SpinWheelScene } from './scenes/SpinWheelScene'
+import { AIGameScene } from '../scenes/AIGameScene'
 
 const config: Phaser.Types.Core.GameConfig = {
 	type: Phaser.AUTO,
@@ -38,12 +38,12 @@ class GameInstance {
 
 	public static startScene(sceneKey: string, data?: any) {
 		if (GameInstance.instance) {
-			GameInstance.instance?.scene.add(sceneKey, SpinWheelScene, true, data);
+			GameInstance.instance?.scene.add(sceneKey, AIGameScene, true, data);
 		}
 		 else {
 			const instance = GameInstance.getInstance();
 			if (instance  && instance.scene.keys[sceneKey] === null) {
-				instance.scene.add(sceneKey, SpinWheelScene, true, data);
+				instance.scene.add(sceneKey, AIGameScene, true, data);
 			}
 		}
 		return GameInstance.instance;

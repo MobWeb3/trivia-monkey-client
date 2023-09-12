@@ -12,4 +12,5 @@ export enum Messages {
     ENTER_CHANNEL = 'EnterChannel',
     CHANNEL_JOINED = 'ChannelJoined',
     ALL_PLAYERS_JOINED = 'AllPlayersJoined',
+    MAY_START_GAME = 'MayStartGame',
   }

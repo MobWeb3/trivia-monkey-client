@@ -1,6 +1,8 @@
 
-import { getSession } from '../polybase/SessionHandler';
+import { getHostId, getSession } from '../polybase/SessionHandler';
+import { SessionPhase } from '../game-domain/SessionPhase';
 import { Types } from 'ably';
+
 
 export class AIGameScene extends Phaser.Scene {
 
@@ -11,7 +13,7 @@ export class AIGameScene extends Phaser.Scene {
     // slices (prizes) placed in the wheel
     slices = 12;
     // prize names, starting from 12 o'clock going clockwise
-    sliceValues = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+    sliceValues = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10,11, 12];
     // the prize you are about to win
     selectedSlice?: number;
     // text field where to show the prize
@@ -20,20 +22,25 @@ export class AIGameScene extends Phaser.Scene {
     sessionId?: string;
     channelId?: string;
     clientId?: string;
-    name?: string;
+    currentPhase?: string;
     channel?: Types.RealtimeChannelPromise;
+    isHost?: boolean = false;
+    name?: string;
+    initialTurnPositions?: any;
+    numberPlayers?: number;
+    gamePhase?: string;
 
     constructor() {
         super({ key: "AIGameScene" });
     }
 
-    init() {
-        this.channelId = this.data.get('channelId');
-        this.sessionId = this.data.get('sessionId');
-        this.clientId = this.data.get('clientId');
-        this.name = this.data.get('name');
-
-
+    init(data: any) {
+        if (data) {
+            this.channelId = data.channelId
+            this.sessionId = data.sessionId;
+            this.clientId = data.clientId;
+            this.name = data.name;
+        }
     }
 
     async preload() {
@@ -42,22 +49,17 @@ export class AIGameScene extends Phaser.Scene {
     }
 
     async create() {
+        console.log("AIGameScene data: ", this.data);
         await this.setupSessionData();
-        this.setupBackButton();
-
-        // Load the spinner wheel
         this.setupSpinWheel();
 
-        // // Load the question box (hidden by default)
-        // this.setupQuestionBox();
-
-        // // Load the answer input (hidden by default)
-        // this.setupAnswerInput();
-
-        // // Load the submit button (hidden by default)
-        // this.setupSubmitButton();
+        this.setupBackButton();
 
 
+
+        if (this.channelId && this.clientId) {                            
+
+        }
     }
 
     async setupBackButton() {
@@ -70,9 +72,25 @@ export class AIGameScene extends Phaser.Scene {
 
 
     async setupSessionData() {
-        const { gamePhase, initialTurnPosition, numberPlayers } = await getSession({ id: this.sessionId });
+        const session = await getSession({ id: this.sessionId });
 
-        console.log('gamePhase: ', gamePhase);
+        if (!session) {
+            console.log('session not initialized yet');
+            this.messageGameText?.setText( "session not initialized yet" );
+            return;
+        }
+        const { numberPlayers, gamePhase } = session;
+    
+        
+        this.gamePhase = gamePhase ?? {};
+        if ( this.gamePhase === SessionPhase.TURN_ORDER){
+            console.log('can turn!');
+            this.canSpin = true;
+        } 
+        
+        const isHost = await getHostId({ id: this.sessionId }) === this.clientId;
+        if (isHost) this.isHost = true;
+        if (numberPlayers) this.numberPlayers = numberPlayers;
     }
 
     // function to spin the wheel
@@ -92,6 +110,14 @@ export class AIGameScene extends Phaser.Scene {
             this.canSpin = false;
             // animation tweeen for the spin: duration 3s, will rotate by (360 * rounds + degrees) degrees
             // the quadratic easing will simulate friction
+            this.tweens.add({
+                targets: this.wheel,
+                angle: 360 * rounds + degrees,
+                ease: 'Cubic.easeOut',
+                duration: 3000,
+                onComplete: this.handleSelectedSlice,
+                callbackScope: this
+            });
         }
     }
 
@@ -101,14 +127,7 @@ export class AIGameScene extends Phaser.Scene {
         this.canSpin = false;
         // writing the prize you just won
         if (this.selectedSlice)
-            this.messageGameText?.setText(this.selectedSlice.toString());
-
-        // report to our polybase server next player is up.
-
-
-        // report through ably that we are done choosing our turn.
-        await this.channel?.publish('turn-selected', { turn: this.selectedSlice });
-
+            this.messageGameText?.setText( this.selectedSlice.toString() );
     }
 
     setupSpinWheel() {

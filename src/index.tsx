@@ -12,6 +12,7 @@ import { ConnectionStatus } from './components/ConnectionStatus';
 import JoinGame from './sceneReactComponents/JoinGame';
 import SpinWheel from './sceneReactComponents/SpinWheel';
 import { SessionDataProvider } from './components/SessionDataContext';
+import AIGame from './sceneReactComponents/AIGame';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -28,6 +29,7 @@ root.render(
             <Route path="/creategame" element={<CreateGame />} />
             <Route path="/joingame" element={<JoinGame />} />
             <Route path="/spinwheel" element={<SpinWheel />} />
+            <Route path="/aigame" element={<AIGame />} />
             {/* other routes... */}
           </Routes>
           {/* <Bootstrap /> */}

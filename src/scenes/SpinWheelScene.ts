@@ -4,6 +4,8 @@ import { getHostId, getSession, getSessionPhase, updateInitialTurnPosition, upda
 import { SessionPhase } from '../game-domain/SessionPhase';
 import { ChannelHandler } from '../ably/ChannelHandler';
 import { Types } from 'ably';
+import { sendMessage } from '../utils/MessageListener';
+import { Messages } from '../utils/Messages';
 const POLYBASE_URL = `${BASE_URL}/api/polybase`;
 
 
@@ -38,10 +40,12 @@ export class SpinWheelScene extends Phaser.Scene {
     }
 
     init(data: any) {
-        this.channelId = data.channelId
-        this.sessionId = data.sessionId;
-        this.clientId = data.clientId;
-        this.name = data.name;
+        if (data) {
+            this.channelId = data.channelId
+            this.sessionId = data.sessionId;
+            this.clientId = data.clientId;
+            this.name = data.name;
+        }
     }
 
     async preload() {
@@ -75,7 +79,6 @@ export class SpinWheelScene extends Phaser.Scene {
                     console.log('turn selected by: ', message.clientId);
                     const { initialTurnPosition } = await getSession({ id: this.sessionId });
                     this.initialTurnPositions = initialTurnPosition;
-                    this.initialTurnPositions?.size
                     console.log('initialTurnPositions: ', initialTurnPosition);
                     console.log('numberPlayers: ', this.numberPlayers);
 
@@ -90,6 +93,7 @@ export class SpinWheelScene extends Phaser.Scene {
                         // if all players have selected their turn, then we can proceed to the next phase.
                         await updateSessionPhase({ id: this.sessionId, newPhase: SessionPhase.GAME_ACTIVE });
                         console.log('GAME_ACTIVE!');
+                        sendMessage(Messages.MAY_START_GAME, { sessionId: this.sessionId });
                     }
                 });
             }
@@ -107,9 +111,17 @@ export class SpinWheelScene extends Phaser.Scene {
 
 
     async setupSessionData() {
-        const {gamePhase, initialTurnPosition, numberPlayers} = await getSession({ id: this.sessionId });
+        const session = await getSession({ id: this.sessionId });
+
+        if (!session) {
+            console.log('session not initialized yet');
+            this.messageGameText?.setText( "session not initialized yet" );
+            return;
+        }
+        const { initialTurnPosition, numberPlayers, gamePhase } = session;
     
-        this.gamePhase = gamePhase;
+        
+        this.gamePhase = gamePhase ?? {};
     
         // console.log('gamePhase: ', this.gamePhase);
         // console.log('gamePhase in preload: ', this.gamePhase);
@@ -122,8 +134,7 @@ export class SpinWheelScene extends Phaser.Scene {
         if (isHost) this.isHost = true;
         if (initialTurnPosition) this.initialTurnPositions = initialTurnPosition;
         if (numberPlayers) this.numberPlayers = numberPlayers;
-        // console.log('isHost: ', this.isHost);
-        // console.log('initialTurnPosition: ', this.initialTurnPositions);
+
     }
 
     // function to spin the wheel
