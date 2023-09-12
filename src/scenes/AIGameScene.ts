@@ -8,14 +8,15 @@ export class AIGameScene extends Phaser.Scene {
 
     // the spinning wheel
     wheel?: Phaser.GameObjects.Sprite;
+    wheelContainer?: Phaser.GameObjects.Container;
     // can the wheel spin?
-    canSpin = false;
+    canSpin = true;
     // slices (prizes) placed in the wheel
-    slices = 12;
+    slices = 8;
     // prize names, starting from 12 o'clock going clockwise
-    sliceValues = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10,11, 12];
+    sliceValues? : string[] = ["elefante", "peso pluma", "como", "calle13", "E", "F", "G", "H"];
     // the prize you are about to win
-    selectedSlice?: number;
+    selectedSlice?: string;
     // text field where to show the prize
     messageGameText?: Phaser.GameObjects.Text;
 
@@ -44,7 +45,7 @@ export class AIGameScene extends Phaser.Scene {
     }
 
     async preload() {
-        this.load.image("wheel", "assets/sprites/wheel2.png");
+        this.load.image("wheel", "assets/sprites/wheel.png");
         this.load.image("pin", "assets/sprites/pin.png");
     }
 
@@ -53,21 +54,13 @@ export class AIGameScene extends Phaser.Scene {
         await this.setupSessionData();
         this.setupSpinWheel();
 
-        this.setupBackButton();
+        // this.setupBackButton();
 
 
 
         if (this.channelId && this.clientId) {                            
 
         }
-    }
-
-    async setupBackButton() {
-        const backButton = this.add.text(20, 20, 'Back', { color: 'white', fontSize: '20px ' });
-        backButton.setInteractive();
-        backButton.on('pointerdown', () => {
-            this.scene.switch('Bootstrap');
-        });
     }
 
 
@@ -83,10 +76,12 @@ export class AIGameScene extends Phaser.Scene {
     
         
         this.gamePhase = gamePhase ?? {};
-        if ( this.gamePhase === SessionPhase.TURN_ORDER){
+        if ( this.gamePhase === SessionPhase.GAME_ACTIVE){
             console.log('can turn!');
             this.canSpin = true;
         } 
+
+        // this.canSpin = true;
         
         const isHost = await getHostId({ id: this.sessionId }) === this.clientId;
         if (isHost) this.isHost = true;
@@ -104,14 +99,15 @@ export class AIGameScene extends Phaser.Scene {
             // then will rotate by a random number from 0 to 360 degrees. This is the actual spin
             var degrees = Phaser.Math.Between(0, 1000) % 360;
             // before the wheel ends spinning, we already know the prize according to "degrees" rotation and the number of slices
-            this.selectedSlice = this.sliceValues[this.slices - 1 - Math.floor(degrees / (360 / this.slices))];
+            if (this.sliceValues)
+                this.selectedSlice = this.sliceValues[this.slices - 1 - Math.floor(degrees / (360 / this.slices))];
             console.log("prize: ", this.selectedSlice);
             // now the wheel cannot spin because it's already spinning
             this.canSpin = false;
             // animation tweeen for the spin: duration 3s, will rotate by (360 * rounds + degrees) degrees
             // the quadratic easing will simulate friction
             this.tweens.add({
-                targets: this.wheel,
+                targets: this.wheelContainer,
                 angle: 360 * rounds + degrees,
                 ease: 'Cubic.easeOut',
                 duration: 3000,
@@ -123,21 +119,46 @@ export class AIGameScene extends Phaser.Scene {
 
     // function to assign the prize
     async handleSelectedSlice() {
-        // now we can only spin once
-        this.canSpin = false;
+        // now we can only spin many times
+        this.canSpin = true;
         // writing the prize you just won
         if (this.selectedSlice)
             this.messageGameText?.setText( this.selectedSlice.toString() );
     }
 
     setupSpinWheel() {
+        this.wheelContainer = this.add.container(this.cameras.main.width / 2, this.cameras.main.height / 2);
+
 
         // giving some color to background
         this.cameras.main.setBackgroundColor('#880041');
         // adding the wheel in the middle of the canvas
-        this.wheel = this.add.sprite(this.cameras.main.width / 2, this.cameras.main.height / 2, "wheel");        // setting wheel registration point in its center
+        // this.wheel = this.add.sprite(this.cameras.main.width / 2, this.cameras.main.height / 2, "wheel");        // setting wheel registration point in its center
+        this.wheel = this.add.sprite(0, 0, "wheel");
         this.wheel.setOrigin(0.5);
         this.wheel.setScale(0.75);
+        // Add the wheel to the container
+        this.wheelContainer?.add(this.wheel);
+
+        if (!this.sliceValues) {console.log("no slice values"); return;}
+
+        // Add the sprites (slice names) to the container
+        for (let i = 0; i < this.slices; i++) {
+            let sliceAngle = (360 / this.slices) * (Math.PI / 180);
+            // let angle = (360 / this.slices) * i * (Math.PI / 180)- Math.PI / 2; // Calculate the rotation angle in radians
+            // let angle = sliceAngle * i - Math.PI / 2 + sliceAngle / 2; // Add half the slice angle to the rotation
+            let angle = sliceAngle * i - Math.PI / 2 + sliceAngle / 2; // Add half the slice angle to the rotation
+
+            let radius = this.wheel.displayHeight / 2; // The radius of the wheel
+            let x = radius * Math.cos(angle); // Calculate the x coordinate
+            let y = radius * Math.sin(angle); // Calculate the y coordinate
+        
+            let sprite = this.add.text(x, y, this.sliceValues[i], { align: 'center' });
+            sprite.setOrigin(0.5);
+            sprite.setRotation(angle + Math.PI / 2); // Rotate the sprite to its position
+            this.wheelContainer.add(sprite);
+        }
+
         // adding the pin in the middle of the canvas
         var pin = this.add.sprite(this.cameras.main.width / 2, this.cameras.main.height / 2, "pin");
         // setting pin registration point in its center
