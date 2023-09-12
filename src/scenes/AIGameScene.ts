@@ -14,11 +14,21 @@ export class AIGameScene extends Phaser.Scene {
     // slices (prizes) placed in the wheel
     slices = 8;
     // prize names, starting from 12 o'clock going clockwise
-    sliceValues? : string[] = ["elefante", "peso pluma", "como", "calle13", "E", "F", "G", "H"];
+    sliceValues? : string[];
     // the prize you are about to win
     selectedSlice?: string;
     // text field where to show the prize
     messageGameText?: Phaser.GameObjects.Text;
+
+
+    // Add new properties
+    playerInTurnAvatar?: string;
+    timeLeft: number = 20; // 20 seconds
+    timerText?: Phaser.GameObjects.Text;
+
+    // Text objects for displaying player in turn avatar and time left
+    playerInTurnAvatarText?: Phaser.GameObjects.Text;
+    timeLeftText?: Phaser.GameObjects.Text;
 
     sessionId?: string;
     channelId?: string;
@@ -54,13 +64,30 @@ export class AIGameScene extends Phaser.Scene {
         await this.setupSessionData();
         this.setupSpinWheel();
 
-        // this.setupBackButton();
-
-
-
         if (this.channelId && this.clientId) {                            
 
         }
+
+        // Add timer text to the scene
+        this.timerText = this.add.text(10, 50, `Time left: ${this.timeLeft}`, { fontSize: '16px', color: '#fff' });
+        // Start the timer
+        this.time.addEvent({
+            delay: 1000, // 1000 ms = 1 second
+            callback: this.updateTimer,
+            callbackScope: this,
+            loop: true
+        });
+    }
+
+
+    updateTimer() {
+        this.timeLeft--; // Decrease the time left
+        if (this.timeLeft <= 0) {
+            this.timeLeft = 0;
+            // Stop the game or do something else when the time is up
+        }
+        // Update the timer text
+        this.timerText?.setText(`Time left: ${this.timeLeft}`);
     }
 
 
@@ -72,9 +99,9 @@ export class AIGameScene extends Phaser.Scene {
             this.messageGameText?.setText( "session not initialized yet" );
             return;
         }
-        const { numberPlayers, gamePhase } = session;
+        const { numberPlayers, gamePhase, topics } = session;
     
-        
+        this.sliceValues = topics;
         this.gamePhase = gamePhase ?? {};
         if ( this.gamePhase === SessionPhase.GAME_ACTIVE){
             console.log('can turn!');

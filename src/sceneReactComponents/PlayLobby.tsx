@@ -1,7 +1,10 @@
+import { useContext } from "react";
 import { useNavigate } from "react-router-dom";
+import { SessionDataContext } from "../components/SessionDataContext";
 
 const PlayLobbyScene = () => {
     const navigate = useNavigate();
+    const {setSessionData } = useContext(SessionDataContext);
 
     const handleCreateGameClick = () => {
         console.log('Create Game');
@@ -23,6 +26,8 @@ const PlayLobbyScene = () => {
     const handleMockGameAIClick = () => {
         console.log('Mock game AI');
         // Set data and navigate to AIGameScene
+        navigate('/aigame');
+        setSessionData({sessionId: 'mk-pbid-91b37893-0f97-4f38-bb86-23c15658c948'})
     };
 
     return (
