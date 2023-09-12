@@ -14,15 +14,16 @@ export class AIGameScene extends Phaser.Scene {
     // slices (prizes) placed in the wheel
     slices = 8;
     // prize names, starting from 12 o'clock going clockwise
-    sliceValues? : string[];
+    sliceValues?: string[];
     // the prize you are about to win
     selectedSlice?: string;
     // text field where to show the prize
     messageGameText?: Phaser.GameObjects.Text;
 
 
-    // Add new properties
-    playerInTurnAvatar?: string;
+    playerInTurnAvatar?: Phaser.GameObjects.Sprite;
+    // playerInTurnAvatar?: string;
+
     timeLeft: number = 20; // 20 seconds
     timerText?: Phaser.GameObjects.Text;
 
@@ -57,6 +58,7 @@ export class AIGameScene extends Phaser.Scene {
     async preload() {
         this.load.image("wheel", "assets/sprites/wheel.png");
         this.load.image("pin", "assets/sprites/pin.png");
+        this.load.image("player", "assets/sprites/monkey-avatar.png");
     }
 
     async create() {
@@ -64,7 +66,7 @@ export class AIGameScene extends Phaser.Scene {
         await this.setupSessionData();
         this.setupSpinWheel();
 
-        if (this.channelId && this.clientId) {                            
+        if (this.channelId && this.clientId) {
 
         }
 
@@ -96,20 +98,20 @@ export class AIGameScene extends Phaser.Scene {
 
         if (!session) {
             console.log('session not initialized yet');
-            this.messageGameText?.setText( "session not initialized yet" );
+            this.messageGameText?.setText("session not initialized yet");
             return;
         }
         const { numberPlayers, gamePhase, topics } = session;
-    
+
         this.sliceValues = topics;
         this.gamePhase = gamePhase ?? {};
-        if ( this.gamePhase === SessionPhase.GAME_ACTIVE){
+        if (this.gamePhase === SessionPhase.GAME_ACTIVE) {
             console.log('can turn!');
             this.canSpin = true;
-        } 
+        }
 
         // this.canSpin = true;
-        
+
         const isHost = await getHostId({ id: this.sessionId }) === this.clientId;
         if (isHost) this.isHost = true;
         if (numberPlayers) this.numberPlayers = numberPlayers;
@@ -150,11 +152,11 @@ export class AIGameScene extends Phaser.Scene {
         this.canSpin = true;
         // writing the prize you just won
         if (this.selectedSlice)
-            this.messageGameText?.setText( this.selectedSlice.toString() );
+            this.messageGameText?.setText(this.selectedSlice.toString());
     }
 
     setupSpinWheel() {
-        this.wheelContainer = this.add.container(this.cameras.main.width / 2, this.cameras.main.height / 2);
+        this.wheelContainer = this.add.container(this.cameras.main.width / 2, this.cameras.main.height / 2 - 50);
 
 
         // giving some color to background
@@ -167,27 +169,30 @@ export class AIGameScene extends Phaser.Scene {
         // Add the wheel to the container
         this.wheelContainer?.add(this.wheel);
 
-        if (!this.sliceValues) {console.log("no slice values"); return;}
+        if (this.sliceValues) {
+            console.log("no slice values");
 
-        // Add the sprites (slice names) to the container
-        for (let i = 0; i < this.slices; i++) {
-            let sliceAngle = (360 / this.slices) * (Math.PI / 180);
-            // let angle = (360 / this.slices) * i * (Math.PI / 180)- Math.PI / 2; // Calculate the rotation angle in radians
-            // let angle = sliceAngle * i - Math.PI / 2 + sliceAngle / 2; // Add half the slice angle to the rotation
-            let angle = sliceAngle * i - Math.PI / 2 + sliceAngle / 2; // Add half the slice angle to the rotation
 
-            let radius = this.wheel.displayHeight / 2; // The radius of the wheel
-            let x = radius * Math.cos(angle); // Calculate the x coordinate
-            let y = radius * Math.sin(angle); // Calculate the y coordinate
-        
-            let sprite = this.add.text(x, y, this.sliceValues[i], { align: 'center' });
-            sprite.setOrigin(0.5);
-            sprite.setRotation(angle + Math.PI / 2); // Rotate the sprite to its position
-            this.wheelContainer.add(sprite);
+            // Add the sprites (slice names) to the container
+            for (let i = 0; i < this.slices; i++) {
+                let sliceAngle = (360 / this.slices) * (Math.PI / 180);
+                // let angle = (360 / this.slices) * i * (Math.PI / 180)- Math.PI / 2; // Calculate the rotation angle in radians
+                // let angle = sliceAngle * i - Math.PI / 2 + sliceAngle / 2; // Add half the slice angle to the rotation
+                let angle = sliceAngle * i - Math.PI / 2 + sliceAngle / 2; // Add half the slice angle to the rotation
+
+                let radius = this.wheel.displayHeight / 2; // The radius of the wheel
+                let x = radius * Math.cos(angle); // Calculate the x coordinate
+                let y = radius * Math.sin(angle); // Calculate the y coordinate
+
+                let sprite = this.add.text(x, y, this.sliceValues[i], { align: 'center' });
+                sprite.setOrigin(0.5);
+                sprite.setRotation(angle + Math.PI / 2); // Rotate the sprite to its position
+                this.wheelContainer.add(sprite);
+            }
         }
 
         // adding the pin in the middle of the canvas
-        var pin = this.add.sprite(this.cameras.main.width / 2, this.cameras.main.height / 2, "pin");
+        var pin = this.add.sprite(this.cameras.main.width / 2, this.cameras.main.height / 2 - 50, "pin");
         // setting pin registration point in its center
         pin.setOrigin(0.5);
         // adding the text field
@@ -198,6 +203,13 @@ export class AIGameScene extends Phaser.Scene {
         this.messageGameText.setAlign('center');
         // waiting for your input, then calling "spin" function
         this.input.on('pointerdown', this.spin, this);
+
+        this.playerInTurnAvatar = this.add.sprite(this.cameras.main.width / 2, this.cameras.main.height / 2 + 200, "player");
+        this.playerInTurnAvatar.setOrigin(0.5);
+        this.playerInTurnAvatar.setScale(0.25);
+
+        this.playerInTurnAvatarText = this.add.text(this.cameras.main.width / 2, this.cameras.main.height / 2 + 200 + this.playerInTurnAvatar.displayHeight, "Player: " + this.playerInTurnAvatar, { fontSize: '16px', color: '#fff' });
+        this.playerInTurnAvatarText.setOrigin(0.5);
     }
 
 }
