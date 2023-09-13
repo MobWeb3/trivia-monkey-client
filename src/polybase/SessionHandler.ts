@@ -75,3 +75,23 @@ export const addTopic = async (data: any) => {
     }
     return false;
 }
+
+export const updatePlayerListOrder = async (data: any) => {
+    try {
+        const response = await axios.post(`${BASE_URL}/api/polybase/session/sortPlayerOrders`, data);
+        return response.data;
+    } catch (error) {
+        console.error(error);
+    }
+    return false;
+}
+
+export const setCurrentTurnPlayerId = async (data: any) => {
+    try {
+        const response = await axios.post(`${BASE_URL}/api/polybase/session/setCurrentTurnPlayerId`, data);
+        return response.data;
+    } catch (error) {
+        console.error(error);
+    }
+    return false;
+}

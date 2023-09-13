@@ -1,4 +1,4 @@
-import Phaser from 'phaser'
+import Phaser, { Game } from 'phaser'
 
 import { SpinWheelScene } from '../scenes/SpinWheelScene'
 
@@ -37,7 +37,7 @@ class GameInstance {
 	}
 
 	public static startScene(sceneKey: string, data?: any) {
-		if (GameInstance.instance) {
+		if (GameInstance.instance && !GameInstance.instance.scene.isActive(sceneKey)) {
 			GameInstance.instance?.scene.add(sceneKey, SpinWheelScene, true, data);
 		}
 		 else {

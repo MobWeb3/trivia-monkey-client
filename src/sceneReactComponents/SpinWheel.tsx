@@ -3,17 +3,20 @@ import '../sceneConfigs/SpinWheelConfig';
 import { useContext, useEffect, useState } from 'react';
 import GameInstance from '../sceneConfigs/SpinWheelConfig';
 import { SessionDataContext } from '../components/SessionDataContext';
-import { Button } from '@mantine/core';
+import { Button, Loader } from '@mantine/core';
 import { addMessageListener } from '../utils/MessageListener';
 import { Messages } from '../utils/Messages';
 import { useNavigate } from 'react-router-dom';
 import { publishStartGameAI, subscribeToStartGameAI } from '../ably/AblyMessages';
+import { setCurrentTurnPlayerId, updatePlayerListOrder } from '../polybase/SessionHandler';
 
 function SpinWheel() {
 
     const { sessionData } = useContext(SessionDataContext);
     const [game, setGame] = useState<Phaser.Game | null>(null);
     const [mayStartGame, setMayStartGame] = useState(false);
+    const [isLoading, setIsLoading] = useState(false); // Add this line
+
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -35,7 +38,16 @@ function SpinWheel() {
             subscribeToStartGameAI(clientId, channelId);
         }
 
-        const handleOpenAIGame = (event:any) => {
+        const handleOpenAIGame = async (event:any) => {
+            // update order list        
+            //make call to polybase to set the first in turn
+            setIsLoading(true);
+            if (sessionData) {
+                const playerList = (await updatePlayerListOrder({id: sessionData.sessionId})).playerList;
+                console.log('playerList', playerList);
+                await setCurrentTurnPlayerId({id: sessionData.sessionId, playerId: playerList[0]})
+            }
+            setIsLoading(false);
             console.log('Naviagting to Game', event.detail);
             navigate('/aigame');
         };
@@ -61,7 +73,8 @@ function SpinWheel() {
 
     return (
         <div style={{ position: 'relative' }}>
-            {mayStartGame && (
+            { isLoading ? <Loader /> :
+            mayStartGame ? (
                 <Button
                     style={{ position: 'absolute', bottom: '100px', left: '50%', transform: 'translateX(-50%)' }}
                     loading={false}
@@ -70,8 +83,8 @@ function SpinWheel() {
                     onClick={handleStartGame}
                 >
                     Start Game
-                </Button>
-            )}
+                </Button> ) : null
+            }
             <div id="phaser-container" className="App"></div>
         </div>
     );
