@@ -208,7 +208,7 @@ export class AIGameScene extends Phaser.Scene {
         this.playerInTurnAvatar.setOrigin(0.5);
         this.playerInTurnAvatar.setScale(0.25);
 
-        this.playerInTurnAvatarText = this.add.text(this.cameras.main.width / 2, this.cameras.main.height / 2 + 200 + this.playerInTurnAvatar.displayHeight, "Player: " + this.playerInTurnAvatar, { fontSize: '16px', color: '#fff' });
+        this.playerInTurnAvatarText = this.add.text(this.cameras.main.width / 2, this.cameras.main.height / 2 + 200 + this.playerInTurnAvatar.displayHeight, "Player: " + this.playerInTurnAvatar + " turn", { fontSize: '16px', color: '#fff' });
         this.playerInTurnAvatarText.setOrigin(0.5);
     }
 
