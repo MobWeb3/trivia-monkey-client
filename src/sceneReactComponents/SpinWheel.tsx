@@ -7,6 +7,7 @@ import { Button } from '@mantine/core';
 import { addMessageListener } from '../utils/MessageListener';
 import { Messages } from '../utils/Messages';
 import { useNavigate } from 'react-router-dom';
+import { publishStartGameAI, subscribeToStartGameAI } from '../ably/AblyMessages';
 
 function SpinWheel() {
 
@@ -27,11 +28,35 @@ function SpinWheel() {
 
         addMessageListener(Messages.MAY_START_GAME, enableStartGameButton);
 
+        console.log('SpinWheel useEffect');
+
+        if ( sessionData && sessionData.clientId && sessionData.channelId) {
+            const { clientId, channelId } = sessionData;
+            subscribeToStartGameAI(clientId, channelId);
+        }
+
+        const handleOpenAIGame = (event:any) => {
+            console.log('Naviagting to Game', event.detail);
+            navigate('/aigame');
+        };
+
+        window.addEventListener(Messages.OPEN_AI_GAME, handleOpenAIGame);
+
+        // Cleanup listener when component unmounts
+        return () => {
+            window.removeEventListener(Messages.OPEN_AI_GAME, handleOpenAIGame);
+        };
     }, [mayStartGame]);
 
     const handleStartGame = () => {
         console.log('handleStartGame');
-        navigate('/aigame');
+        console.log('handleStartGame SpinWheel sesionData: ', sessionData);
+        if ( sessionData === null ) return;
+        const { clientId, channelId } = sessionData;
+        if ( clientId && channelId ) {
+            navigate('/aigame');
+            publishStartGameAI(clientId, channelId)
+        }
     };
 
     return (
@@ -42,7 +67,7 @@ function SpinWheel() {
                     loading={false}
                     variant="gradient"
                     gradient={{ from: 'teal', to: 'lime', deg: 105 }}
-                    onClick={() => {}}
+                    onClick={handleStartGame}
                 >
                     Start Game
                 </Button>

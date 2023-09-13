@@ -48,6 +48,7 @@ export class AIGameScene extends Phaser.Scene {
 
     init(data: any) {
         if (data) {
+            console.log("AIGameScene init data: ", data);
             this.channelId = data.channelId
             this.sessionId = data.sessionId;
             this.clientId = data.clientId;
@@ -62,7 +63,7 @@ export class AIGameScene extends Phaser.Scene {
     }
 
     async create() {
-        console.log("AIGameScene data: ", this.data);
+        console.log("AIGameScene create data: ", this.data);
         await this.setupSessionData();
         this.setupSpinWheel();
 

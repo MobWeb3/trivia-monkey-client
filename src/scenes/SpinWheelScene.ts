@@ -63,8 +63,6 @@ export class SpinWheelScene extends Phaser.Scene {
         await this.setupSessionData();
         this.setupSpinWheel();
 
-        this.setupBackButton();
-
 
 
         if (this.channelId && this.clientId) {

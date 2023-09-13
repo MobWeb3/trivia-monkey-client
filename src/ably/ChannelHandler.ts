@@ -63,4 +63,21 @@ export class ChannelHandler {
       return undefined;
     }
   }
+
+  public async publishMessage(data: any) {
+    const { channelId, message, details} = data;
+    try {
+      await ChannelHandler.ablyInstance?.publishToChannel(channelId, message, details);
+    } catch (error) {
+      console.error(`Error: ${error}`);
+    }
+  }
+
+  public async subscribeToChannel(channelId: string, message: string) {
+    try {
+      await ChannelHandler.ablyInstance?.subscribeToChannel(channelId, message);
+    } catch (error) {
+      console.error(`Error: ${error}`);
+    }
+  }
 }
