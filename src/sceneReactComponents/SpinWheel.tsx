@@ -45,6 +45,7 @@ function SpinWheel() {
             if (sessionData) {
                 const playerList = (await updatePlayerListOrder({id: sessionData.sessionId})).playerList;
                 console.log('playerList', playerList);
+                // set the first player in the list as the current turn player
                 await setCurrentTurnPlayerId({id: sessionData.sessionId, playerId: playerList[0]})
             }
             setIsLoading(false);

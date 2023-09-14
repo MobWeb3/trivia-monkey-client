@@ -22,5 +22,5 @@ export const web3authSolana = new Web3Auth({
       loginMethodsOrder: ['facebook', 'google'],
       appLogo: 'https://web3auth.io/images/w3a-L-Favicon-1.svg' // Your App Logo Here
     },
-    web3AuthNetwork: "testnet",
+    web3AuthNetwork: "cyan",
 });
