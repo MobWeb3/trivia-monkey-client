@@ -39,7 +39,7 @@ export const createChannelListenerWrapper = async (web3auth: Web3Auth, data: any
     const publicKey = await getConnectedPublicKey(web3auth);
     if (!publicKey) {
         console.log('publicKey not initialized yet');
-        return;
+        return {};
     }
     const userInfo = await getUserInfo(web3auth);
     data.clientId = userInfo?.email;
@@ -85,8 +85,11 @@ export const createChannelListenerWrapper = async (web3auth: Web3Auth, data: any
             // Update topics
             const addTopicResponse= await addTopic({id:pbSessionId, topic: data.topic})
             console.log('addTopic response:', addTopicResponse);
+
+            return {sessionId: pbSessionId, channelId};
         }
     }
+    return {channelId}
 };
 
 export const enterChannelListenerWrapper = async (web3auth: Web3Auth, data: any) => {
