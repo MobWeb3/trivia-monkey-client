@@ -2,15 +2,16 @@ import { useContext, useEffect, useState } from 'react';
 import { enterChannelListenerWrapper } from '../ably/ChannelListener';
 import { SignerContext } from '../components/SignerContext';
 import { Messages } from '../utils/Messages';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { SessionDataContext } from '../components/SessionDataContext';
+import queryString from 'query-string';
 
 const JoinGame = () => {
     const [channelId, setChannelId] = useState('');
     const { web3auth } = useContext(SignerContext);
     const navigate = useNavigate(); 
     const { setSessionData } = useContext(SessionDataContext);
-
+    const location = useLocation();
 
     useEffect(() => {
         const handleAllPlayersJoined = (event:any) => {
@@ -27,6 +28,16 @@ const JoinGame = () => {
             window.removeEventListener(Messages.ALL_PLAYERS_JOINED, handleAllPlayersJoined);
         };
     }, []);
+
+    useEffect(() => {
+        const parsed = queryString.parse(location.search);
+        const { sessionId, channelId } = parsed;
+
+        if (sessionId && channelId) {
+            setChannelId(channelId as string);
+            handleJoinGame({ channelId });
+        }
+    }, [location]);
 
     const handleJoinGame = async (data: any) => {
         if (web3auth) {

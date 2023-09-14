@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import { createChannelListenerWrapper } from '../ably/ChannelListener';
 import { SignerContext } from '../components/SignerContext';
 import { Messages } from '../utils/Messages';
@@ -9,18 +9,26 @@ import { useDisclosure } from '@mantine/hooks';
 import ModalContent from '../components/ModalContent';
 import { NumberInputComponent } from '../components/NumberInput';
 import { IconPacman } from '@tabler/icons-react';
+import QRCodeStyling from "qr-code-styling";
 
 const CreateGame = () => {
     const [nickname, setNickname] = useState('');
     const [numberPlayers, setNumberPlayers] = useState('');
     const [pointsToWin, setPointsToWin] = useState('');
     const { web3auth } = useContext(SignerContext);
-    const { setSessionData } = useContext(SessionDataContext);
+    const {sessionData, setSessionData } = useContext(SessionDataContext);
     const navigate = useNavigate();
     const [opened, { open, close }] = useDisclosure(false);
     const [selectedChip, setSelectedChip] = useState(null);
     const [loading, setLoading] = useState(false);
     const [sesssionCreated, setSessionCreated] = useState(false);
+    const ref = useRef(null); //qr code ref
+
+    useEffect(() => {
+        if (ref.current) {
+            qrCode.append(ref.current);
+        }
+    }, []);
 
     useEffect(() => {
         const handleAllPlayersJoined = (event: any) => {
@@ -38,18 +46,29 @@ const CreateGame = () => {
         };
     }, [selectedChip, pointsToWin, nickname]);
 
+    useEffect(() => {
+        qrCode.update({
+          data:`https://helpful-knowing-ghost.ngrok-free.app/joingame?sessionId=${sessionData?.sessionId}&channelId=${sessionData?.channelId}`
+        });
+        if (ref.current) {
+            qrCode.append(ref.current);
+        }
+      }, [sessionData]);
+
     const handleCreateChannel = async (data: any) => {
         if (web3auth) {
-            await createChannelListenerWrapper(web3auth, data);
+            const {sessionId, channelId} =  await createChannelListenerWrapper(web3auth, data);
+            console.log('handleCreateChannel: ', sessionId, channelId);
+            setSessionData({ sessionId, channelId });
         }
     };
 
     const handlePlayButtonClick = async () => {
         setLoading(true);
 
-        console.log('handlePlayButtonClick A');
+        // console.log('handlePlayButtonClick A');
         if (nickname !== '' && numberPlayers !== '' && pointsToWin !== '') {
-            console.log('handlePlayButtonClick B');
+            // console.log('handlePlayButtonClick B');
             await handleCreateChannel({ nickname, numberPlayers, pointsToWin, topic: selectedChip });
             setSessionCreated(true);
         }
@@ -60,11 +79,30 @@ const CreateGame = () => {
         return (
             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
                 <p>We are waiting for other players to join...</p>
+                <div ref={ref} />
             </div>
-
+            
         );
     };
 
+    const qrCode = new QRCodeStyling({
+        width: 300,
+        height: 300,
+        type: "svg",
+        data: "https://helpful-knowing-ghost.ngrok-free.app/joingame?channelId=1234",
+        image: "https://cryptologos.cc/logos/chimpion-bnana-logo.svg",
+        dotsOptions: {
+            color: "#4267b2",
+            type: "rounded"
+        },
+        backgroundOptions: {
+            color: "#e9ebee",
+        },
+        imageOptions: {
+            crossOrigin: "anonymous",
+            margin: 20
+        }
+    });
 
     return (
         <>
