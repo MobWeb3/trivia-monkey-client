@@ -24,7 +24,6 @@ export class AIGameScene extends Phaser.Scene {
 
     currentTurnPlayerId?: string;
 
-
     playerInTurnAvatar?: Phaser.GameObjects.Sprite;
     // Text objects for displaying player in turn avatar and time left
     playerInTurnAvatarText?: Phaser.GameObjects.Text;
@@ -89,8 +88,8 @@ export class AIGameScene extends Phaser.Scene {
     }
 
     async updateTurn() {
-        await this.setupSessionData();
-        this.setupPlayerInTurnAvatar();
+        await this.updateSessionData();
+        this.updatedPlayerInTurnAvatar();
     }
 
     shutdown() {
@@ -153,6 +152,38 @@ export class AIGameScene extends Phaser.Scene {
         const isHost = await getHostId({ id: this.sessionId }) === this.clientId;
         if (isHost) this.isHost = true;
         if (numberPlayers) this.numberPlayers = numberPlayers;
+    }
+
+    async updateSessionData() {
+        // Get session data
+        const session = await getSession({ id: this.sessionId });
+        if (!session) {
+            console.log('session not initialized yet');
+            this.messageGameText?.setText("session not initialized yet");
+            return;
+        }
+        const {gamePhase, topics, currentTurnPlayerId} = session;
+
+        // Get topics
+        this.sliceValues = topics;
+        this.gamePhase = gamePhase ?? {};
+
+        // Check if game is active
+        if (this.gamePhase !== SessionPhase.GAME_ACTIVE) {
+            console.log('Game is not active!');
+            // tell page to show that game has not started yet or is over.
+            return;
+        }
+
+        // On load check if player is up for turn
+        this.currentTurnPlayerId = currentTurnPlayerId;
+        if (this.isPlayerTurn() && this.messageGameText) {
+            this.canSpin = true;
+            this.messageGameText?.setText("Your turn!");
+        } else {
+            this.canSpin = false;
+            this.messageGameText?.setText(`Waiting for ${currentTurnPlayerId} to finish turn...`);
+        }
     }
 
     // function to spin the wheel
@@ -251,6 +282,15 @@ export class AIGameScene extends Phaser.Scene {
 
         this.playerInTurnAvatarText = this.add.text(this.cameras.main.width / 2, this.cameras.main.height / 2 + 200 + this.playerInTurnAvatar.displayHeight, "Player: " + this.currentTurnPlayerId + " turn", { fontSize: '16px', color: '#fff' });
         this.playerInTurnAvatarText.setOrigin(0.5);
+    }
+
+    updatedPlayerInTurnAvatar() {
+        // change text
+        if (this.playerInTurnAvatarText && this.currentTurnPlayerId) {
+            this.playerInTurnAvatarText.setText("Player: " + this.currentTurnPlayerId + " turn");
+        }
+
+        // change avatar later TODO: change avatar
     }
 
 }
