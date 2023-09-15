@@ -53,11 +53,11 @@ function SpinWheel() {
             navigate('/aigame');
         };
 
-        window.addEventListener(Messages.OPEN_AI_GAME, handleOpenAIGame);
+        window.addEventListener(Messages.START_GAME_AI, handleOpenAIGame);
 
         // Cleanup listener when component unmounts
         return () => {
-            window.removeEventListener(Messages.OPEN_AI_GAME, handleOpenAIGame);
+            window.removeEventListener(Messages.START_GAME_AI, handleOpenAIGame);
         };
     }, [mayStartGame]);
 

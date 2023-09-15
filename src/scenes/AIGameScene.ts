@@ -1,7 +1,9 @@
 
-import { getHostId, getSession } from '../polybase/SessionHandler';
+import { getHostId, getNextTurnPlayerId, getSession } from '../polybase/SessionHandler';
 import { SessionPhase } from '../game-domain/SessionPhase';
 import { Types } from 'ably';
+import { publishTurnCompleted, suscribeToTurnCompleted } from '../ably/AblyMessages';
+import { Messages } from '../utils/Messages';
 
 
 export class AIGameScene extends Phaser.Scene {
@@ -10,7 +12,7 @@ export class AIGameScene extends Phaser.Scene {
     wheel?: Phaser.GameObjects.Sprite;
     wheelContainer?: Phaser.GameObjects.Container;
     // can the wheel spin?
-    canSpin = true;
+    canSpin?: boolean;
     // slices (prizes) placed in the wheel
     slices = 8;
     // prize names, starting from 12 o'clock going clockwise
@@ -20,15 +22,16 @@ export class AIGameScene extends Phaser.Scene {
     // text field where to show the prize
     messageGameText?: Phaser.GameObjects.Text;
 
+    currentTurnPlayerId?: string;
+
 
     playerInTurnAvatar?: Phaser.GameObjects.Sprite;
-    // playerInTurnAvatar?: string;
+    // Text objects for displaying player in turn avatar and time left
+    playerInTurnAvatarText?: Phaser.GameObjects.Text;
 
     timeLeft: number = 20; // 20 seconds
     timerText?: Phaser.GameObjects.Text;
 
-    // Text objects for displaying player in turn avatar and time left
-    playerInTurnAvatarText?: Phaser.GameObjects.Text;
     timeLeftText?: Phaser.GameObjects.Text;
 
     sessionId?: string;
@@ -66,11 +69,14 @@ export class AIGameScene extends Phaser.Scene {
         console.log("AIGameScene create data: ", this.data);
         await this.setupSessionData();
         this.setupSpinWheel();
-
-        if (this.channelId && this.clientId) {
-
+        if (this.clientId && this.channelId){
+            suscribeToTurnCompleted(this.clientId, this.channelId);
         }
 
+        window.addEventListener(Messages.TURN_COMPLETED, () => {
+                console.log("AIGameScene TURN_COMPLETED");
+                this.updateTurn();
+        });
         // Add timer text to the scene
         this.timerText = this.add.text(10, 50, `Time left: ${this.timeLeft}`, { fontSize: '16px', color: '#fff' });
         // Start the timer
@@ -82,6 +88,14 @@ export class AIGameScene extends Phaser.Scene {
         });
     }
 
+    async updateTurn() {
+        await this.setupSessionData();
+        this.setupPlayerInTurnAvatar();
+    }
+
+    shutdown() {
+        window.removeEventListener(Messages.TURN_COMPLETED, this.updateTurn.bind(this));
+    }
 
     updateTimer() {
         this.timeLeft--; // Decrease the time left
@@ -93,25 +107,48 @@ export class AIGameScene extends Phaser.Scene {
         this.timerText?.setText(`Time left: ${this.timeLeft}`);
     }
 
+    isPlayerTurn(): boolean {
+        if (!this.clientId || !this.currentTurnPlayerId)
+            return false;
+        return this.clientId === this.currentTurnPlayerId;
+    }
 
     async setupSessionData() {
+        // Get session data
         const session = await getSession({ id: this.sessionId });
-
         if (!session) {
             console.log('session not initialized yet');
             this.messageGameText?.setText("session not initialized yet");
             return;
         }
-        const { numberPlayers, gamePhase, topics } = session;
+        const { numberPlayers, gamePhase, topics, currentTurnPlayerId} = session;
 
+        // Get topics
         this.sliceValues = topics;
         this.gamePhase = gamePhase ?? {};
-        if (this.gamePhase === SessionPhase.GAME_ACTIVE) {
-            console.log('can turn!');
-            this.canSpin = true;
+
+        // Check if game is active
+        if (this.gamePhase !== SessionPhase.GAME_ACTIVE) {
+            console.log('Game is not active!');
+            // tell page to show that game has not started yet or is over.
+            return;
         }
 
-        // this.canSpin = true;
+        // On load check if player is up for turn
+        this.currentTurnPlayerId = currentTurnPlayerId;
+        // adding the text field
+        this.messageGameText = this.add.text(this.cameras.main.centerX, this.cameras.main.centerY / 2 - 100, "", { align: 'center' });
+        // setting text field registration point in its center
+        this.messageGameText.setOrigin(0.5);
+        // aligning the text to center
+        this.messageGameText.setAlign('center');
+        if (this.isPlayerTurn()) {
+            this.canSpin = true;
+            this.messageGameText?.setText("Your turn!");
+        } else {
+            this.canSpin = false;
+            this.messageGameText?.setText(`Waiting for ${currentTurnPlayerId} to finish turn...`);
+        }
 
         const isHost = await getHostId({ id: this.sessionId }) === this.clientId;
         if (isHost) this.isHost = true;
@@ -121,7 +158,7 @@ export class AIGameScene extends Phaser.Scene {
     // function to spin the wheel
     spin() {
         // can we spin the wheel?
-        if (this.canSpin) {
+        if (this.canSpin && this.isPlayerTurn()) {
             // resetting text field
             this.messageGameText?.setText("");
             // the wheel will spin round from 2 to 4 times. This is just coreography
@@ -144,13 +181,19 @@ export class AIGameScene extends Phaser.Scene {
                 onComplete: this.handleSelectedSlice,
                 callbackScope: this
             });
+
+            // Update turn on polybase
+            getNextTurnPlayerId({id: this.sessionId});
+
+            // Publish turn completed // we know clientId is not null because we checked isPlayerTurn
+            if(this.clientId && this.channelId) {
+                publishTurnCompleted(this.clientId, this.channelId);
+            }   
         }
     }
 
     // function to assign the prize
     async handleSelectedSlice() {
-        // now we can only spin many times
-        this.canSpin = true;
         // writing the prize you just won
         if (this.selectedSlice)
             this.messageGameText?.setText(this.selectedSlice.toString());
@@ -171,8 +214,6 @@ export class AIGameScene extends Phaser.Scene {
         this.wheelContainer?.add(this.wheel);
 
         if (this.sliceValues) {
-            console.log("no slice values");
-
 
             // Add the sprites (slice names) to the container
             for (let i = 0; i < this.slices; i++) {
@@ -196,20 +237,19 @@ export class AIGameScene extends Phaser.Scene {
         var pin = this.add.sprite(this.cameras.main.width / 2, this.cameras.main.height / 2 - 50, "pin");
         // setting pin registration point in its center
         pin.setOrigin(0.5);
-        // adding the text field
-        this.messageGameText = this.add.text(this.cameras.main.centerX, this.cameras.main.centerY / 2 - 100, "not spinned", { align: 'center' });
-        // setting text field registration point in its center
-        this.messageGameText.setOrigin(0.5);
-        // aligning the text to center
-        this.messageGameText.setAlign('center');
+
         // waiting for your input, then calling "spin" function
         this.input.on('pointerdown', this.spin, this);
 
+        this.setupPlayerInTurnAvatar();
+    }
+
+    setupPlayerInTurnAvatar() {
         this.playerInTurnAvatar = this.add.sprite(this.cameras.main.width / 2, this.cameras.main.height / 2 + 200, "player");
         this.playerInTurnAvatar.setOrigin(0.5);
         this.playerInTurnAvatar.setScale(0.25);
 
-        this.playerInTurnAvatarText = this.add.text(this.cameras.main.width / 2, this.cameras.main.height / 2 + 200 + this.playerInTurnAvatar.displayHeight, "Player: " + this.playerInTurnAvatar + " turn", { fontSize: '16px', color: '#fff' });
+        this.playerInTurnAvatarText = this.add.text(this.cameras.main.width / 2, this.cameras.main.height / 2 + 200 + this.playerInTurnAvatar.displayHeight, "Player: " + this.currentTurnPlayerId + " turn", { fontSize: '16px', color: '#fff' });
         this.playerInTurnAvatarText.setOrigin(0.5);
     }
 

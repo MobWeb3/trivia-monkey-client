@@ -27,7 +27,7 @@ const PlayLobbyScene = () => {
         console.log('Mock game AI');
         // Set data and navigate to AIGameScene
         navigate('/aigame');
-        setSessionData({sessionId: 'mk-pbid-91b37893-0f97-4f38-bb86-23c15658c948'})
+        setSessionData({sessionId: 'mk-pbid-14ff981a-ba4b-4979-9d82-37ee9539e36d', clientId: 'noell.lpz@gmail.com'})
     };
 
     return (

@@ -27,8 +27,8 @@ export class AblyHandler {
     async subscribeToChannel(channelName: string, message: string) {
         const channel = this.ablyInstance.channels.get(channelName);
         channel?.subscribe(message, async function (message) {
-            console.log(`Message ${message} with id:`, message);
-            window.dispatchEvent(new CustomEvent(Messages.OPEN_AI_GAME, {detail: message}));
+            console.log(`Message received: `, message);
+            window.dispatchEvent(new CustomEvent(message.name, { detail: message.data }));
         });
     }
 

@@ -13,5 +13,6 @@ export enum Messages {
     CHANNEL_JOINED = 'ChannelJoined',
     ALL_PLAYERS_JOINED = 'AllPlayersJoined',
     MAY_START_GAME = 'MayStartGame',
-    OPEN_AI_GAME = 'OpenAIGame',
+    START_GAME_AI = 'start-game-ai',
+    TURN_COMPLETED = 'turn-completed',
   }
