@@ -1,10 +1,9 @@
 
 import { getHostId, getNextTurnPlayerId, getSession } from '../polybase/SessionHandler';
 import { SessionPhase } from '../game-domain/SessionPhase';
-import { Types } from 'ably';
 import { publishTurnCompleted, suscribeToTurnCompleted } from '../ably/AblyMessages';
 import { Messages } from '../utils/Messages';
-
+import { GameSession } from '../game-domain/GameSession';
 
 export class AIGameScene extends Phaser.Scene {
 
@@ -32,22 +31,11 @@ export class AIGameScene extends Phaser.Scene {
     timerText?: Phaser.GameObjects.Text;
 
     timeLeftText?: Phaser.GameObjects.Text;
-
-    // Session data -deprecated should be replaced by session variable 
-    sessionId?: string;
-    channelId?: string;
-    clientId?: string;
-    currentPhase?: string;
-    channel?: Types.RealtimeChannelPromise;
     isHost?: boolean = false;
-    name?: string;
-    initialTurnPositions?: any;
-    numberPlayers?: number;
-    gamePhase?: string;
+    clientId?: string;
 
     // This should replace all variables above
-    session?: any;
-    // oldTurnPlayerId: string | undefined;
+    session: GameSession = {} as GameSession;
 
     constructor() {
         super({ key: "AIGameScene" });
@@ -56,10 +44,10 @@ export class AIGameScene extends Phaser.Scene {
     init(data: any) {
         if (data) {
             console.log("AIGameScene init data: ", data);
-            this.channelId = data.channelId
-            this.sessionId = data.sessionId;
+            this.session.channelId = data.channelId
+            this.session.id = data.sessionId;
             this.clientId = data.clientId;
-            this.name = data.name;
+            // this.name = data.name;
         }
     }
 
@@ -73,8 +61,8 @@ export class AIGameScene extends Phaser.Scene {
         console.log("AIGameScene create data: ", this.data);
         await this.setupSessionData();
         this.setupSpinWheel();
-        if (this.clientId && this.channelId){
-            suscribeToTurnCompleted(this.clientId, this.channelId);
+        if (this.clientId && this.session.channelId){
+            suscribeToTurnCompleted(this.clientId, this.session.channelId);
         }
 
         window.addEventListener(Messages.TURN_COMPLETED, (event:any) => {
@@ -100,7 +88,11 @@ export class AIGameScene extends Phaser.Scene {
     }
 
     shutdown() {
-        window.removeEventListener(Messages.TURN_COMPLETED, this.updateTurn.bind(this, ""));
+            // Remove event listener
+            window.removeEventListener(Messages.TURN_COMPLETED, this.updateTurn.bind(this, ""));
+
+            // Destroy the scene
+            this.scene.remove('AIGameScene');
     }
 
     updateTimer() {
@@ -125,13 +117,13 @@ export class AIGameScene extends Phaser.Scene {
         return new Promise(async (resolve, reject) => {
             const intervalId = setInterval(async () => {
                 // Get session data
-                const session = await getSession({ id: this.sessionId });
+                const session = await getSession({ id: this.session.id });
                 if (!session) {
                     console.log('session not initialized yet');
                     this.messageGameText?.setText("session not initialized yet");
                     return;
                 }
-                const { numberPlayers, gamePhase, topics, currentTurnPlayerId} = session;
+                const { currentTurnPlayerId } = session;
     
                 // If currentTurnPlayerId is not null, clear the interval and resolve the Promise
                 if (currentTurnPlayerId) {
@@ -155,7 +147,7 @@ export class AIGameScene extends Phaser.Scene {
             const maxTries = 10; // Set maximum number of tries
             const intervalId = setInterval(async () => {
                 // Get new session data
-                const newSession = await getSession({ id: this.sessionId });
+                const newSession = await getSession({ id: this.session.id });
                 if (!newSession) {
                     console.log('session not initialized yet');
                     this.messageGameText?.setText("session not initialized yet");
@@ -178,17 +170,15 @@ export class AIGameScene extends Phaser.Scene {
 
     async setupSessionData() {
 
-        
         this.session = await this.pollForCurrentPlayerId();
         // Get session data
-        const { numberPlayers, gamePhase, topics, currentTurnPlayerId } = this.session
+        const { topics, currentTurnPlayerId } = this.session
 
         // Get topics
         this.sliceValues = topics;
-        this.gamePhase = gamePhase ?? {};
 
         // Check if game is active
-        if (this.gamePhase !== SessionPhase.GAME_ACTIVE) {
+        if (this.session.gamePhase !== SessionPhase.GAME_ACTIVE) {
             console.log('Game is not active!');
             // tell page to show that game has not started yet or is over.
             return;
@@ -210,9 +200,9 @@ export class AIGameScene extends Phaser.Scene {
             this.messageGameText?.setText(`Waiting for ${currentTurnPlayerId} to finish turn...`);
         }
 
-        const isHost = await getHostId({ id: this.sessionId }) === this.clientId;
+        const isHost = await getHostId({ id: this.session.id }) === this.clientId;
         if (isHost) this.isHost = true;
-        if (numberPlayers) this.numberPlayers = numberPlayers;
+        // if (numberPlayers) this.session.numberPlayers = numberPlayers;
     }
 
     async updateSessionData(expectedCurrentPlayerId: string) {
@@ -221,10 +211,10 @@ export class AIGameScene extends Phaser.Scene {
 
         // Get topics
         this.sliceValues = topics;
-        this.gamePhase = gamePhase ?? {};
+        this.session.gamePhase = gamePhase ?? {};
 
         // Check if game is active
-        if (this.gamePhase !== SessionPhase.GAME_ACTIVE) {
+        if (this.session.gamePhase !== SessionPhase.GAME_ACTIVE) {
             console.log('Game is not active!');
             // tell page to show that game has not started yet or is over.
             return;
@@ -269,14 +259,12 @@ export class AIGameScene extends Phaser.Scene {
             });
 
 
-            // save old turn player id in order to check if it changed later
-            // this.oldTurnPlayerId = this.currentTurnPlayerId;
             // Update turn on polybase
-            const {nextTurnPlayerId} = await getNextTurnPlayerId({id: this.sessionId});
+            const {nextTurnPlayerId} = await getNextTurnPlayerId({id: this.session.id});
 
             // Publish turn completed // we know clientId is not null because we checked isPlayerTurn
-            if(this.clientId && this.channelId) {
-                await publishTurnCompleted(this.clientId, this.channelId, {nextTurnPlayerId});
+            if(this.clientId && this.session.channelId) {
+                await publishTurnCompleted(this.clientId, this.session.channelId, {nextTurnPlayerId});
             }   
         }
     }
