@@ -112,15 +112,30 @@ export class AIGameScene extends Phaser.Scene {
         return this.clientId === this.currentTurnPlayerId;
     }
 
+    pollForCurrentPlayerId(): Promise<any> {
+        return new Promise(async (resolve, reject) => {
+            const intervalId = setInterval(async () => {
+                // Get session data
+                const session = await getSession({ id: this.sessionId });
+                if (!session) {
+                    console.log('session not initialized yet');
+                    this.messageGameText?.setText("session not initialized yet");
+                    return;
+                }
+                const { numberPlayers, gamePhase, topics, currentTurnPlayerId} = session;
+    
+                // If currentTurnPlayerId is not null, clear the interval and resolve the Promise
+                if (currentTurnPlayerId) {
+                    clearInterval(intervalId);
+                    resolve(session);
+                }
+            }, 1000); // 1000 ms = 1 second
+        });
+    }
+
     async setupSessionData() {
         // Get session data
-        const session = await getSession({ id: this.sessionId });
-        if (!session) {
-            console.log('session not initialized yet');
-            this.messageGameText?.setText("session not initialized yet");
-            return;
-        }
-        const { numberPlayers, gamePhase, topics, currentTurnPlayerId} = session;
+        const { numberPlayers, gamePhase, topics, currentTurnPlayerId } = await this.pollForCurrentPlayerId();
 
         // Get topics
         this.sliceValues = topics;
