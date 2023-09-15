@@ -11,9 +11,9 @@ export const subscribeToStartGameAI = async (clientId: string, channelId: string
     await channelHandler?.subscribeToChannel(channelId, Messages.START_GAME_AI);
 }
 
-export const publishTurnCompleted = async (clientId: string, channelId: string) => {
+export const publishTurnCompleted = async (clientId: string, channelId: string, data?: any) => {
     const channelHandler = await new ChannelHandler().initChannelHandler(clientId);
-    await channelHandler?.publishMessage({ channelId, message: Messages.TURN_COMPLETED, details: {} });
+    await channelHandler?.publishMessage({ channelId, message: Messages.TURN_COMPLETED, details: data });
 }
 
 export const suscribeToTurnCompleted = async (clientId: string, channelId: string) => {

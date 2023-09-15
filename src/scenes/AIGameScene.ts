@@ -33,6 +33,7 @@ export class AIGameScene extends Phaser.Scene {
 
     timeLeftText?: Phaser.GameObjects.Text;
 
+    // Session data -deprecated should be replaced by session variable 
     sessionId?: string;
     channelId?: string;
     clientId?: string;
@@ -43,6 +44,10 @@ export class AIGameScene extends Phaser.Scene {
     initialTurnPositions?: any;
     numberPlayers?: number;
     gamePhase?: string;
+
+    // This should replace all variables above
+    session?: any;
+    // oldTurnPlayerId: string | undefined;
 
     constructor() {
         super({ key: "AIGameScene" });
@@ -72,9 +77,10 @@ export class AIGameScene extends Phaser.Scene {
             suscribeToTurnCompleted(this.clientId, this.channelId);
         }
 
-        window.addEventListener(Messages.TURN_COMPLETED, () => {
-                console.log("AIGameScene TURN_COMPLETED");
-                this.updateTurn();
+        window.addEventListener(Messages.TURN_COMPLETED, (event:any) => {
+                console.log("AIGameScene TURN_COMPLETED with next expected", event);
+                const {nextTurnPlayerId} = event.detail;
+                this.updateTurn(nextTurnPlayerId);
         });
         // Add timer text to the scene
         this.timerText = this.add.text(10, 50, `Time left: ${this.timeLeft}`, { fontSize: '16px', color: '#fff' });
@@ -87,13 +93,14 @@ export class AIGameScene extends Phaser.Scene {
         });
     }
 
-    async updateTurn() {
-        await this.updateSessionData();
+    // This should only be called if a previous change on Polybase has been deployed
+    async updateTurn(expectedCurrentPlayerId: string) {
+        await this.updateSessionData(expectedCurrentPlayerId);
         this.updatedPlayerInTurnAvatar();
     }
 
     shutdown() {
-        window.removeEventListener(Messages.TURN_COMPLETED, this.updateTurn.bind(this));
+        window.removeEventListener(Messages.TURN_COMPLETED, this.updateTurn.bind(this, ""));
     }
 
     updateTimer() {
@@ -113,6 +120,8 @@ export class AIGameScene extends Phaser.Scene {
     }
 
     pollForCurrentPlayerId(): Promise<any> {
+        let tries = 0; // Initialize tries counter
+        const maxTries = 5; // Set maximum number of tries
         return new Promise(async (resolve, reject) => {
             const intervalId = setInterval(async () => {
                 // Get session data
@@ -129,13 +138,50 @@ export class AIGameScene extends Phaser.Scene {
                     clearInterval(intervalId);
                     resolve(session);
                 }
+
+                // If maximum number of tries has been reached, clear the interval and reject the Promise
+                if (++tries >= maxTries) {
+                    clearInterval(intervalId);
+                    reject('Timeout: Maximum number of tries reached');
+                }
+            }, 1000); // 1000 ms = 1 second
+        });
+    }
+
+    pollUntilSessionChanges(expectedCurrentPlayerId: string): Promise<any> {
+
+        return new Promise(async (resolve, reject) => {
+            let tries = 0; // Initialize tries counter
+            const maxTries = 10; // Set maximum number of tries
+            const intervalId = setInterval(async () => {
+                // Get new session data
+                const newSession = await getSession({ id: this.sessionId });
+                if (!newSession) {
+                    console.log('session not initialized yet');
+                    this.messageGameText?.setText("session not initialized yet");
+                    return;
+                }
+    
+                if (expectedCurrentPlayerId === newSession.currentTurnPlayerId) {
+                    clearInterval(intervalId);
+                    resolve(newSession);
+                }
+
+                // If maximum number of tries has been reached, clear the interval and reject the Promise
+                if (++tries >= maxTries) {
+                    clearInterval(intervalId);
+                    reject('Timeout: Maximum number of tries reached');
+                }
             }, 1000); // 1000 ms = 1 second
         });
     }
 
     async setupSessionData() {
+
+        
+        this.session = await this.pollForCurrentPlayerId();
         // Get session data
-        const { numberPlayers, gamePhase, topics, currentTurnPlayerId } = await this.pollForCurrentPlayerId();
+        const { numberPlayers, gamePhase, topics, currentTurnPlayerId } = this.session
 
         // Get topics
         this.sliceValues = topics;
@@ -169,15 +215,9 @@ export class AIGameScene extends Phaser.Scene {
         if (numberPlayers) this.numberPlayers = numberPlayers;
     }
 
-    async updateSessionData() {
-        // Get session data
-        const session = await getSession({ id: this.sessionId });
-        if (!session) {
-            console.log('session not initialized yet');
-            this.messageGameText?.setText("session not initialized yet");
-            return;
-        }
-        const {gamePhase, topics, currentTurnPlayerId} = session;
+    async updateSessionData(expectedCurrentPlayerId: string) {
+        console.log("current session:", this.session);
+        const {gamePhase, topics, currentTurnPlayerId} = await this.pollUntilSessionChanges(expectedCurrentPlayerId);
 
         // Get topics
         this.sliceValues = topics;
@@ -202,7 +242,7 @@ export class AIGameScene extends Phaser.Scene {
     }
 
     // function to spin the wheel
-    spin() {
+    async spin() {
         // can we spin the wheel?
         if (this.canSpin && this.isPlayerTurn()) {
             // resetting text field
@@ -228,12 +268,15 @@ export class AIGameScene extends Phaser.Scene {
                 callbackScope: this
             });
 
+
+            // save old turn player id in order to check if it changed later
+            // this.oldTurnPlayerId = this.currentTurnPlayerId;
             // Update turn on polybase
-            getNextTurnPlayerId({id: this.sessionId});
+            const {nextTurnPlayerId} = await getNextTurnPlayerId({id: this.sessionId});
 
             // Publish turn completed // we know clientId is not null because we checked isPlayerTurn
             if(this.clientId && this.channelId) {
-                publishTurnCompleted(this.clientId, this.channelId);
+                await publishTurnCompleted(this.clientId, this.channelId, {nextTurnPlayerId});
             }   
         }
     }
