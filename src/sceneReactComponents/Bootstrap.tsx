@@ -63,7 +63,8 @@ export const Bootstrap = () => {
             console.log("signer address", await _signer.getAddress());
         } else {
             const publicKey = await getConnectedPublicKey(web3auth);
-            console.log(`publick key: ${publicKey?.toString()}, ${publicKey?.toBase58()}`);
+            console.log(`publick key: ${publicKey?.toString()}`);
+            // console.log(`userInfo: ${JSON.stringify(userInfo)}`);
             return {
                 clientId: userInfo.email ?? "",
                 name: userInfo.name ?? "",

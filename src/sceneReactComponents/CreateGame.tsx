@@ -10,6 +10,8 @@ import ModalContent from '../components/ModalContent';
 import { NumberInputComponent } from '../components/NumberInput';
 import { IconPacman } from '@tabler/icons-react';
 import QRCodeStyling from "qr-code-styling";
+import { addTopicToQuestionSession, createQuestionSession } from '../polybase/QuestionsHandler';
+import { generateQuestions } from '../game-domain/GenerateQuestionsHandler';
 
 const CreateGame = () => {
     const [nickname, setNickname] = useState('');
@@ -21,14 +23,14 @@ const CreateGame = () => {
     const [opened, { open, close }] = useDisclosure(false);
     const [selectedChip, setSelectedChip] = useState(null);
     const [loading, setLoading] = useState(false);
-    const [sesssionCreated, setSessionCreated] = useState(false);
+    const [sessionCreated, setSessionCreated] = useState(false);
     const ref = useRef(null); //qr code ref
 
-    useEffect(() => {
-        if (ref.current) {
-            qrCode.append(ref.current);
-        }
-    }, []);
+    // useEffect(() => {
+    //     if (ref.current) {
+    //         qrCode.append(ref.current);
+    //     }
+    // }, []);
 
     useEffect(() => {
         const handleAllPlayersJoined = (event: any) => {
@@ -53,14 +55,16 @@ const CreateGame = () => {
         if (ref.current) {
             qrCode.append(ref.current);
         }
-      }, [sessionData]);
+      }, [sessionCreated]);
 
     const handleCreateChannel = async (data: any) => {
         if (web3auth) {
-            const {sessionId, channelId} =  await createChannelListenerWrapper(web3auth, data);
+            const {sessionId, channelId, clientId} =  await createChannelListenerWrapper(web3auth, data);
             console.log('handleCreateChannel: ', sessionId, channelId);
-            setSessionData({ sessionId, channelId });
+            setSessionData({sessionId, channelId, clientId});
+            return { sessionId, channelId, clientId };
         }
+        return {};
     };
 
     const handlePlayButtonClick = async () => {
@@ -69,7 +73,27 @@ const CreateGame = () => {
         // console.log('handlePlayButtonClick A');
         if (nickname !== '' && numberPlayers !== '' && pointsToWin !== '') {
             // console.log('handlePlayButtonClick B');
-            await handleCreateChannel({ nickname, numberPlayers, pointsToWin, topic: selectedChip });
+            const sessionData = await handleCreateChannel({ nickname, numberPlayers, pointsToWin, topic: selectedChip });
+            console.log('handlePlayButtonClick C, sessionData', sessionData);
+            // Create AI session question database record in Polybase
+            if (sessionData){
+                console.log('entered createQuestionSession');
+                const response = await createQuestionSession({ 
+                    sessionId: sessionData.sessionId,
+                    clientId: sessionData.clientId
+                }); 
+                
+                if (response){
+                    const questionSessionId = response.recordData.data.id;
+                    // Deploy generation of AI questions
+                    generateQuestions({topic: selectedChip}).then((response) => {
+                        console.log('generateQuestions response: ', response);
+                        addTopicToQuestionSession({id: questionSessionId, column: 1, topic: response});
+                    });
+                } 
+
+            }
+            console.log('handlePlayButtonClick setSessionCreated');
             setSessionCreated(true);
         }
         setLoading(false);
@@ -114,7 +138,7 @@ const CreateGame = () => {
                             <Loader variant="bars" />
                         </div>
                     </div> :
-                    sesssionCreated ? <WaitingMessage /> : (
+                    sessionCreated ? <WaitingMessage /> : (
                         <div>
                             <h1>Let's create your game...</h1>
                             <Input

@@ -86,7 +86,7 @@ export const createChannelListenerWrapper = async (web3auth: Web3Auth, data: any
             const addTopicResponse= await addTopic({id:pbSessionId, topic: data.topic})
             console.log('addTopic response:', addTopicResponse);
 
-            return {sessionId: pbSessionId, channelId};
+            return {sessionId: pbSessionId, channelId, clientId: data.clientId};
         }
     }
     return {channelId}
