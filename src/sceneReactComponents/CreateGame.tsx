@@ -10,7 +10,7 @@ import ModalContent from '../components/ModalContent';
 import { NumberInputComponent } from '../components/NumberInput';
 import { IconPacman } from '@tabler/icons-react';
 import QRCodeStyling from "qr-code-styling";
-import { addTopicToQuestionSession, createQuestionSession } from '../polybase/QuestionsHandler';
+import { addQuestions, createQuestionSession } from '../polybase/QuestionsHandler';
 import { generateQuestions } from '../game-domain/GenerateQuestionsHandler';
 
 const CreateGame = () => {
@@ -21,7 +21,7 @@ const CreateGame = () => {
     const {sessionData, setSessionData } = useContext(SessionDataContext);
     const navigate = useNavigate();
     const [opened, { open, close }] = useDisclosure(false);
-    const [selectedChip, setSelectedChip] = useState(null);
+    const [selectedChips, setSelectedChips] = useState<string[]>([]);
     const [loading, setLoading] = useState(false);
     const [sessionCreated, setSessionCreated] = useState(false);
     const ref = useRef(null); //qr code ref
@@ -46,7 +46,7 @@ const CreateGame = () => {
         return () => {
             window.removeEventListener(Messages.ALL_PLAYERS_JOINED, handleAllPlayersJoined);
         };
-    }, [selectedChip, pointsToWin, nickname]);
+    }, [selectedChips, pointsToWin, nickname]);
 
     useEffect(() => {
         qrCode.update({
@@ -73,7 +73,7 @@ const CreateGame = () => {
         // console.log('handlePlayButtonClick A');
         if (nickname !== '' && numberPlayers !== '' && pointsToWin !== '') {
             // console.log('handlePlayButtonClick B');
-            const sessionData = await handleCreateChannel({ nickname, numberPlayers, pointsToWin, topic: selectedChip });
+            const sessionData = await handleCreateChannel({ nickname, numberPlayers, pointsToWin, topic: selectedChips });
             console.log('handlePlayButtonClick C, sessionData', sessionData);
             // Create AI session question database record in Polybase
             if (sessionData){
@@ -86,9 +86,11 @@ const CreateGame = () => {
                 if (response){
                     const questionSessionId = response.recordData.data.id;
                     // Deploy generation of AI questions
-                    generateQuestions({topic: selectedChip}).then((response) => {
+                    generateQuestions({topic: selectedChips}).then((response) => {
                         console.log('generateQuestions response: ', response);
-                        addTopicToQuestionSession({id: questionSessionId, column: 1, topic: response});
+
+                        // Add data to AI session question database record in Polybase
+                        addQuestions({id: questionSessionId, column: 1, topic: response});
                     });
                 } 
 
@@ -156,11 +158,12 @@ const CreateGame = () => {
                                 onChange={(value) => setPointsToWin(value)} />
                             {/* <input type="text" placeholder="Enter points to win" value={pointsToWin} onChange={e => setPointsToWin(e.target.value)} /> */}
                             <Modal opened={opened} onClose={close} title="Pick topic" radius={'lg'} padding={'xl'}>
-                                <ModalContent setSelectedChip={setSelectedChip}></ModalContent>
+                                <ModalContent setSelectedChips={setSelectedChips} numberOfPlayers={parseInt(numberPlayers)}></ModalContent>
                                 {/* Modal content */}
                             </Modal>
                             <Group position="center">
-                                <Badge size="lg" radius="lg" variant="dot">Selected topic: {selectedChip}</Badge>
+                                <Badge size="lg" radius="lg" variant="dot">Selected topics: {selectedChips.join(', ')}</Badge>
+
                                 <Button onClick={open}>Pick a topic</Button>
                             </Group>
                             <button onClick={handlePlayButtonClick}>Create Game</button>

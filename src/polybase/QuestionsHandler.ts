@@ -11,9 +11,9 @@ export const createQuestionSession = async (data: any) => {
     return false;
 }
 
-export const addTopicToQuestionSession = async (data: any) => {
+export const addQuestions = async (data: any) => {
     try {
-        const response = await axios.post(`${BASE_URL}/api/polybase/questions/addTopic`, data);
+        const response = await axios.post(`${BASE_URL}/api/polybase/questions/addQuestions`, data);
         return response.data;
     } catch (error) {
         console.error(error);

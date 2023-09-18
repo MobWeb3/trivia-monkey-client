@@ -1,6 +1,6 @@
 import { Chip, DefaultMantineColor, Group, Select } from '@mantine/core';
-import React from 'react';
-import { GeneralTopics } from '../game-domain/Topics';
+import React, { useState } from 'react';
+import { GeneralTopics, numberOfQuestionPlayerCanChoose } from '../game-domain/Topics';
 
 // Define the Mantine colors
 const mantineColors = ['blue', 'cyan', 'teal', 'green', 'lightGreen', 'lime', 'yellow', 'amber', 'orange', 'deepOrange', 'red', 'pink', 'purple', 'deepPurple', 'lightBlue', 'indigo'];
@@ -8,18 +8,37 @@ const mantineColors = ['blue', 'cyan', 'teal', 'green', 'lightGreen', 'lime', 'y
 
 type ModalContentProps = {
     // Define your prop types here
-    setSelectedChip: (value: any) => void;
+    setSelectedChips: (value: any) => void;
+    numberOfPlayers: number;
 };
+
 
 export const ModalContent = (props: ModalContentProps) => {
 
+    const [selectedChips, setSelectedChips] = useState<string[]>([]);
+    const [chipsDisabled, setChipsDisabled] = useState(false);
+
+
+    const numberQuestions = numberOfQuestionPlayerCanChoose(props.numberOfPlayers);
+
     // Inside ModalContent component
     const handleChipSelect = (chipValue: string) => {
-        props.setSelectedChip(chipValue);
+        // Create a new array with the new chip value
+        const newSelectedChips = [...selectedChips, chipValue];
+    
+        // Update the selectedChips state
+        setSelectedChips(newSelectedChips);
+        props.setSelectedChips(newSelectedChips);
+    
+        // Now check if the length of newSelectedChips is greater than or equal to numberQuestions
+        if (newSelectedChips.length >= numberQuestions) {
+            // alert(`You can only select up to ${numberQuestions} topics.`);
+            setChipsDisabled(true);
+        }
     };
 
     return (
-        <Chip.Group>
+        <Chip.Group multiple>
             <Group position="center">
                 <Select
                 label="Select topic"
@@ -33,6 +52,7 @@ export const ModalContent = (props: ModalContentProps) => {
                         color={'teal'}
                         value={"Custom Topic"}
                         radius={'md'}
+                        disabled = {!selectedChips.includes('customTopic')}
                         size={'md'}
                         variant="filled"
                         onClick={() => handleChipSelect("customTopic")}>{"Write any topic..."}
@@ -45,6 +65,7 @@ export const ModalContent = (props: ModalContentProps) => {
                         value={topicKey}
                         radius={'md'}
                         size={'md'}
+                        disabled = {chipsDisabled && !selectedChips.includes(topicKey)}
                         variant="filled"
                         onClick={() => handleChipSelect(topicKey)}>{topicKey}
                     </Chip>
