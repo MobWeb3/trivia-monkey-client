@@ -9,19 +9,19 @@ export const GeneralTopics = {
     Mathematics: "Mathematics",
     Religion: "Religion",
     PopularCulture: "Popular culture",
-    DisneyTrivia: "Disney Trivia",
+    DisneyTrivia: "Disney",
     Art: "Art",
-    ChristmasTrivia: "Christmas trivia",
+    ChristmasTrivia: "Christmas",
     Education: "Education",
-    BakingTrivia: "Baking trivia",
-    CasinoTrivia: "Casino trivia",
+    BakingTrivia: "Baking",
+    CasinoTrivia: "Casino",
     Infant: "Infant",
-    ComedyTrivia: "Comedy trivia",
-    ClassicRockTrivia: "Classic rock trivia",
+    ComedyTrivia: "Comedy",
+    ClassicRockTrivia: "Classic rock",
     Biology: "Biology",
     Astronomy: "Astronomy",
-    BatmanTrivia: "Batman trivia",
-    Trivia1980s: "1980s trivia"
+    BatmanTrivia: "Batman",
+    Trivia1980s: "1980s"
 }
 
 const questionsPerPlayer = {

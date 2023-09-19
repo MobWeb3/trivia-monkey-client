@@ -73,7 +73,7 @@ const CreateGame = () => {
         // console.log('handlePlayButtonClick A');
         if (nickname !== '' && numberPlayers !== '' && pointsToWin !== '') {
             // console.log('handlePlayButtonClick B');
-            const sessionData = await handleCreateChannel({ nickname, numberPlayers, pointsToWin, topic: selectedChips });
+            const sessionData = await handleCreateChannel({ nickname, numberPlayers, pointsToWin, topics: selectedChips });
             console.log('handlePlayButtonClick C, sessionData', sessionData);
             // Create AI session question database record in Polybase
             if (sessionData){
@@ -86,11 +86,10 @@ const CreateGame = () => {
                 if (response){
                     const questionSessionId = response.recordData.data.id;
                     // Deploy generation of AI questions
-                    generateQuestions({topic: selectedChips}).then((response) => {
-                        console.log('generateQuestions response: ', response);
-
-                        // Add data to AI session question database record in Polybase
-                        addQuestions({id: questionSessionId, column: 1, topic: response});
+                    generateQuestions({topics: selectedChips})
+                    .then((result) => {
+                        console.log('generateQuestions response: ', result);
+                        addQuestions({id: questionSessionId, column: 1, topic: result});
                     });
                 } 
 
