@@ -1,4 +1,4 @@
-import { addTopic, createSession, updateSessionPhase } from "../polybase/SessionHandler";
+import { createSession, updateSessionPhase } from "../polybase/SessionHandler";
 import { ChannelHandler } from "./ChannelHandler";
 import { SolanaWallet } from "@web3auth/solana-provider";
 import { MySolanaWallet } from "../solana/MySolanaWallet";
@@ -81,10 +81,6 @@ export const createChannelListenerWrapper = async (web3auth: Web3Auth, data: any
                     await channel.publish("start-game", {sessionId: pbSessionId});
                 }
             });
-
-            // Update topics
-            // const addTopicResponse= await addTopic({id:pbSessionId, topics: data.topics})
-            // console.log('addTopic response:', addTopicResponse);
 
             return {sessionId: pbSessionId, channelId, clientId: data.clientId};
         }

@@ -12,6 +12,7 @@ import { IconPacman } from '@tabler/icons-react';
 import QRCodeStyling from "qr-code-styling";
 import { addQuestions, createQuestionSession } from '../polybase/QuestionsHandler';
 import { generateQuestions } from '../game-domain/GenerateQuestionsHandler';
+import { updateTopics } from '../polybase/SessionHandler';
 
 const CreateGame = () => {
     const [nickname, setNickname] = useState('');
@@ -91,6 +92,9 @@ const CreateGame = () => {
                         console.log('generateQuestions response: ', result);
                         addQuestions({id: questionSessionId, column: 1, topic: result});
                     });
+                    // Update topics to Game session
+                    const addTopicResponse= await updateTopics({id:sessionData?.sessionId, topics: selectedChips})
+                    console.log('updatedTopics response:', addTopicResponse);
                 } 
 
             }

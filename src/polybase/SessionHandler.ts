@@ -66,9 +66,9 @@ export const getHostId = async (data: any) => {
     return false;
 }
 
-export const addTopic = async (data: any) => {
+export const updateTopics = async (data: any) => {
     try {
-        const response = await axios.post(`${BASE_URL}/api/polybase/session/addTopic`, data);
+        const response = await axios.post(`${BASE_URL}/api/polybase/session/updateTopics`, data);
         return response.data;
     } catch (error) {
         console.error(error);
