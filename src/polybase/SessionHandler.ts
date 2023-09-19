@@ -105,3 +105,13 @@ export const getNextTurnPlayerId = async (data: any) => {
     }
     return false;
 }
+
+export const updateQuestionSessionId = async (data: any) => {
+    try {
+        const response = await axios.post(`${BASE_URL}/api/polybase/session/setQuestionSessionId`, data);
+        return response.data;
+    } catch (error) {
+        console.error(error);
+    }
+    return false;
+}

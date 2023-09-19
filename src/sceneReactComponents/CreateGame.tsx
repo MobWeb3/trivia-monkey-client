@@ -12,7 +12,7 @@ import { IconPacman } from '@tabler/icons-react';
 import QRCodeStyling from "qr-code-styling";
 import { addQuestions, createQuestionSession } from '../polybase/QuestionsHandler';
 import { generateQuestions } from '../game-domain/GenerateQuestionsHandler';
-import { updateTopics } from '../polybase/SessionHandler';
+import { updateQuestionSessionId, updateTopics } from '../polybase/SessionHandler';
 
 const CreateGame = () => {
     const [nickname, setNickname] = useState('');
@@ -26,12 +26,6 @@ const CreateGame = () => {
     const [loading, setLoading] = useState(false);
     const [sessionCreated, setSessionCreated] = useState(false);
     const ref = useRef(null); //qr code ref
-
-    // useEffect(() => {
-    //     if (ref.current) {
-    //         qrCode.append(ref.current);
-    //     }
-    // }, []);
 
     useEffect(() => {
         const handleAllPlayersJoined = (event: any) => {
@@ -90,11 +84,14 @@ const CreateGame = () => {
                     generateQuestions({topics: selectedChips})
                     .then((result) => {
                         console.log('generateQuestions response: ', result);
-                        addQuestions({id: questionSessionId, column: 1, topic: result});
+                        addQuestions({id: questionSessionId, column: 1, topics: result});
                     });
                     // Update topics to Game session
                     const addTopicResponse= await updateTopics({id:sessionData?.sessionId, topics: selectedChips})
                     console.log('updatedTopics response:', addTopicResponse);
+
+                    // Set questionSessionId in the Game session records
+                    updateQuestionSessionId({id:sessionData?.sessionId, questionSessionId});
                 } 
 
             }
