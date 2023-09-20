@@ -116,20 +116,25 @@ export class AIGameScene extends Phaser.Scene {
         const maxTries = 5; // Set maximum number of tries
         return new Promise(async (resolve, reject) => {
             const intervalId = setInterval(async () => {
-                // Get session data
-                const session = await getSession({ id: this.session.id });
-                if (!session) {
-                    console.log('session not initialized yet');
-                    this.messageGameText?.setText("session not initialized yet");
-                    return;
+
+                try {
+                    // Get session data
+                    const session = await getSession({ id: this.session.id });
+                    if (!session) {
+                        console.log('session not initialized yet');
+                        this.messageGameText?.setText("session not initialized yet");
+                    }
+                    const { currentTurnPlayerId } = session;
+        
+                    // If currentTurnPlayerId is not null, clear the interval and resolve the Promise
+                    if (currentTurnPlayerId) {
+                        clearInterval(intervalId);
+                        resolve(session);
+                    }
+                } catch (error) {
+                    console.log("error polling for current player id: ", error);
                 }
-                const { currentTurnPlayerId } = session;
-    
-                // If currentTurnPlayerId is not null, clear the interval and resolve the Promise
-                if (currentTurnPlayerId) {
-                    clearInterval(intervalId);
-                    resolve(session);
-                }
+
 
                 // If maximum number of tries has been reached, clear the interval and reject the Promise
                 if (++tries >= maxTries) {
@@ -147,16 +152,19 @@ export class AIGameScene extends Phaser.Scene {
             const maxTries = 10; // Set maximum number of tries
             const intervalId = setInterval(async () => {
                 // Get new session data
-                const newSession = await getSession({ id: this.session.id });
-                if (!newSession) {
-                    console.log('session not initialized yet');
-                    this.messageGameText?.setText("session not initialized yet");
-                    return;
-                }
-    
-                if (expectedCurrentPlayerId === newSession.currentTurnPlayerId) {
-                    clearInterval(intervalId);
-                    resolve(newSession);
+                try {
+                    const newSession = await getSession({ id: this.session.id });
+                    if (!newSession) {
+                        console.log('session not initialized yet');
+                        this.messageGameText?.setText("session not initialized yet");
+                    }
+        
+                    if (expectedCurrentPlayerId === newSession.currentTurnPlayerId) {
+                        clearInterval(intervalId);
+                        resolve(newSession);
+                    }
+                } catch (error) {
+                    console.log("error polling for session changes: ", error);
                 }
 
                 // If maximum number of tries has been reached, clear the interval and reject the Promise
