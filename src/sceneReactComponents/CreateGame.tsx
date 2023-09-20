@@ -44,9 +44,11 @@ const CreateGame = () => {
     }, [selectedChips, pointsToWin, nickname]);
 
     useEffect(() => {
+        const url =`https://helpful-knowing-ghost.ngrok-free.app/joingame?sessionId=${sessionData?.sessionId}&channelId=${sessionData?.channelId}`;
         qrCode.update({
-          data:`https://helpful-knowing-ghost.ngrok-free.app/joingame?sessionId=${sessionData?.sessionId}&channelId=${sessionData?.channelId}`
+          data: url,
         });
+        console.log('qrCode URL to share: ', url);
         if (ref.current) {
             qrCode.append(ref.current);
         }

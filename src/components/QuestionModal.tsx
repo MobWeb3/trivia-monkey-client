@@ -27,6 +27,7 @@ const QuestionModal: React.FC<QuestionModalProps> = ({ open, onClose }) => {
                 size="70%"
                 className='centered-modal'
                 centered
+                withCloseButton = {false}
             >
                 <Card shadow="lg" padding="lg">
                     <Card.Section withBorder inheritPadding >

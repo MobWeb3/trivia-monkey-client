@@ -36,15 +36,10 @@ class GameInstance {
 		return GameInstance.instance;
 	}
 
-	public static startScene(sceneKey: string, data?: any) {
-		if (GameInstance.instance) {
-			GameInstance.instance?.scene.add(sceneKey, AIGameScene, true, data);
-		}
-		 else {
-			const instance = GameInstance.getInstance();
-			if (instance  && instance.scene.keys[sceneKey] === null) {
-				instance.scene.add(sceneKey, AIGameScene, true, data);
-			}
+	public static addScene(data?: any){
+		const instance = GameInstance.getInstance();
+		if (instance) {
+			instance.scene.add('AIGameScene', AIGameScene, true, data);
 		}
 		return GameInstance.instance;
 	}

@@ -21,13 +21,16 @@ const JoinGame = () => {
     const [opened, { open, close }] = useDisclosure(false);
     const [selectedChips, setSelectedChips] = useState<string[]>([]);
     const [numberPlayers, setNumberPlayers] = useState<number>(0);
+    const [joined, setJoined] = useState(false);
 
     useEffect(() => {
         const handleAllPlayersJoined = (event: any) => {
             console.log('All players have joined', event.detail);
             setSessionData(event.detail);
             // Handle the event here
-            // navigate('/spinwheel');
+            
+            // If all players have joined and current player joined, navigate to SpinWheel
+            navigate('/spinwheel');    
         };
 
         window.addEventListener(Messages.ALL_PLAYERS_JOINED, handleAllPlayersJoined);
@@ -70,17 +73,28 @@ const JoinGame = () => {
             // Update topics to Game session
             await updateTopics({id:sessionData?.sessionId, topics: selectedChips})
             // console.log('updatedTopics response:', addTopicResponse);
+            setJoined(true);
         }
     };
 
     const handleJoinButtonClick = () => {
         if (channelId !== '') {
             handleJoinGame({ channelId });
-            navigate('/spinwheel');
+            // navigate('/spinwheel', {state: {sessionId: sessionData?.sessionId, channelId: channelId}});
         }
     };
 
+    const WaitingMessage = () => {
+        return (
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+                <p>We are waiting for other players to join...</p>
+            </div>
+            
+        );
+    };
+
     return (
+        joined ? <WaitingMessage /> :
         <div>
             <h1>Select topics and Join</h1>
             <input type="text" placeholder="Channel id" value={channelId} onChange={e => setChannelId(e.target.value)} />
