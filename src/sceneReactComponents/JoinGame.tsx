@@ -90,7 +90,7 @@ const JoinGame = () => {
                 <ModalContent setSelectedChips={setSelectedChips} numberOfPlayers={numberPlayers}></ModalContent>
                 {/* Modal content */}
             </Modal>
-            <Group position="center">
+            <Group justify="center">
                 <Badge size="lg" radius="lg" variant="dot">Selected topics: {selectedChips.join(', ')}</Badge>
                 <Button onClick={open}>Pick a topic</Button>
             </Group>

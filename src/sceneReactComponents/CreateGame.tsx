@@ -144,7 +144,7 @@ const CreateGame = () => {
                         <div>
                             <h1>Let's create your game...</h1>
                             <Input
-                                icon={<IconPacman />}
+                                leftSection={<IconPacman />}
                                 placeholder="Your Name"
                                 radius="md"
                                 onChange={e => setNickname(e.currentTarget.value)} />
@@ -161,7 +161,7 @@ const CreateGame = () => {
                                 <ModalContent setSelectedChips={setSelectedChips} numberOfPlayers={parseInt(numberPlayers)}></ModalContent>
                                 {/* Modal content */}
                             </Modal>
-                            <Group position="center">
+                            <Group justify="center">
                                 <Badge size="lg" radius="lg" variant="dot">Selected topics: {selectedChips.join(', ')}</Badge>
 
                                 <Button onClick={open}>Pick a topic</Button>

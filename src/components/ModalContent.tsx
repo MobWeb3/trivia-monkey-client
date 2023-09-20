@@ -1,5 +1,5 @@
-import { Chip, DefaultMantineColor, Group, Select } from '@mantine/core';
-import React, { useState } from 'react';
+import { Chip, Group, Select } from '@mantine/core';
+import { useState } from 'react';
 import { GeneralTopics, numberOfQuestionPlayerCanChoose } from '../game-domain/Topics';
 
 // Define the Mantine colors
@@ -39,12 +39,11 @@ export const ModalContent = (props: ModalContentProps) => {
 
     return (
         <Chip.Group multiple>
-            <Group position="center">
+            <Group justify={'center'}>
                 <Select
                 label="Select topic"
                 placeholder="Search and select"
                 searchable
-                nothingFound="No options"
                 data={['React', 'Angular', 'Svelte', 'Vue']}
                 /> 
                 <Chip
