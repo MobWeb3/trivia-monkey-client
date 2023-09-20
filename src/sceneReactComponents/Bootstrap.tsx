@@ -16,7 +16,7 @@ export const Bootstrap = () => {
     }
 
     const handleSettingsClick = async () => {
-        // Add your logic here for when the 'Settings' button is selected
+        
     }
 
     const handleConnectNowClick = async () => {
