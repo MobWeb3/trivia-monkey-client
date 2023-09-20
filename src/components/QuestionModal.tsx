@@ -1,7 +1,7 @@
 import React from 'react';
 import { Modal, Button, Card, Container, Grid, HoverCard } from '@mantine/core';
 import './QuestionModal.css';
-import { IconPhoto } from '@tabler/icons-react';
+import { IconSquareLetterA } from '@tabler/icons-react';
 
 interface QuestionModalProps {
     open: boolean;
@@ -10,7 +10,7 @@ interface QuestionModalProps {
 }
 
 const QuestionModal: React.FC<QuestionModalProps> = ({ open, onClose, onAnswerSubmit }) => {
-    const icon = <IconPhoto size={14} />;
+    const iconA = <IconSquareLetterA size={24} />;
 
     return (
         <div style={{ display: 'flex', justifyContent: 'center' }}>
@@ -25,8 +25,8 @@ const QuestionModal: React.FC<QuestionModalProps> = ({ open, onClose, onAnswerSu
                 <Card shadow="xs" padding="md">
                     <Container>
                         <Grid>
-                            <Grid.Col span={8}>
-                            <Button justify="space-between" fullWidth leftSection={icon} rightSection={icon} variant="default">
+                            <Grid.Col span={10}>
+                            <Button justify="left" fullWidth leftSection={iconA} variant="default">
                                 Button label
                             </Button>
                             </Grid.Col>
