@@ -59,7 +59,12 @@ export class AIGameScene extends Phaser.Scene {
 
     async create() {
         console.log("AIGameScene create data: ", this.data);
-        await this.setupSessionData();
+        try {
+            await this.setupSessionData();
+        } catch (error) {
+            console.log("error setting up session data: ", error);
+        }
+        
         this.setupSpinWheel();
         if (this.clientId && this.session.channelId){
             suscribeToTurnCompleted(this.clientId, this.session.channelId);
@@ -215,27 +220,33 @@ export class AIGameScene extends Phaser.Scene {
 
     async updateSessionData(expectedCurrentPlayerId: string) {
         console.log("current session:", this.session);
-        const {gamePhase, topics, currentTurnPlayerId} = await this.pollUntilSessionChanges(expectedCurrentPlayerId);
 
-        // Get topics
-        this.sliceValues = topics;
-        this.session.gamePhase = gamePhase ?? {};
+        try {
+            const {gamePhase, topics, currentTurnPlayerId} = await this.pollUntilSessionChanges(expectedCurrentPlayerId);
 
-        // Check if game is active
-        if (this.session.gamePhase !== SessionPhase.GAME_ACTIVE) {
-            console.log('Game is not active!');
-            // tell page to show that game has not started yet or is over.
-            return;
-        }
+            // Get topics
+            this.sliceValues = topics;
+            this.session.gamePhase = gamePhase ?? {};
 
-        // On load check if player is up for turn
-        this.currentTurnPlayerId = currentTurnPlayerId;
-        if (this.isPlayerTurn() && this.messageGameText) {
-            this.canSpin = true;
-            this.messageGameText?.setText("Your turn!");
-        } else {
-            this.canSpin = false;
-            this.messageGameText?.setText(`Waiting for ${currentTurnPlayerId} to finish turn...`);
+            // Check if game is active
+            if (this.session.gamePhase !== SessionPhase.GAME_ACTIVE) {
+                console.log('Game is not active!');
+                // tell page to show that game has not started yet or is over.
+                return;
+            }
+
+            // On load check if player is up for turn
+            this.currentTurnPlayerId = currentTurnPlayerId;
+            if (this.isPlayerTurn() && this.messageGameText) {
+                this.canSpin = true;
+                this.messageGameText?.setText("Your turn!");
+            } else {
+                this.canSpin = false;
+                this.messageGameText?.setText(`Waiting for ${currentTurnPlayerId} to finish turn...`);
+            }
+            
+        } catch (error) {
+            console.log("error updating session data: ", error);
         }
     }
 

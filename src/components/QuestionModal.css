@@ -4,3 +4,10 @@
     align-items: center;
     height: 100vh;
 }
+
+.timer-container {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    width: 100%;
+}
