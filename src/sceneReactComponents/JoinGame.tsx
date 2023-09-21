@@ -11,6 +11,7 @@ import { useDisclosure } from '@mantine/hooks';
 import { getSession, updateTopics } from '../polybase/SessionHandler';
 import { generateQuestions } from '../game-domain/GenerateQuestionsHandler';
 import { addQuestions } from '../polybase/QuestionsHandler';
+import { SessionPhase } from '../game-domain/SessionPhase';
 
 const JoinGame = () => {
     const [channelId, setChannelId] = useState('');
@@ -45,14 +46,15 @@ const JoinGame = () => {
         const parsed = queryString.parse(location.search);
         const { sessionId, channelId } = parsed;
 
+        console.log('JoinGame loaded: ', sessionId, channelId);
         if (sessionId && channelId) {
-            getSession({ id: sessionId }).then((sessionData) => {
-                setNumberPlayers(parseInt(sessionData.numberPlayers));
+            getSession({ id: sessionId }).then((_sessionData) => {
+                setNumberPlayers(parseInt(_sessionData.numberPlayers));
                 setSessionData({
+                    ...sessionData,
                     sessionId: sessionId as string,
                     channelId: channelId as string,
-                    clientId: '',
-                    questionSessionId: sessionData.questionSessionId
+                    questionSessionId: _sessionData.questionSessionId
                     });
             });
             setChannelId(channelId as string);
@@ -78,11 +80,31 @@ const JoinGame = () => {
     };
 
     const handleJoinButtonClick = () => {
+        joinIfAlreadyActiveGame();
         if (channelId !== '') {
             handleJoinGame({ channelId });
-            // navigate('/spinwheel', {state: {sessionId: sessionData?.sessionId, channelId: channelId}});
         }
     };
+
+    const joinIfAlreadyActiveGame = async () => {
+        if (sessionData?.sessionId && sessionData?.channelId) {
+            try {
+                const { questionSessionId, gamePhase } = await getSession({ id: sessionData?.sessionId });
+
+                if (gamePhase === SessionPhase.GAME_ACTIVE) {
+                    setSessionData({
+                        ...sessionData,
+                        questionSessionId: questionSessionId
+                    });
+                    navigate('/aigame');
+                }
+            } catch (error) {
+                console.log()
+            }
+            
+        }
+        
+    }
 
     const WaitingMessage = () => {
         return (
@@ -116,3 +138,8 @@ const JoinGame = () => {
 };
 
 export default JoinGame;
+
+
+/**
+ * https://helpful-knowing-ghost.ngrok-free.app/joingame?sessionId=mk-pbid-de8a7ec4-79c3-44c8-95bf-8a037ade0dc2&channelId=tm-chid-e20516c1-b458-47ea-8c08-e0a2f1dd4dfa
+ */

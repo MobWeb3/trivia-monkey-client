@@ -26,8 +26,14 @@ const PlayLobbyScene = () => {
     const handleMockGameAIClick = () => {
         console.log('Mock game AI');
         // Set data and navigate to AIGameScene
+        setSessionData({
+            sessionId: 'mk-pbid-de8a7ec4-79c3-44c8-95bf-8a037ade0dc2',
+            clientId: 'norman.lopez.krypo@gmail.com',
+            channelId: 'tm-chid-e20516c1-b458-47ea-8c08-e0a2f1dd4dfa',
+            questionSessionId: 'Qn-01a8c310-6a9d-4853-a28d-906ed937580b'
+        })
+
         navigate('/aigame');
-        setSessionData({sessionId: 'mk-pbid-40d2d7e1-b161-40c1-b7bd-3b7b7e5a7fe4', clientId: 'norman.lopez.krypo@gmail.com'})
     };
 
     return (

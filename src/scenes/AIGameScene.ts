@@ -118,11 +118,12 @@ export class AIGameScene extends Phaser.Scene {
 
     pollForCurrentPlayerId(): Promise<any> {
         let tries = 0; // Initialize tries counter
-        const maxTries = 5; // Set maximum number of tries
+        const maxTries = 3; // Set maximum number of tries
         return new Promise(async (resolve, reject) => {
             const intervalId = setInterval(async () => {
 
                 try {
+                    console.log("polling for session id: ", this.session.id);
                     // Get session data
                     const session = await getSession({ id: this.session.id });
                     if (!session) {
@@ -146,7 +147,7 @@ export class AIGameScene extends Phaser.Scene {
                     clearInterval(intervalId);
                     reject('Timeout: Maximum number of tries reached');
                 }
-            }, 1000); // 1000 ms = 1 second
+            }, 2000); // 1000 ms = 1 second
         });
     }
 
@@ -154,7 +155,7 @@ export class AIGameScene extends Phaser.Scene {
 
         return new Promise(async (resolve, reject) => {
             let tries = 0; // Initialize tries counter
-            const maxTries = 10; // Set maximum number of tries
+            const maxTries = 3; // Set maximum number of tries
             const intervalId = setInterval(async () => {
                 // Get new session data
                 try {
@@ -177,7 +178,7 @@ export class AIGameScene extends Phaser.Scene {
                     clearInterval(intervalId);
                     reject('Timeout: Maximum number of tries reached');
                 }
-            }, 1000); // 1000 ms = 1 second
+            }, 2000); // 1000 ms = 1 second
         });
     }
 

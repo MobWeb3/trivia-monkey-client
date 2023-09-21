@@ -54,12 +54,7 @@ export class SpinWheelScene extends Phaser.Scene {
     }
 
     async create() {
-        console.log("SpinWheelScene data: ", this.data);
-
-        // console.log("SpinWheelScene data: ", this.data.list);
-        
-        // console.log("sessionId: ", this.sessionId);
-
+        // console.log("SpinWheelScene data: ", this.data);
         await this.setupSessionData();
         this.setupSpinWheel();
 
@@ -69,28 +64,28 @@ export class SpinWheelScene extends Phaser.Scene {
             const channelHandler = await new ChannelHandler().initChannelHandler(this.clientId);
             await channelHandler?.enterChannel({ channelId: this.channelId, clientId: this.clientId, nickname: this.name});
             this.channel = ChannelHandler.ablyInstance?.ablyInstance.channels.get(this.channelId);
-            console.log('HERE channelId: ', this.channelId);
-            console.log('HERE channel: ', this.channel);
+            // console.log('HERE channelId: ', this.channelId);
+            // console.log('HERE channel: ', this.channel);
             if(this.isHost) {
                 console.log ("subscribing to turn-selected");
                 this.channel?.subscribe('turn-selected', async (message) => {
                     console.log('turn selected by: ', message.clientId);
                     const { initialTurnPosition } = await getSession({ id: this.sessionId });
                     this.initialTurnPositions = initialTurnPosition;
-                    console.log('initialTurnPositions: ', initialTurnPosition);
-                    console.log('numberPlayers: ', this.numberPlayers);
+                    // console.log('initialTurnPositions: ', initialTurnPosition);
+                    // console.log('numberPlayers: ', this.numberPlayers);
 
                     const initialTurnPositionLength = Object.keys(initialTurnPosition).length;
                     const canStartGame = this.numberPlayers &&
                     initialTurnPositionLength >= this.numberPlayers;
 
-                    console.log('canStartGame: ', canStartGame);
+                    // console.log('canStartGame: ', canStartGame);
                     // check if all other players have already selected their turn. To do this we must check the length of 
                     // initialTurnPosition in the Polybase server
                     if (canStartGame) {
                         // if all players have selected their turn, then we can proceed to the next phase.
                         await updateSessionPhase({ id: this.sessionId, newPhase: SessionPhase.GAME_ACTIVE });
-                        console.log('GAME_ACTIVE!');
+                        // console.log('GAME_ACTIVE!');
                         sendMessage(Messages.MAY_START_GAME, { sessionId: this.sessionId });
                     }
                 });
@@ -124,7 +119,7 @@ export class SpinWheelScene extends Phaser.Scene {
         // console.log('gamePhase: ', this.gamePhase);
         // console.log('gamePhase in preload: ', this.gamePhase);
         if ( this.gamePhase === SessionPhase.TURN_ORDER){
-            console.log('can turn!');
+            // console.log('can turn!');
             this.canSpin = true;
         } 
         
@@ -147,7 +142,7 @@ export class SpinWheelScene extends Phaser.Scene {
             var degrees = Phaser.Math.Between(0, 1000) % 360;
             // before the wheel ends spinning, we already know the prize according to "degrees" rotation and the number of slices
             this.selectedSlice = this.sliceValues[this.slices - 1 - Math.floor(degrees / (360 / this.slices))];
-            console.log("prize: ", this.selectedSlice);
+            // console.log("prize: ", this.selectedSlice);
             // now the wheel cannot spin because it's already spinning
             this.canSpin = false;
             // animation tweeen for the spin: duration 3s, will rotate by (360 * rounds + degrees) degrees

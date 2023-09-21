@@ -30,8 +30,8 @@ function AIGame() {
         console.log('AIGame loaded: ', sessionData);
 
         if (!sceneAddedRef.current) { // Check if the scene has been added
-            console.log('AIGame not possible twice');
             GameInstance.getInstance();
+            console.log('AIGame add scene session', sessionData);
             GameInstance.addScene(sessionData ?? "");
             sceneAddedRef.current = true;
         }
