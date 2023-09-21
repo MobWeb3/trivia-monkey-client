@@ -3,14 +3,16 @@ import { Modal, Button, Card, Container, Grid, Text } from '@mantine/core';
 import './QuestionModal.css';
 import { IconSquareLetterA, IconSquareLetterB, IconSquareLetterC } from '@tabler/icons-react';
 import { useTimer } from 'react-timer-hook';
+import { Question } from '../game-domain/Question';
 
 interface QuestionModalProps {
     open: boolean;
     onClose: () => void;
     onAnswerSubmit: () => void;
+    question: Question | null;
 }
 
-const QuestionModal: React.FC<QuestionModalProps> = ({ open, onClose }) => {
+const QuestionModal: React.FC<QuestionModalProps> = ({ open, onClose, question }) => {
     const iconA = <IconSquareLetterA size={24} />;
     const iconB = <IconSquareLetterB size={24} />;
     const iconC = <IconSquareLetterC size={24} />;
@@ -37,7 +39,7 @@ const QuestionModal: React.FC<QuestionModalProps> = ({ open, onClose }) => {
                     </Card.Section>
                     <Card.Section py="lg" px="lg">
                         <Text size="xl" fw={700} >
-                            What is the world's largest island?
+                            { question?.question}
                         </Text>
                     </Card.Section>
                     <Card.Section withBorder inheritPadding py="lg">
@@ -45,17 +47,22 @@ const QuestionModal: React.FC<QuestionModalProps> = ({ open, onClose }) => {
                             <Grid>
                                 <Grid.Col span={10}>
                                     <Button color='grey' size='md' justify="left" fullWidth leftSection={iconA} variant="default">
-                                        First Option
+                                        {question?.options[0]}
                                     </Button>
                                 </Grid.Col>
                                 <Grid.Col span={10}>
                                     <Button size='md' justify="left" fullWidth leftSection={iconB} variant="default">
-                                        Second Option
+                                        {question?.options[1]}
                                     </Button>
                                 </Grid.Col>
                                 <Grid.Col span={10}>
                                     <Button size='md' justify="left" fullWidth leftSection={iconC} variant="default">
-                                        Third Option
+                                        {question?.options[2]}
+                                    </Button>
+                                </Grid.Col>
+                                <Grid.Col span={10}>
+                                    <Button size='md' justify="left" fullWidth leftSection={iconC} variant="default">
+                                        {question?.options[3]}
                                     </Button>
                                 </Grid.Col>
                             </Grid>

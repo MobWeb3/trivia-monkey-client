@@ -5,15 +5,20 @@ import GameInstance from '../sceneConfigs/AIGameConfig';
 import { SessionDataContext } from '../components/SessionDataContext';
 import { Button } from '@mantine/core';
 import QuestionModal from '../components/QuestionModal';
+import { getQuestion } from '../polybase/QuestionsHandler';
+import { Question } from '../game-domain/Question';
 
 function AIGame() {
 
     const { sessionData } = useContext(SessionDataContext);
     const [showQuestionModal, setShowQuestionModal] = useState(false);
+    const [currentQuestion, setCurrentQuestion] = useState<Question | null>(null);
 
     const sceneAddedRef = useRef(false);
 
-    const handleQuestionClick = () => {
+    const handleQuestionClick = async () => {
+        const question: Question = await getQuestion({id:"Qn-028173de-a6c8-47ca-9e36-c0bb59c027e4", topic: "Geography"});
+        setCurrentQuestion(question);
         setShowQuestionModal(true);
     }
     
@@ -38,7 +43,6 @@ function AIGame() {
 
     }, [sessionData]);
 
-
     return (
         <div style={{ position: 'relative' }}>
             <Button onClick={handleQuestionClick}>
@@ -48,6 +52,7 @@ function AIGame() {
                 open={showQuestionModal} 
                 onClose={handleCloseQuestionModal} 
                 onAnswerSubmit={handleAnswerSubmit}
+                question={currentQuestion}
             />
             <div id="phaser-container" className="App"></div>
 

@@ -20,3 +20,23 @@ export const addQuestions = async (data: any) => {
     }
     return false;
 }
+
+export const getQuestions = async (data: any) => {
+    try {
+        const response = await axios.post(`${BASE_URL}/api/polybase/questions/getQuestions`, data);
+        return response.data.recordData;
+    } catch (error) {
+        console.error(error);
+    }
+    return false;
+}
+
+export const getQuestion = async (data: any) => {
+    try {
+        const response = await axios.post(`${BASE_URL}/api/polybase/questions/getQuestion`, data);
+        return response.data.question;
+    } catch (error) {
+        console.error(error);
+    }
+    return false;
+}
