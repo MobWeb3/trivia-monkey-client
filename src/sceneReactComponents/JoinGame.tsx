@@ -12,6 +12,7 @@ import { getSession, updateTopics } from '../polybase/SessionHandler';
 import { generateQuestions } from '../game-domain/GenerateQuestionsHandler';
 import { addQuestions } from '../polybase/QuestionsHandler';
 import { SessionPhase } from '../game-domain/SessionPhase';
+import { login } from '../utils/Web3AuthAuthentication';
 
 const JoinGame = () => {
     const [channelId, setChannelId] = useState('');
@@ -96,6 +97,16 @@ const JoinGame = () => {
                         ...sessionData,
                         questionSessionId: questionSessionId
                     });
+
+                    // initialize web3auth
+                    if(web3auth) {
+                        const userInfo = await login(web3auth);
+                        localStorage.setItem('userInfo', JSON.stringify(userInfo));
+                        if (sessionData){
+                          setSessionData({ ...sessionData, clientId: userInfo.email });
+                        }
+                    }
+
                     navigate('/aigame');
                 }
             } catch (error) {

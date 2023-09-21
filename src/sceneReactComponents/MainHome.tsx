@@ -7,7 +7,8 @@ import { getRPCProviderOwner, getZeroDevSigner } from '@zerodevapp/sdk';
 import { SafeEventEmitterProvider } from '@web3auth/base';
 import { Messages } from '../utils/Messages';
 import { createUser, userExists } from '../polybase/UserHandler';
-import { createChannelListenerWrapper, enterChannelListenerWrapper, getConnectedPublicKey } from '../ably/ChannelListener';
+import { createChannelListenerWrapper, enterChannelListenerWrapper } from '../ably/ChannelListener';
+import { getConnectedPublicKey } from '../utils/Web3AuthAuthentication';
 
 function App() {
   const { signer, web3auth, setSigner } = useContext(SignerContext);

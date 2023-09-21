@@ -2,9 +2,9 @@ import React, { useContext, useState } from 'react';
 import { SafeEventEmitterProvider } from '@web3auth/base';
 import { SignerContext } from '../components/SignerContext';
 import { getRPCProviderOwner, getZeroDevSigner } from '@zerodevapp/sdk';
-import { getConnectedPublicKey } from '../ably/ChannelListener';
 import { createUser, userExists } from '../polybase/UserHandler';
 import { useNavigate } from 'react-router-dom';
+import { getConnectedPublicKey } from '../utils/Web3AuthAuthentication';
 
 export const Bootstrap = () => {
     const { signer, web3auth, setSigner, loggedIn, setLoggedIn, setUserInfo } = useContext(SignerContext);

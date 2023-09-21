@@ -8,8 +8,8 @@ import {
 import { SignerContext } from './SignerContext';
 import { useContext } from 'react';
 import { getRPCProviderOwner, getZeroDevSigner } from '@zerodevapp/sdk';
-import { getConnectedPublicKey } from '../ably/ChannelListener';
 import { SessionDataContext } from './SessionDataContext';
+import { getConnectedPublicKey } from '../utils/Web3AuthAuthentication';
   
   interface UserButtonProps extends UnstyledButtonProps {
     image: string;
