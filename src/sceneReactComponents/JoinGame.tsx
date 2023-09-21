@@ -99,7 +99,7 @@ const JoinGame = () => {
                     navigate('/aigame');
                 }
             } catch (error) {
-                console.log()
+                console.log("joinIfAlreadyActiveGame - Error getting session: ", error);
             }
             
         }

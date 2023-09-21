@@ -9,6 +9,7 @@ import { SignerContext } from './SignerContext';
 import { useContext } from 'react';
 import { getRPCProviderOwner, getZeroDevSigner } from '@zerodevapp/sdk';
 import { getConnectedPublicKey } from '../ably/ChannelListener';
+import { SessionDataContext } from './SessionDataContext';
   
   interface UserButtonProps extends UnstyledButtonProps {
     image: string;
@@ -19,7 +20,7 @@ import { getConnectedPublicKey } from '../ably/ChannelListener';
   
   export function ConnectionStatus({ image, name, email, icon, ...others }: UserButtonProps) {
     const { signer, web3auth, setSigner, loggedIn, setLoggedIn, setUserInfo, userInfo } = useContext(SignerContext);
-
+    const { sessionData, setSessionData } = useContext(SessionDataContext);
 
     const login = async () => {
       if (!web3auth) {
@@ -32,7 +33,10 @@ import { getConnectedPublicKey } from '../ably/ChannelListener';
 
       const userInfo = await web3auth.getUserInfo();
       setUserInfo(userInfo);
-
+      localStorage.setItem('userInfo', JSON.stringify(userInfo));
+      if (sessionData){
+        setSessionData({ ...sessionData, clientId: userInfo.email });
+      }
       const evmChain = false;
 
       if (evmChain) {
@@ -48,6 +52,7 @@ import { getConnectedPublicKey } from '../ably/ChannelListener';
           const publicKey = await getConnectedPublicKey(web3auth);
           console.log(`publick key: ${publicKey?.toString()}`);
           // console.log(`userInfo: ${JSON.stringify(userInfo)}`);
+
           return {
               clientId: userInfo.email ?? "",
               name: userInfo.name ?? "",

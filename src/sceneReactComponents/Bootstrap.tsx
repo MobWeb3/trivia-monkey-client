@@ -88,6 +88,9 @@ export const Bootstrap = () => {
 
         setProvider(null);
         setLoggedIn(false);
+        setUserInfo(null);
+        localStorage.removeItem('userInfo');
+        localStorage.removeItem('web3auth');
         console.log('Disconnected');
     };
 
