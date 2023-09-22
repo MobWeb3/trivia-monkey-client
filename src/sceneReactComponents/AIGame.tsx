@@ -25,7 +25,7 @@ function AIGame() {
 
         // console.log('handleShowQuestion', event.detail.topic);
         // setChosenTopic(event.detail.topic);
-        const question: Question = await getQuestion({id:"Qn-028173de-a6c8-47ca-9e36-c0bb59c027e4", topic});
+        const question: Question = await getQuestion({id:"Qn-99f458eb-4952-469c-b630-82c1ee887aa3", topic});
         setCurrentQuestion(question);
         setShowQuestionModal(true);
         setChosenTopic(topic);
@@ -37,7 +37,7 @@ function AIGame() {
     
     const handleAnswerSubmit = async () => {
         // Update turn on polybase
-        const {nextTurnPlayerId} = await getNextTurnPlayerId({id: "Qn-028173de-a6c8-47ca-9e36-c0bb59c027e4"});
+        const {nextTurnPlayerId} = await getNextTurnPlayerId({id: "Qn-99f458eb-4952-469c-b630-82c1ee887aa3"});
         // Publish turn completed // we know clientId is not null because we checked isPlayerTurn
         if(sessionData?.clientId && sessionData.channelId) {
             await publishTurnCompleted(sessionData?.clientId, sessionData.channelId, {nextTurnPlayerId});
@@ -82,7 +82,7 @@ function AIGame() {
 
     return (
         <div style={{ position: 'relative' }}>
-            <Button onClick={() => handleShowQuestion("Geography")}>
+            <Button onClick={() => handleShowQuestion("Music")}>
                 Show Question
             </Button>
             <QuestionModal 

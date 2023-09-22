@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Modal, Button, Card, Container, Grid, Text } from '@mantine/core';
 import './QuestionModal.css';
 import { IconSquareLetterA, IconSquareLetterB, IconSquareLetterC, IconSquareLetterD } from '@tabler/icons-react';
@@ -22,21 +22,55 @@ const QuestionModal: React.FC<QuestionModalProps> = ({ open, onClose, question, 
     const iconC = <IconSquareLetterC size={24} />;
     const iconD = <IconSquareLetterD size={24} />;
 
+    const OptionButton = {
+        A: 0,
+        B: 1,
+        C: 2,
+        D: 3
+    } as const;
+
     const [selectedButton, setSelectedButton] = useState<number | null>(null);
     const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
+    const [showCorrectAnswer, setShowCorrectAnswer] = useState<boolean>(false);
+    const [correctAnswerButton, setCorrectAnswerButton] = useState<number | null>(null);
 
 
-    enum SelectedButton {
-        A = 0,
-        B = 1,
-        C = 2,
-        D = 3
+    const getCorrectAnswerButton = () => {
+        if (question?.answer === question?.options[0]) {
+            return OptionButton.A;
+        }
+        if (question?.answer === question?.options[1]) {
+            return OptionButton.B;
+        }
+        if (question?.answer === question?.options[2]) {
+            return OptionButton.C;
+        }
+        if (question?.answer === question?.options[3]) {
+            return OptionButton.D;
+        }
+        return null;
     }
 
+    useEffect(() => {
+        if (selectedButton !== null) {
+            setCorrectAnswerButton(getCorrectAnswerButton());
+        }
+    }, [selectedButton, question]);
+
+
+
     const handleButtonClick = (optionIndex: number) => {
+        // Avoid double clicking
+        if (selectedButton !== null) {
+            return;
+        }
+
         setSelectedButton(optionIndex);
+        const correctAnswerButton = getCorrectAnswerButton();
+        setCorrectAnswerButton(correctAnswerButton);
         const isValid = validateAnswer(question?.options[optionIndex]);
         setIsCorrect(isValid);
+        setShowCorrectAnswer(true);
     }
 
 
@@ -44,11 +78,20 @@ const QuestionModal: React.FC<QuestionModalProps> = ({ open, onClose, question, 
     time.setSeconds(time.getSeconds() + 20);
 
     const validateAnswer = (selectedOption?: string) => {
-        console.log('validateAnswer', selectedOption, question?.answer);
+        console.log('selected options', selectedOption);
+        console.log('Correct answer', question?.answer);
+        console.log('correct answer button', correctAnswerButton);
         return selectedOption === question?.answer;
     }
 
     const getButtonColor = (optionIndex: number) => {
+        // console.log(`getButtonColor: selectedButton: ${selectedButton}, optionIndex: ${optionIndex}, correctAnswerButton: ${correctAnswerButton}, showCorrectAnswer: ${showCorrectAnswer}`);
+        const showGreen = showCorrectAnswer && correctAnswerButton === optionIndex;
+        // console.log('showGreen', showGreen);
+        if (showGreen) {
+            // console.log('returning Green');
+            return 'green';
+        }
         if (selectedButton === optionIndex) {
             return isCorrect ? 'green' : 'red';
         }
@@ -56,7 +99,8 @@ const QuestionModal: React.FC<QuestionModalProps> = ({ open, onClose, question, 
     }
 
     const getButtonVariant = (optionIndex: number) => {
-        if (selectedButton === optionIndex) {
+        const displayCorrect = showCorrectAnswer && correctAnswerButton === optionIndex
+        if (selectedButton === optionIndex || displayCorrect) {
             return 'light';
         }
         return "default";
@@ -94,9 +138,9 @@ const QuestionModal: React.FC<QuestionModalProps> = ({ open, onClose, question, 
                                         justify="left"
                                         fullWidth
                                         leftSection={iconA}
-                                        color={getButtonColor(SelectedButton.A)}
-                                        variant={getButtonVariant(SelectedButton.A)}
-                                        onClick={() => handleButtonClick(SelectedButton.A)}>
+                                        color={getButtonColor(OptionButton.A)}
+                                        variant={getButtonVariant(OptionButton.A)}
+                                        onClick={() => handleButtonClick(OptionButton.A)}>
                                         {question?.options[0] ?? placeholderOptionA}
                                     </Button>
                                 </Grid.Col>
@@ -105,9 +149,9 @@ const QuestionModal: React.FC<QuestionModalProps> = ({ open, onClose, question, 
                                         justify="left"
                                         fullWidth
                                         leftSection={iconB}
-                                        color={getButtonColor(SelectedButton.B)}
-                                        variant={getButtonVariant(SelectedButton.B)}
-                                        onClick={() => handleButtonClick(SelectedButton.B)}>
+                                        color={getButtonColor(OptionButton.B)}
+                                        variant={getButtonVariant(OptionButton.B)}
+                                        onClick={() => handleButtonClick(OptionButton.B)}>
                                         {question?.options[1] ?? placeholderOptionA}
                                     </Button>
                                 </Grid.Col>
@@ -116,9 +160,9 @@ const QuestionModal: React.FC<QuestionModalProps> = ({ open, onClose, question, 
                                         justify="left"
                                         fullWidth
                                         leftSection={iconC}
-                                        color={getButtonColor(SelectedButton.C)}
-                                        variant={getButtonVariant(SelectedButton.C)}
-                                        onClick={() => handleButtonClick(SelectedButton.C)}>
+                                        color={getButtonColor(OptionButton.C)}
+                                        variant={getButtonVariant(OptionButton.C)}
+                                        onClick={() => handleButtonClick(OptionButton.C)}>
                                         {question?.options[2] ?? placeholderOptionA}
                                     </Button>
                                 </Grid.Col>
@@ -127,12 +171,13 @@ const QuestionModal: React.FC<QuestionModalProps> = ({ open, onClose, question, 
                                             justify="left"
                                             fullWidth
                                             leftSection={iconD}
-                                            color={getButtonColor(SelectedButton.D)}
-                                            variant={getButtonVariant(SelectedButton.D)}
-                                            onClick={() => handleButtonClick(SelectedButton.D)}>
+                                            color={getButtonColor(OptionButton.D)}
+                                            variant={getButtonVariant(OptionButton.D)}
+                                            onClick={() => handleButtonClick(OptionButton.D)}>
                                         {question?.options[3] ?? placeholderOptionA}
                                     </Button>
                                 </Grid.Col>
+
                             </Grid>
                         </Container>
                     </Card.Section>
@@ -155,18 +200,11 @@ function TimerComponent({ expiryTimestamp }: TimerProps) {
 
     return (
         <div>
-
             <Text size="xl"
                 fw={900}
                 variant="gradient"
                 gradient={{ from: 'gray', to: 'indigo', deg: 111 }}>
                 {minutes}:{seconds}</Text>
-            {/* <button onClick={() => {
-                // Restarts to 5 minutes timer
-                const time = new Date();
-                time.setSeconds(time.getSeconds() + 20);
-                restart(time)
-            }}>Restart</button> */}
         </div>
     );
 }
