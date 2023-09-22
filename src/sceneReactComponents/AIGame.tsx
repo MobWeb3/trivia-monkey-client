@@ -10,6 +10,7 @@ import { addMessageListener, removeMessageListener, sendMessage } from '../utils
 import { Messages } from '../utils/Messages';
 import { getNextTurnPlayerId } from '../polybase/SessionHandler';
 import { publishTurnCompleted } from '../ably/AblyMessages';
+import { Button } from '@mantine/core';
 
 function AIGame() {
 
@@ -44,7 +45,6 @@ function AIGame() {
 
         sendMessage(Messages.HIDE_QUESTION, {});
     }
-
 
     useEffect(() => {
         console.log('AIGame loaded: ', sessionData);
@@ -82,6 +82,9 @@ function AIGame() {
 
     return (
         <div style={{ position: 'relative' }}>
+            <Button onClick={() => handleShowQuestion("History")}>
+                Show Question
+            </Button>
             <QuestionModal 
                 open={showQuestionModal} 
                 onClose={handleCloseQuestionModal} 

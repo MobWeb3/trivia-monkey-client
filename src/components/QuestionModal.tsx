@@ -1,9 +1,12 @@
 import React from 'react';
 import { Modal, Button, Card, Container, Grid, Text } from '@mantine/core';
 import './QuestionModal.css';
-import { IconSquareLetterA, IconSquareLetterB, IconSquareLetterC } from '@tabler/icons-react';
+import { IconSquareLetterA, IconSquareLetterB, IconSquareLetterC, IconSquareLetterD } from '@tabler/icons-react';
 import { useTimer } from 'react-timer-hook';
 import { Question } from '../game-domain/Question';
+
+const placeholderQuestionText = "What is the capital of the United States of America?"
+const placeholderOptionA = "Lorem Ipsum long anser that is very long, and more text";
 
 interface QuestionModalProps {
     open: boolean;
@@ -17,6 +20,7 @@ const QuestionModal: React.FC<QuestionModalProps> = ({ open, onClose, question, 
     const iconA = <IconSquareLetterA size={24} />;
     const iconB = <IconSquareLetterB size={24} />;
     const iconC = <IconSquareLetterC size={24} />;
+    const iconD = <IconSquareLetterD size={24} />;
 
     const time = new Date();
     time.setSeconds(time.getSeconds() + 20);
@@ -27,44 +31,44 @@ const QuestionModal: React.FC<QuestionModalProps> = ({ open, onClose, question, 
                 opened={open}
                 onClose={onClose}
                 radius="lg"
-                size="70%"
+                size="90%"
                 title={topic}
                 className='centered-modal'
                 centered
                 withCloseButton = {false}
             >
-                <Card shadow="lg" padding="lg">
+                <Card shadow="lg" padding="md">
                     <Card.Section withBorder inheritPadding >
                         <div className="timer-container">
                             <TimerComponent expiryTimestamp={time} />
                         </div>
                     </Card.Section>
-                    <Card.Section py="lg" px="lg">
+                    <Card.Section py="md" px="md">
                         <Text size="xl" fw={700} >
-                            { question?.question}
+                            { question?.question ?? placeholderQuestionText}
                         </Text>
                     </Card.Section>
-                    <Card.Section withBorder inheritPadding py="lg">
-                        <Container>
+                    <Card.Section withBorder py="md">
+                        <Container fluid>
                             <Grid>
-                                <Grid.Col span={10}>
-                                    <Button color='grey' size='md' justify="left" fullWidth leftSection={iconA} variant="default">
-                                        {question?.options[0]}
+                                <Grid.Col span={12}>
+                                    <Button size='sm' justify="left" fullWidth leftSection={iconA} variant="default">
+                                        {question?.options[0] ?? placeholderOptionA}
                                     </Button>
                                 </Grid.Col>
-                                <Grid.Col span={10}>
-                                    <Button size='md' justify="left" fullWidth leftSection={iconB} variant="default">
-                                        {question?.options[1]}
+                                <Grid.Col span={12}>
+                                    <Button size='sm' justify="left" fullWidth leftSection={iconB} variant="default">
+                                        {question?.options[1] ?? placeholderOptionA}
                                     </Button>
                                 </Grid.Col>
-                                <Grid.Col span={10}>
-                                    <Button size='md' justify="left" fullWidth leftSection={iconC} variant="default">
-                                        {question?.options[2]}
+                                <Grid.Col span={12}>
+                                    <Button size='sm' justify="left" fullWidth leftSection={iconC} variant="default">
+                                        {question?.options[2] ?? placeholderOptionA}
                                     </Button>
                                 </Grid.Col>
-                                <Grid.Col span={10}>
-                                    <Button size='md' justify="left" fullWidth leftSection={iconC} variant="default">
-                                        {question?.options[3]}
+                                <Grid.Col span={12}>
+                                    <Button size='sm' justify="left" fullWidth leftSection={iconD} variant="default">
+                                        {question?.options[3] ?? placeholderOptionA}
                                     </Button>
                                 </Grid.Col>
                             </Grid>
@@ -95,12 +99,12 @@ function TimerComponent({ expiryTimestamp }: TimerProps) {
                   variant="gradient"
                   gradient={{ from: 'gray', to: 'indigo', deg: 111 }}>
                     {minutes}:{seconds}</Text>  
-            <button onClick={() => {
+            {/* <button onClick={() => {
                 // Restarts to 5 minutes timer
                 const time = new Date();
                 time.setSeconds(time.getSeconds() + 20);
                 restart(time)
-            }}>Restart</button>
+            }}>Restart</button> */}
         </div>
     );
 }
