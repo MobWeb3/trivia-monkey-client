@@ -82,7 +82,7 @@ function AIGame() {
 
     return (
         <div style={{ position: 'relative' }}>
-            <Button onClick={() => handleShowQuestion("Music")}>
+            <Button onClick={() => handleShowQuestion("History")}>
                 Show Question
             </Button>
             <QuestionModal 
@@ -91,6 +91,7 @@ function AIGame() {
                 onAnswerSubmit={handleAnswerSubmit}
                 question={currentQuestion}
                 topic={chosenTopic}
+                onExpire={() => setShowQuestionModal(false)}
             />
             <div id="phaser-container" className="App"></div>
 

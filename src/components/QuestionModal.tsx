@@ -14,9 +14,10 @@ interface QuestionModalProps {
     onAnswerSubmit: () => void;
     question: Question | null;
     topic: string | null;
+    onExpire: () => void;
 }
 
-const QuestionModal: React.FC<QuestionModalProps> = ({ open, onClose, question, topic }) => {
+const QuestionModal: React.FC<QuestionModalProps> = ({ open, onClose, question, topic, onExpire }) => {
     const iconA = <IconSquareLetterA size={24} />;
     const iconB = <IconSquareLetterB size={24} />;
     const iconC = <IconSquareLetterC size={24} />;
@@ -75,7 +76,7 @@ const QuestionModal: React.FC<QuestionModalProps> = ({ open, onClose, question, 
 
 
     const time = new Date();
-    time.setSeconds(time.getSeconds() + 20);
+    time.setSeconds(time.getSeconds() + 5);
 
     const validateAnswer = (selectedOption?: string) => {
         console.log('selected options', selectedOption);
@@ -117,11 +118,12 @@ const QuestionModal: React.FC<QuestionModalProps> = ({ open, onClose, question, 
                 className='centered-modal'
                 centered
                 withCloseButton={false}
+                transitionProps={{ transition: 'slide-up', exitDuration: 600 }}
             >
                 <Card shadow="lg" padding="md">
                     <Card.Section withBorder inheritPadding >
                         <div className="timer-container">
-                            <TimerComponent expiryTimestamp={time} />
+                            <TimerComponent expiryTimestamp={time} onExpire={onExpire} />
                         </div>
                     </Card.Section>
                     <Card.Section py="md" px="md">
@@ -189,14 +191,14 @@ const QuestionModal: React.FC<QuestionModalProps> = ({ open, onClose, question, 
 
 export interface TimerProps {
     expiryTimestamp: Date;
+    onExpire: () => void;
 }
 
-function TimerComponent({ expiryTimestamp }: TimerProps) {
+function TimerComponent({ expiryTimestamp, onExpire }: TimerProps) {
     const {
         seconds,
         minutes,
-        restart,
-    } = useTimer({ expiryTimestamp, onExpire: () => console.warn('onExpire called') });
+    } = useTimer({ expiryTimestamp, onExpire });
 
     return (
         <div>

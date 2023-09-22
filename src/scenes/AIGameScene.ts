@@ -25,11 +25,7 @@ export class AIGameScene extends Phaser.Scene {
     currentTurnPlayerId?: string;
 
     playerInTurnAvatar?: Phaser.GameObjects.Sprite;
-    // Text objects for displaying player in turn avatar and time left
     playerInTurnAvatarText?: Phaser.GameObjects.Text;
-
-    timeLeft: number = 20; // 20 seconds
-    timerText?: Phaser.GameObjects.Text;
 
     timeLeftText?: Phaser.GameObjects.Text;
     isHost?: boolean = false;
@@ -76,15 +72,6 @@ export class AIGameScene extends Phaser.Scene {
                 const {nextTurnPlayerId} = event.detail;
                 this.updateTurn(nextTurnPlayerId);
         });
-        // Add timer text to the scene
-        this.timerText = this.add.text(10, 50, `Time left: ${this.timeLeft}`, { fontSize: '16px', color: '#fff' });
-        // Start the timer
-        this.time.addEvent({
-            delay: 1000, // 1000 ms = 1 second
-            callback: this.updateTimer,
-            callbackScope: this,
-            loop: true
-        });
     }
 
     // This should only be called if a previous change on Polybase has been deployed
@@ -99,16 +86,6 @@ export class AIGameScene extends Phaser.Scene {
 
             // Destroy the scene
             this.scene.remove('AIGameScene');
-    }
-
-    updateTimer() {
-        this.timeLeft--; // Decrease the time left
-        if (this.timeLeft <= 0) {
-            this.timeLeft = 0;
-            // Stop the game or do something else when the time is up
-        }
-        // Update the timer text
-        this.timerText?.setText(`Time left: ${this.timeLeft}`);
     }
 
     isPlayerTurn(): boolean {
