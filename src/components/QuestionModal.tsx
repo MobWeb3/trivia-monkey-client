@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Modal, Button, Card, Container, Grid, Text } from '@mantine/core';
 import './QuestionModal.css';
 import { IconSquareLetterA, IconSquareLetterB, IconSquareLetterC, IconSquareLetterD } from '@tabler/icons-react';
@@ -22,8 +22,45 @@ const QuestionModal: React.FC<QuestionModalProps> = ({ open, onClose, question, 
     const iconC = <IconSquareLetterC size={24} />;
     const iconD = <IconSquareLetterD size={24} />;
 
+    const [selectedButton, setSelectedButton] = useState<number | null>(null);
+    const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
+
+
+    enum SelectedButton {
+        A = 0,
+        B = 1,
+        C = 2,
+        D = 3
+    }
+
+    const handleButtonClick = (optionIndex: number) => {
+        setSelectedButton(optionIndex);
+        const isValid = validateAnswer(question?.options[optionIndex]);
+        setIsCorrect(isValid);
+    }
+
+
     const time = new Date();
     time.setSeconds(time.getSeconds() + 20);
+
+    const validateAnswer = (selectedOption?: string) => {
+        console.log('validateAnswer', selectedOption, question?.answer);
+        return selectedOption === question?.answer;
+    }
+
+    const getButtonColor = (optionIndex: number) => {
+        if (selectedButton === optionIndex) {
+            return isCorrect ? 'green' : 'red';
+        }
+        return 'default';
+    }
+
+    const getButtonVariant = (optionIndex: number) => {
+        if (selectedButton === optionIndex) {
+            return 'light';
+        }
+        return "default";
+    }
 
     return (
         <div style={{ display: 'flex', justifyContent: 'center' }}>
@@ -35,7 +72,7 @@ const QuestionModal: React.FC<QuestionModalProps> = ({ open, onClose, question, 
                 title={topic}
                 className='centered-modal'
                 centered
-                withCloseButton = {false}
+                withCloseButton={false}
             >
                 <Card shadow="lg" padding="md">
                     <Card.Section withBorder inheritPadding >
@@ -45,29 +82,54 @@ const QuestionModal: React.FC<QuestionModalProps> = ({ open, onClose, question, 
                     </Card.Section>
                     <Card.Section py="md" px="md">
                         <Text size="xl" fw={700} >
-                            { question?.question ?? placeholderQuestionText}
+                            {question?.question ?? placeholderQuestionText}
                         </Text>
                     </Card.Section>
                     <Card.Section withBorder py="md">
                         <Container fluid>
                             <Grid>
                                 <Grid.Col span={12}>
-                                    <Button size='sm' justify="left" fullWidth leftSection={iconA} variant="default">
+                                    <Button
+                                        size='sm'
+                                        justify="left"
+                                        fullWidth
+                                        leftSection={iconA}
+                                        color={getButtonColor(SelectedButton.A)}
+                                        variant={getButtonVariant(SelectedButton.A)}
+                                        onClick={() => handleButtonClick(SelectedButton.A)}>
                                         {question?.options[0] ?? placeholderOptionA}
                                     </Button>
                                 </Grid.Col>
                                 <Grid.Col span={12}>
-                                    <Button size='sm' justify="left" fullWidth leftSection={iconB} variant="default">
+                                    <Button size='sm'
+                                        justify="left"
+                                        fullWidth
+                                        leftSection={iconB}
+                                        color={getButtonColor(SelectedButton.B)}
+                                        variant={getButtonVariant(SelectedButton.B)}
+                                        onClick={() => handleButtonClick(SelectedButton.B)}>
                                         {question?.options[1] ?? placeholderOptionA}
                                     </Button>
                                 </Grid.Col>
                                 <Grid.Col span={12}>
-                                    <Button size='sm' justify="left" fullWidth leftSection={iconC} variant="default">
+                                    <Button size='sm'
+                                        justify="left"
+                                        fullWidth
+                                        leftSection={iconC}
+                                        color={getButtonColor(SelectedButton.C)}
+                                        variant={getButtonVariant(SelectedButton.C)}
+                                        onClick={() => handleButtonClick(SelectedButton.C)}>
                                         {question?.options[2] ?? placeholderOptionA}
                                     </Button>
                                 </Grid.Col>
                                 <Grid.Col span={12}>
-                                    <Button size='sm' justify="left" fullWidth leftSection={iconD} variant="default">
+                                    <Button size='sm'
+                                            justify="left"
+                                            fullWidth
+                                            leftSection={iconD}
+                                            color={getButtonColor(SelectedButton.D)}
+                                            variant={getButtonVariant(SelectedButton.D)}
+                                            onClick={() => handleButtonClick(SelectedButton.D)}>
                                         {question?.options[3] ?? placeholderOptionA}
                                     </Button>
                                 </Grid.Col>
@@ -95,10 +157,10 @@ function TimerComponent({ expiryTimestamp }: TimerProps) {
         <div>
 
             <Text size="xl"
-                  fw={900}
-                  variant="gradient"
-                  gradient={{ from: 'gray', to: 'indigo', deg: 111 }}>
-                    {minutes}:{seconds}</Text>  
+                fw={900}
+                variant="gradient"
+                gradient={{ from: 'gray', to: 'indigo', deg: 111 }}>
+                {minutes}:{seconds}</Text>
             {/* <button onClick={() => {
                 // Restarts to 5 minutes timer
                 const time = new Date();

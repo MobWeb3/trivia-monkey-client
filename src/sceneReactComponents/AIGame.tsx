@@ -25,7 +25,7 @@ function AIGame() {
 
         // console.log('handleShowQuestion', event.detail.topic);
         // setChosenTopic(event.detail.topic);
-        const question: Question = await getQuestion({id:"Qn-028173de-a6c8-47ca-9e36-c0bb59c027e4", topic: "History"});
+        const question: Question = await getQuestion({id:"Qn-028173de-a6c8-47ca-9e36-c0bb59c027e4", topic});
         setCurrentQuestion(question);
         setShowQuestionModal(true);
         setChosenTopic(topic);
@@ -82,7 +82,7 @@ function AIGame() {
 
     return (
         <div style={{ position: 'relative' }}>
-            <Button onClick={() => handleShowQuestion("History")}>
+            <Button onClick={() => handleShowQuestion("Geography")}>
                 Show Question
             </Button>
             <QuestionModal 
