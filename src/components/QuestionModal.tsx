@@ -10,9 +10,10 @@ interface QuestionModalProps {
     onClose: () => void;
     onAnswerSubmit: () => void;
     question: Question | null;
+    topic: string | null;
 }
 
-const QuestionModal: React.FC<QuestionModalProps> = ({ open, onClose, question }) => {
+const QuestionModal: React.FC<QuestionModalProps> = ({ open, onClose, question, topic }) => {
     const iconA = <IconSquareLetterA size={24} />;
     const iconB = <IconSquareLetterB size={24} />;
     const iconC = <IconSquareLetterC size={24} />;
@@ -27,6 +28,7 @@ const QuestionModal: React.FC<QuestionModalProps> = ({ open, onClose, question }
                 onClose={onClose}
                 radius="lg"
                 size="70%"
+                title={topic}
                 className='centered-modal'
                 centered
                 withCloseButton = {false}

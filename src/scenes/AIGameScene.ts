@@ -1,9 +1,10 @@
 
-import { getHostId, getNextTurnPlayerId, getSession } from '../polybase/SessionHandler';
+import { getHostId, getSession } from '../polybase/SessionHandler';
 import { SessionPhase } from '../game-domain/SessionPhase';
-import { publishTurnCompleted, suscribeToTurnCompleted } from '../ably/AblyMessages';
+import { suscribeToTurnCompleted } from '../ably/AblyMessages';
 import { Messages } from '../utils/Messages';
 import { GameSession } from '../game-domain/GameSession';
+import { sendMessage } from '../utils/MessageListener';
 
 export class AIGameScene extends Phaser.Scene {
 
@@ -276,16 +277,7 @@ export class AIGameScene extends Phaser.Scene {
                 duration: 3000,
                 onComplete: this.handleSelectedSlice,
                 callbackScope: this
-            });
-
-
-            // Update turn on polybase
-            const {nextTurnPlayerId} = await getNextTurnPlayerId({id: this.session.id});
-
-            // Publish turn completed // we know clientId is not null because we checked isPlayerTurn
-            if(this.clientId && this.session.channelId) {
-                await publishTurnCompleted(this.clientId, this.session.channelId, {nextTurnPlayerId});
-            }   
+            });  
         }
     }
 
@@ -294,6 +286,9 @@ export class AIGameScene extends Phaser.Scene {
         // writing the prize you just won
         if (this.selectedSlice)
             this.messageGameText?.setText(this.selectedSlice.toString());
+
+        // Show the question
+        sendMessage(Messages.SHOW_QUESTION, {topic: this.selectedSlice});
     }
 
     setupSpinWheel() {

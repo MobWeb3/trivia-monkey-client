@@ -4,7 +4,7 @@ import { useContext, useEffect, useState } from 'react';
 import GameInstance from '../sceneConfigs/SpinWheelConfig';
 import { SessionDataContext } from '../components/SessionDataContext';
 import { Button, Loader } from '@mantine/core';
-import { addMessageListener } from '../utils/MessageListener';
+import { addMessageListener, removeMessageListener } from '../utils/MessageListener';
 import { Messages } from '../utils/Messages';
 import { useNavigate } from 'react-router-dom';
 import { publishStartGameAI, subscribeToStartGameAI } from '../ably/AblyMessages';
@@ -58,6 +58,7 @@ function SpinWheel() {
         // Cleanup listener when component unmounts
         return () => {
             window.removeEventListener(Messages.START_GAME_AI, handleOpenAIGame);
+            removeMessageListener(Messages.MAY_START_GAME, enableStartGameButton);
         };
     }, [mayStartGame]);
 

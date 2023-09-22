@@ -15,4 +15,6 @@ export enum Messages {
     MAY_START_GAME = 'MayStartGame',
     START_GAME_AI = 'start-game-ai',
     TURN_COMPLETED = 'turn-completed',
+    SHOW_QUESTION = 'show-question',
+    HIDE_QUESTION = 'hide-question',
   }
