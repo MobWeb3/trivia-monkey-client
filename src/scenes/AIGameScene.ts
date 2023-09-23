@@ -14,7 +14,7 @@ export class AIGameScene extends Phaser.Scene {
     // can the wheel spin?
     canSpin?: boolean;
     // slices (prizes) placed in the wheel
-    slices = 8;
+    slices = 6;
     // prize names, starting from 12 o'clock going clockwise
     sliceValues?: string[];
     // the prize you are about to win
@@ -49,8 +49,8 @@ export class AIGameScene extends Phaser.Scene {
     }
 
     async preload() {
-        this.load.image("wheel", "assets/sprites/wheel.png");
-        this.load.image("pin", "assets/sprites/pin.png");
+        this.load.image("wheel", "assets/spinners/topic-spinner-wheel.png");
+        this.load.image("pin", "assets/spinners/turns-spinner-pointer.png");
         this.load.image("player", "assets/sprites/monkey-avatar.png");
     }
 
@@ -278,7 +278,7 @@ export class AIGameScene extends Phaser.Scene {
         // this.wheel = this.add.sprite(this.cameras.main.width / 2, this.cameras.main.height / 2, "wheel");        // setting wheel registration point in its center
         this.wheel = this.add.sprite(0, 0, "wheel");
         this.wheel.setOrigin(0.5);
-        this.wheel.setScale(0.75);
+        this.wheel.setScale(0.5);
         // Add the wheel to the container
         this.wheelContainer?.add(this.wheel);
 
@@ -306,6 +306,7 @@ export class AIGameScene extends Phaser.Scene {
         var pin = this.add.sprite(this.cameras.main.width / 2, this.cameras.main.height / 2 - 50, "pin");
         // setting pin registration point in its center
         pin.setOrigin(0.5);
+        pin.setScale(0.5);
 
         // waiting for your input, then calling "spin" function
         this.input.on('pointerdown', this.spin, this);

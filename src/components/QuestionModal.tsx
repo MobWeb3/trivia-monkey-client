@@ -1,9 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Modal, Button, Card, Container, Grid, Text } from '@mantine/core';
 import './QuestionModal.css';
 import { IconSquareLetterA, IconSquareLetterB, IconSquareLetterC, IconSquareLetterD } from '@tabler/icons-react';
 import { useTimer } from 'react-timer-hook';
 import { Question } from '../game-domain/Question';
+import { addPointToPlayer, getNextTurnPlayerId } from '../polybase/SessionHandler';
+import { SessionDataContext } from './SessionDataContext';
+import { publishTurnCompleted } from '../ably/AblyMessages';
+import { sendMessage } from '../utils/MessageListener';
+import { Messages } from '../utils/Messages';
 
 const placeholderQuestionText = "What is the capital of the United States of America?"
 const placeholderOptionA = "Lorem Ipsum long anser that is very long, and more text";
@@ -11,7 +16,6 @@ const placeholderOptionA = "Lorem Ipsum long anser that is very long, and more t
 interface QuestionModalProps {
     open: boolean;
     onClose: () => void;
-    onAnswerSubmit: () => void;
     question: Question | null;
     topic: string | null;
     onExpire: () => void;
@@ -34,6 +38,7 @@ const QuestionModal: React.FC<QuestionModalProps> = ({ open, onClose, question, 
     const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
     const [showCorrectAnswer, setShowCorrectAnswer] = useState<boolean>(false);
     const [correctAnswerButton, setCorrectAnswerButton] = useState<number | null>(null);
+    const { sessionData } = useContext(SessionDataContext);
 
 
     const getCorrectAnswerButton = () => {
@@ -60,7 +65,7 @@ const QuestionModal: React.FC<QuestionModalProps> = ({ open, onClose, question, 
 
 
 
-    const handleButtonClick = (optionIndex: number) => {
+    const handleButtonClick = async (optionIndex: number) => {
         // Avoid double clicking
         if (selectedButton !== null) {
             return;
@@ -69,14 +74,32 @@ const QuestionModal: React.FC<QuestionModalProps> = ({ open, onClose, question, 
         setSelectedButton(optionIndex);
         const correctAnswerButton = getCorrectAnswerButton();
         setCorrectAnswerButton(correctAnswerButton);
-        const isValid = validateAnswer(question?.options[optionIndex]);
+        const chosenAnswer = question?.options[optionIndex];
+        const isValid = validateAnswer(chosenAnswer);
         setIsCorrect(isValid);
         setShowCorrectAnswer(true);
+
+
+        if (isValid) {
+            // Add point to player
+            console.log('adding point to player', sessionData?.clientId);
+            addPointToPlayer({ playerId: sessionData?.clientId, id: sessionData?.sessionId });
+        }
+
+        console.log("sessionData in handleButtonClick", sessionData)
+        // Update turn on polybase
+        const {nextTurnPlayerId} = await getNextTurnPlayerId({id: sessionData?.sessionId});
+        // Publish turn completed // we know clientId is not null because we checked isPlayerTurn
+        if(sessionData?.clientId && sessionData.channelId) {
+            await publishTurnCompleted(sessionData?.clientId, sessionData.channelId, {nextTurnPlayerId});
+        } 
+        
+        sendMessage(Messages.HIDE_QUESTION, {});
     }
 
 
     const time = new Date();
-    time.setSeconds(time.getSeconds() + 5);
+    time.setSeconds(time.getSeconds() + 20);
 
     const validateAnswer = (selectedOption?: string) => {
         console.log('selected options', selectedOption);

@@ -6,10 +6,8 @@ import { SessionDataContext } from '../components/SessionDataContext';
 import QuestionModal from '../components/QuestionModal';
 import { getQuestion } from '../polybase/QuestionsHandler';
 import { Question } from '../game-domain/Question';
-import { addMessageListener, removeMessageListener, sendMessage } from '../utils/MessageListener';
+import { addMessageListener, removeMessageListener } from '../utils/MessageListener';
 import { Messages } from '../utils/Messages';
-import { getNextTurnPlayerId } from '../polybase/SessionHandler';
-import { publishTurnCompleted } from '../ably/AblyMessages';
 import { Button } from '@mantine/core';
 
 function AIGame() {
@@ -25,7 +23,7 @@ function AIGame() {
 
         // console.log('handleShowQuestion', event.detail.topic);
         // setChosenTopic(event.detail.topic);
-        const question: Question = await getQuestion({id:"Qn-99f458eb-4952-469c-b630-82c1ee887aa3", topic});
+        const question: Question = await getQuestion({id:sessionData?.questionSessionId, topic});
         setCurrentQuestion(question);
         setShowQuestionModal(true);
         setChosenTopic(topic);
@@ -35,16 +33,9 @@ function AIGame() {
         setShowQuestionModal(false);
     }
     
-    const handleAnswerSubmit = async () => {
-        // Update turn on polybase
-        const {nextTurnPlayerId} = await getNextTurnPlayerId({id: "Qn-99f458eb-4952-469c-b630-82c1ee887aa3"});
-        // Publish turn completed // we know clientId is not null because we checked isPlayerTurn
-        if(sessionData?.clientId && sessionData.channelId) {
-            await publishTurnCompleted(sessionData?.clientId, sessionData.channelId, {nextTurnPlayerId});
-        } 
+    // const handleAnswerSubmit = async () => {
 
-        sendMessage(Messages.HIDE_QUESTION, {});
-    }
+    // }
 
     useEffect(() => {
         console.log('AIGame loaded: ', sessionData);
@@ -88,7 +79,6 @@ function AIGame() {
             <QuestionModal 
                 open={showQuestionModal} 
                 onClose={handleCloseQuestionModal} 
-                onAnswerSubmit={handleAnswerSubmit}
                 question={currentQuestion}
                 topic={chosenTopic}
                 onExpire={() => setShowQuestionModal(false)}
