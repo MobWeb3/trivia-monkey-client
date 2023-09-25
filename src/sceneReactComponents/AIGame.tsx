@@ -9,6 +9,8 @@ import { Question } from '../game-domain/Question';
 import { addMessageListener, removeMessageListener } from '../utils/MessageListener';
 import { Messages } from '../utils/Messages';
 import { Button } from '@mantine/core';
+import { getNextTurnPlayerId } from '../polybase/SessionHandler';
+import { publishTurnCompleted } from '../ably/AblyMessages';
 
 function AIGame() {
 
@@ -29,8 +31,14 @@ function AIGame() {
         setChosenTopic(topic);
     }
     
-    const handleCloseQuestionModal = () => {
+    const handleCloseQuestionModal = async () => {
         setShowQuestionModal(false);
+        // Update turn on polybase
+        const {nextTurnPlayerId} = await getNextTurnPlayerId({id: sessionData?.sessionId});
+        // Publish turn completed // we know clientId is not null because we checked isPlayerTurn
+        if(sessionData?.clientId && sessionData.channelId) {
+            await publishTurnCompleted(sessionData?.clientId, sessionData.channelId, {nextTurnPlayerId});
+        } 
     }
     
     // const handleAnswerSubmit = async () => {
@@ -56,7 +64,7 @@ function AIGame() {
             await handleShowQuestion(event?.topic);
         }
 
-        const hideQuestion = () => {
+        const hideQuestion = async () => {
             setShowQuestionModal(false);
         }
 
@@ -81,7 +89,7 @@ function AIGame() {
                 onClose={handleCloseQuestionModal} 
                 question={currentQuestion}
                 topic={chosenTopic}
-                onExpire={() => setShowQuestionModal(false)}
+                onExpire={() => handleCloseQuestionModal()}
             />
             <div id="phaser-container" className="App"></div>
 

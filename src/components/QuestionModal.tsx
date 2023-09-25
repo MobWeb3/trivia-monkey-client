@@ -4,9 +4,8 @@ import './QuestionModal.css';
 import { IconSquareLetterA, IconSquareLetterB, IconSquareLetterC, IconSquareLetterD } from '@tabler/icons-react';
 import { useTimer } from 'react-timer-hook';
 import { Question } from '../game-domain/Question';
-import { addPointToPlayer, getNextTurnPlayerId } from '../polybase/SessionHandler';
+import { addPointToPlayer } from '../polybase/SessionHandler';
 import { SessionDataContext } from './SessionDataContext';
-import { publishTurnCompleted } from '../ably/AblyMessages';
 import { sendMessage } from '../utils/MessageListener';
 import { Messages } from '../utils/Messages';
 
@@ -86,15 +85,14 @@ const QuestionModal: React.FC<QuestionModalProps> = ({ open, onClose, question, 
             addPointToPlayer({ playerId: sessionData?.clientId, id: sessionData?.sessionId });
         }
 
-        console.log("sessionData in handleButtonClick", sessionData)
-        // Update turn on polybase
-        const {nextTurnPlayerId} = await getNextTurnPlayerId({id: sessionData?.sessionId});
-        // Publish turn completed // we know clientId is not null because we checked isPlayerTurn
-        if(sessionData?.clientId && sessionData.channelId) {
-            await publishTurnCompleted(sessionData?.clientId, sessionData.channelId, {nextTurnPlayerId});
-        } 
-        
         sendMessage(Messages.HIDE_QUESTION, {});
+    }
+
+    const resetState = async () => {
+        setSelectedButton(null);
+        setIsCorrect(null);
+        setShowCorrectAnswer(false);
+        setCorrectAnswerButton(null);        
     }
 
 
@@ -134,7 +132,10 @@ const QuestionModal: React.FC<QuestionModalProps> = ({ open, onClose, question, 
         <div style={{ display: 'flex', justifyContent: 'center' }}>
             <Modal
                 opened={open}
-                onClose={onClose}
+                onClose={() => {
+                    onClose();
+                    resetState();
+                }}
                 radius="lg"
                 size="90%"
                 title={topic}
