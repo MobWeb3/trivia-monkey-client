@@ -13,7 +13,7 @@ export class ChannelHandler {
     const { clientId, nickname } = data;
     const channelId = `tm-chid-${generateUniqueId()}`;
 
-    console.log(`data-createChannelListener:`, data);
+    // console.log(`data-createChannelListener:`, data);
 
     try {
       const postResponse = await axios.post(`${baseUrl}/subscribeToChannel`, {
@@ -21,7 +21,7 @@ export class ChannelHandler {
 
       });
       const connectionStatus = postResponse.data.state.connectionStatus;
-      console.log(`Connection status: ${connectionStatus}`);
+      // console.log(`Connection status: ${connectionStatus}`);
       // window.dispatchEvent(new CustomEvent(Messages.CHANNEL_CREATED));
       const eventData = { channelInfo: data, channelId: channelId };
       window.dispatchEvent(new CustomEvent(Messages.CHANNEL_CREATED, { detail: eventData }));
@@ -37,7 +37,7 @@ export class ChannelHandler {
   public async enterChannel(data: any) {
     const { channelId, clientId, nickname } = data;
 
-    console.log("data-enterChannelListener:",  data);
+    // console.log("data-enterChannelListener:",  data);
     try {
       await ChannelHandler.ablyInstance?.enterChannel(channelId, clientId, nickname);
       const eventData = { nickname, channelId, clientId };
@@ -54,7 +54,7 @@ export class ChannelHandler {
       });
       const token = response.data.token;
 
-      console.log(`Token: ${token}`);
+      // console.log(`Token: ${token}`);
       ChannelHandler.ablyInstance = AblyHandler.getInstanceWithToken(token);
       return this;
 

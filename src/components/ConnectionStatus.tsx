@@ -46,7 +46,7 @@ import { getConnectedPublicKey } from '../utils/Web3AuthAuthentication';
           })
 
           setSigner(_signer);
-          console.log("signer created: ", signer);
+          // console.log("signer created: ", signer);
           console.log("signer address", await _signer.getAddress());
       } else {
           const publicKey = await getConnectedPublicKey(web3auth);

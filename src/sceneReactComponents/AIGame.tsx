@@ -31,7 +31,7 @@ function AIGame() {
         setChosenTopic(topic);
     }
     
-    const handleCloseQuestionModal = async () => {
+    const finishTurnAndSaveState = async () => {
         setShowQuestionModal(false);
         // Update turn on polybase
         const {nextTurnPlayerId} = await getNextTurnPlayerId({id: sessionData?.sessionId});
@@ -40,10 +40,6 @@ function AIGame() {
             await publishTurnCompleted(sessionData?.clientId, sessionData.channelId, {nextTurnPlayerId});
         } 
     }
-    
-    // const handleAnswerSubmit = async () => {
-
-    // }
 
     useEffect(() => {
         console.log('AIGame loaded: ', sessionData);
@@ -64,17 +60,17 @@ function AIGame() {
             await handleShowQuestion(event?.topic);
         }
 
-        const hideQuestion = async () => {
-            setShowQuestionModal(false);
-        }
+        // const hideQuestion = async () => {
+        //     setShowQuestionModal(false);
+        // }
 
         addMessageListener(Messages.SHOW_QUESTION, showQuestion);
-        addMessageListener(Messages.HIDE_QUESTION, hideQuestion);
+        addMessageListener(Messages.HIDE_QUESTION, finishTurnAndSaveState);
 
 
         return () => {
             removeMessageListener(Messages.SHOW_QUESTION, showQuestion);
-            removeMessageListener(Messages.HIDE_QUESTION, hideQuestion)
+            removeMessageListener(Messages.HIDE_QUESTION, finishTurnAndSaveState)
         };
 
     });
@@ -86,10 +82,10 @@ function AIGame() {
             </Button>
             <QuestionModal 
                 open={showQuestionModal} 
-                onClose={handleCloseQuestionModal} 
+                onClose={finishTurnAndSaveState} 
                 question={currentQuestion}
                 topic={chosenTopic}
-                onExpire={() => handleCloseQuestionModal()}
+                onExpire={() => finishTurnAndSaveState()}
             />
             <div id="phaser-container" className="App"></div>
 

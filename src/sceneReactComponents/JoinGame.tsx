@@ -59,6 +59,8 @@ const JoinGame = () => {
                     });
             });
             setChannelId(channelId as string);
+
+            console.log('JoinGame sessionData state ', sessionData);
             // handleJoinGame({ channelId });
         }
     }, [location]);

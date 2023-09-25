@@ -19,7 +19,7 @@ export const createChannelListenerWrapper = async (web3auth: Web3Auth, data: any
     }
     const userInfo = await getUserInfo(web3auth);
     data.clientId = userInfo?.email;
-    console.log('createChannelListenerWrapper data:', data);
+    // console.log('createChannelListenerWrapper data:', data);
     const channelHandler = await new ChannelHandler().initChannelHandler(data.clientId);
     // setAblyInstance(await initAblyHandler(data.clientId) ?? null);
     const channelId = await channelHandler?.createChannel(data);
@@ -34,17 +34,16 @@ export const createChannelListenerWrapper = async (web3auth: Web3Auth, data: any
         });
 
         if (response) {
-            console.log('createSession response:', response);
+            // console.log('createSession response:', response);
             const pbSessionId = response?.recordData?.data?.id;
             const channel = ChannelHandler.ablyInstance?.ablyInstance.channels.get(channelId);
             channel?.presence.subscribe('enter', async function (member) {
-                console.log(member.clientId + ' entered realtime-chat');
+                // console.log(member.clientId + ' entered realtime-chat');
                 const presence = await channel?.presence.get();
-                console.log('presence: ', presence);
+                // console.log('presence: ', presence);
                 if (presence.length == data.numberPlayers) {
 
                     
-                    console.log('All players are here!!');
                     data.sessionId = pbSessionId;
                     data.channelId = channelId;
                     
@@ -66,11 +65,11 @@ export const createChannelListenerWrapper = async (web3auth: Web3Auth, data: any
 
 export const enterChannelListenerWrapper = async (web3auth: Web3Auth, data: any) => {
 
-    console.log('enterChannelListenerWrapper data:', data);
+    // console.log('enterChannelListenerWrapper data:', data);
 
     const publicKey = await getConnectedPublicKey(web3auth);
     if (!publicKey) {
-        console.log('publicKey not initialized yet');
+        // console.log('publicKey not initialized yet');
         return;
     }
     const userInfo = await getUserInfo(web3auth);
@@ -79,7 +78,7 @@ export const enterChannelListenerWrapper = async (web3auth: Web3Auth, data: any)
     await channelHandler?.enterChannel(data);
     const channel = ChannelHandler.ablyInstance?.ablyInstance.channels.get(data.channelId);
     channel?.subscribe('start-game', async function (message) {
-        console.log('start-game event received with id:', message);
+        // console.log('start-game event received with id:', message);
         data.sessionId = message.data.sessionId;
         await new Promise(resolve => setTimeout(resolve, 500));
         window.dispatchEvent(new CustomEvent(Messages.ALL_PLAYERS_JOINED, {detail: data}));

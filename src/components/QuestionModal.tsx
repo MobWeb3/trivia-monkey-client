@@ -60,7 +60,12 @@ const QuestionModal: React.FC<QuestionModalProps> = ({ open, onClose, question, 
         if (selectedButton !== null) {
             setCorrectAnswerButton(getCorrectAnswerButton());
         }
-    }, [selectedButton, question]);
+    }, [selectedButton]);
+
+    useEffect(() => {
+        // Reset state when a new question is received
+        resetState();
+    }, [question]);
 
 
 
