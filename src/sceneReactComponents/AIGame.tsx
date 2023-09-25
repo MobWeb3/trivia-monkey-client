@@ -11,10 +11,14 @@ import { Messages } from '../utils/Messages';
 import { Button } from '@mantine/core';
 import { getNextTurnPlayerId } from '../polybase/SessionHandler';
 import { publishTurnCompleted } from '../ably/AblyMessages';
+import createPersistedState from 'use-persisted-state';
+import { SessionData } from './SessionData';
+
+const useSessionDataState = createPersistedState<SessionData | null>('sessionData');
 
 function AIGame() {
 
-    const { sessionData } = useContext(SessionDataContext);
+    const [sessionData] = useSessionDataState(null);
     const [showQuestionModal, setShowQuestionModal] = useState(false);
     const [currentQuestion, setCurrentQuestion] = useState<Question | null>(null);
     const [chosenTopic, setChosenTopic] = useState<string | null>(null);

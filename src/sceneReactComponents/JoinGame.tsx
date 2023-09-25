@@ -3,7 +3,6 @@ import { enterChannelListenerWrapper } from '../ably/ChannelListener';
 import { SignerContext } from '../components/SignerContext';
 import { Messages } from '../utils/Messages';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { SessionDataContext } from '../components/SessionDataContext';
 import queryString from 'query-string';
 import { Badge, Button, Group, Modal } from '@mantine/core';
 import ModalContent from '../components/ModalContent';
@@ -13,12 +12,16 @@ import { generateQuestions } from '../game-domain/GenerateQuestionsHandler';
 import { addQuestions } from '../polybase/QuestionsHandler';
 import { SessionPhase } from '../game-domain/SessionPhase';
 import { login } from '../utils/Web3AuthAuthentication';
+import createPersistedState from 'use-persisted-state';
+import { SessionData } from './SessionData';
+
+const useSessionDataState = createPersistedState<SessionData | null>('sessionData');
 
 const JoinGame = () => {
     const [channelId, setChannelId] = useState('');
     const { web3auth } = useContext(SignerContext);
     const navigate = useNavigate();
-    const {sessionData, setSessionData } = useContext(SessionDataContext);
+    const [sessionData, setSessionData] = useSessionDataState(null);
     const location = useLocation();
     const [opened, { open, close }] = useDisclosure(false);
     const [selectedChips, setSelectedChips] = useState<string[]>([]);

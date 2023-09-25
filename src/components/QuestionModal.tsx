@@ -1,16 +1,19 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Modal, Button, Card, Container, Grid, Text } from '@mantine/core';
 import './QuestionModal.css';
 import { IconSquareLetterA, IconSquareLetterB, IconSquareLetterC, IconSquareLetterD } from '@tabler/icons-react';
 import { useTimer } from 'react-timer-hook';
 import { Question } from '../game-domain/Question';
 import { addPointToPlayer } from '../polybase/SessionHandler';
-import { SessionDataContext } from './SessionDataContext';
 import { sendMessage } from '../utils/MessageListener';
 import { Messages } from '../utils/Messages';
+import { SessionData } from '../sceneReactComponents/SessionData';
+import createPersistedState from 'use-persisted-state';
 
 const placeholderQuestionText = "What is the capital of the United States of America?"
 const placeholderOptionA = "Lorem Ipsum long anser that is very long, and more text";
+
+const useSessionDataState = createPersistedState<SessionData | null>('sessionData');
 
 interface QuestionModalProps {
     open: boolean;
@@ -37,7 +40,7 @@ const QuestionModal: React.FC<QuestionModalProps> = ({ open, onClose, question, 
     const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
     const [showCorrectAnswer, setShowCorrectAnswer] = useState<boolean>(false);
     const [correctAnswerButton, setCorrectAnswerButton] = useState<number | null>(null);
-    const { sessionData } = useContext(SessionDataContext);
+    const [sessionData] = useSessionDataState(null);
 
 
     const getCorrectAnswerButton = () => {
