@@ -4,7 +4,7 @@
   "private": true,
   "dependencies": {
     "@emotion/react": "^11.11.1",
-    "@mantine/core": "^7.0.0",
+    "@mantine/core": "^7.0.2",
     "@mantine/hooks": "^7.0.0",
     "@mantine/notifications": "^6.0.17",
     "@metaplex-foundation/js": "^0.19.4",
@@ -20,6 +20,8 @@
     "@types/react-dom": "^18.2.7",
     "@types/use-persisted-state": "^0.3.2",
     "@types/uuid": "^9.0.2",
+    "@vitejs/plugin-react": "^4.1.0",
+    "@vitejs/plugin-react-swc": "^3.4.0",
     "@walletconnect/sign-client": "^2.9.1",
     "@web3auth/modal": "^6.1.5",
     "@web3auth/wallet-connect-v2-adapter": "^6.1.5",
@@ -32,11 +34,15 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.15.0",
-    "react-scripts": "5.0.1",
     "react-timer-hook": "^3.0.7",
+    "rollup-plugin-polyfill-node": "^0.12.0",
     "typescript": "^5.0.4",
     "use-persisted-state": "^0.3.3",
     "viem": "^1.4.1",
+    "vite-plugin-checker": "^0.6.2",
+    "vite-plugin-handlebars": "^1.6.0",
+    "vite-plugin-svgr": "^4.0.0",
+    "vite-tsconfig-paths": "^4.2.1",
     "wagmi": "^1.3.9",
     "web-vitals": "^2.1.4",
     "workbox-background-sync": "^6.6.0",
@@ -53,9 +59,12 @@
     "workbox-streams": "^6.6.0"
   },
   "devDependencies": {
+    "@esbuild-plugins/node-globals-polyfill": "^0.2.3",
+    "@esbuild-plugins/node-modules-polyfill": "^0.2.2",
     "assert": "^2.0.0",
     "buffer": "^6.0.3",
     "crypto-browserify": "^3.12.0",
+    "eslint": "^8.50.0",
     "eslint-config-react-app": "^7.0.1",
     "https-browserify": "^1.0.0",
     "os-browserify": "^0.3.0",
@@ -64,17 +73,19 @@
     "postcss-simple-vars": "^7.0.1",
     "process": "^0.11.10",
     "react-app-rewired": "^2.2.1",
+    "rollup-plugin-node-builtins": "^2.1.2",
+    "rollup-plugin-node-polyfills": "^0.2.1",
     "source-map-loader": "^4.0.1",
     "stream-browserify": "^3.0.0",
     "stream-http": "^3.2.0",
     "url": "^0.11.0",
+    "vite": "^4.4.9",
     "zlib-browserify": "^0.0.3"
   },
   "scripts": {
-    "start": "react-app-rewired start",
-    "build": "react-app-rewired build",
-    "test": "react-app-rewired test",
-    "eject": "react-scripts eject"
+    "start": "vite",
+    "build": "tsc && vite build",
+    "serve": "vite preview"
   },
   "eslintConfig": {
     "extends": [
