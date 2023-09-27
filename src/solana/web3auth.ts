@@ -1,7 +1,7 @@
 import { Web3Auth } from "@web3auth/modal";
 import { CHAIN_NAMESPACES } from '@web3auth/base';
 
-const clientId = process.env.REACT_APP_WEB3AUTH_CLIENT_ID ?? "";
+const clientId = import.meta.env.VITE_APP_WEB3AUTH_CLIENT_ID ?? "";
 
 //https://api.testnet.solana.com
 //https://api.devnet.solana.com
