@@ -3,15 +3,14 @@ import react from '@vitejs/plugin-react-swc'
 import checker from 'vite-plugin-checker';
 import viteTsconfigPaths from 'vite-tsconfig-paths';
 import svgrPlugin from 'vite-plugin-svgr';
-import { resolve } from 'path';
+import path, { resolve as pathResolve } from 'path';
 import handlebars from 'vite-plugin-handlebars';
 import { NodeGlobalsPolyfillPlugin } from "@esbuild-plugins/node-globals-polyfill";
 import { NodeModulesPolyfillPlugin } from "@esbuild-plugins/node-modules-polyfill";
 import rollupNodePolyFill from "rollup-plugin-node-polyfills";
 import builtins from "rollup-plugin-node-builtins";
 import polyfillNode from 'rollup-plugin-polyfill-node'
-
-
+import { VitePWA } from 'vite-plugin-pwa'
 
 // https://vitejs.dev/config/
 export default defineConfig(({ command, mode }) => {
@@ -26,15 +25,36 @@ export default defineConfig(({ command, mode }) => {
                 overlay: { initialIsOpen: false },
                 typescript: true,
                 eslint: {
-                  lintCommand: 'eslint "./src/**/*.{ts,tsx}"',
+                    lintCommand: 'eslint "./src/**/*.{ts,tsx}"',
                 },
-              }),
+            }),
             viteTsconfigPaths(),
             svgrPlugin(),
             handlebars({
-            partialDirectory: resolve(__dirname, 'src/partials'),
+                partialDirectory: pathResolve(__dirname, 'src/partials'),
             }) as Plugin,
-            polyfillNode()
+            polyfillNode(),
+            VitePWA({
+                manifest: {
+                    icons: [
+                        {
+                            src: 'assets/monkeys_avatars/astronaut-monkey1-200x200.png',
+                            sizes: '192x192',
+                            type: 'image/png',
+                            purpose: 'any maskable',
+                        },
+                    ],
+                },
+                injectRegister: 'auto',
+                registerType: 'autoUpdate',
+                workbox: {
+                    clientsClaim: true,
+                    skipWaiting: true
+                },
+                devOptions: {
+                    enabled: true
+                }
+            })
         ],
         define: {
             VITE_PUBLIC_URL: JSON.stringify(env.VITE_PUBLIC_URL),
@@ -70,31 +90,36 @@ export default defineConfig(({ command, mode }) => {
                 domain: 'rollup-plugin-node-polyfills/polyfills/domain',
                 buffer: 'rollup-plugin-node-polyfills/polyfills/buffer-es6',
             }
-          },
-          optimizeDeps: {
+        },
+        optimizeDeps: {
+            // include: ['end-of-stream'],
+
             esbuildOptions: {
-              target: "es2020",
-              supported: { bigint: true },
-              plugins: [
-                NodeGlobalsPolyfillPlugin({
-                  buffer: true,
-                }),
-                NodeModulesPolyfillPlugin(),
-              ],
+                target: "es2020",
+                supported: { bigint: true },
+                plugins: [
+                    NodeGlobalsPolyfillPlugin({
+                        buffer: true,
+                    }),
+                    NodeModulesPolyfillPlugin(),
+                ],
             },
-          },
-          build: {
+        },
+        build: {
+            commonjsOptions: {
+                exclude: ['end-of-stream/*', 'node_modules/*'],
+              },
             target: "es2020",
             rollupOptions: {
-              plugins: [
-                // Enable rollup polyfills plugin
-                // used during production bundling
-                builtins(),
-                rollupNodePolyFill(),
-              ],
+                plugins: [
+                    // Enable rollup polyfills plugin
+                    // used during production bundling
+                    builtins(),
+                    rollupNodePolyFill(),
+                ],
             },
-          },
-        
+        },
+
     }
 
 })
