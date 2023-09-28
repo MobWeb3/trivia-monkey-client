@@ -24,6 +24,5 @@ yarn-error.log*
 .yarn
 .yarnrc.yml
 .env
-dev-dist/registerSW.js
-dev-dist/sw.js
-dev-dist/workbox-f16557dd.js
+dev-dist/**/*
+dist/**/*

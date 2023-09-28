@@ -3,24 +3,28 @@ import react from '@vitejs/plugin-react-swc'
 import checker from 'vite-plugin-checker';
 import viteTsconfigPaths from 'vite-tsconfig-paths';
 import svgrPlugin from 'vite-plugin-svgr';
-import path, { resolve as pathResolve } from 'path';
-import handlebars from 'vite-plugin-handlebars';
 import { NodeGlobalsPolyfillPlugin } from "@esbuild-plugins/node-globals-polyfill";
 import { NodeModulesPolyfillPlugin } from "@esbuild-plugins/node-modules-polyfill";
 import rollupNodePolyFill from "rollup-plugin-node-polyfills";
 import builtins from "rollup-plugin-node-builtins";
 import polyfillNode from 'rollup-plugin-polyfill-node'
 import { VitePWA } from 'vite-plugin-pwa'
+import commonjs from '@rollup/plugin-commonjs';
+
 
 // https://vitejs.dev/config/
 export default defineConfig(({ command, mode }) => {
 
     const env = loadEnv(mode, process.cwd(), '')
 
+    const externals =  ['end-of-stream', 'pump', 'lodash.merge', 'lodash', 'react', 'react/jsx-runtime', 'lodash.clonedeep', 'react-dom/client',
+    'borsh', 'bigint-buffer', 'rpc-websockets/dist/lib/client', '@zerodevapp/sdk', 'ably', 'react-dom', 'prop-types', 'phaser', 'lodash.isequal']
+
     return {
         base: '/',
         plugins: [
             react(),
+            commonjs(),
             checker({
                 overlay: { initialIsOpen: false },
                 typescript: true,
@@ -30,9 +34,6 @@ export default defineConfig(({ command, mode }) => {
             }),
             viteTsconfigPaths(),
             svgrPlugin(),
-            handlebars({
-                partialDirectory: pathResolve(__dirname, 'src/partials'),
-            }) as Plugin,
             polyfillNode(),
             VitePWA({
                 manifest: {
@@ -92,8 +93,8 @@ export default defineConfig(({ command, mode }) => {
             }
         },
         optimizeDeps: {
-            // include: ['end-of-stream'],
-
+            include: ['end-of-stream'],
+            // exclude: externals,
             esbuildOptions: {
                 target: "es2020",
                 supported: { bigint: true },
@@ -106,9 +107,6 @@ export default defineConfig(({ command, mode }) => {
             },
         },
         build: {
-            commonjsOptions: {
-                exclude: ['end-of-stream/*', 'node_modules/*'],
-              },
             target: "es2020",
             rollupOptions: {
                 plugins: [
@@ -116,6 +114,7 @@ export default defineConfig(({ command, mode }) => {
                     // used during production bundling
                     builtins(),
                     rollupNodePolyFill(),
+                    commonjs(),
                 ],
             },
         },
