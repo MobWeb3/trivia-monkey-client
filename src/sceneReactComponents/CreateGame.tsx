@@ -13,13 +13,17 @@ import QRCodeStyling from "qr-code-styling";
 import { addQuestions, createQuestionSession } from '../polybase/QuestionsHandler';
 import { generateQuestions } from '../game-domain/GenerateQuestionsHandler';
 import { updateQuestionSessionId, updateTopics } from '../polybase/SessionHandler';
+import createPersistedState from 'use-persisted-state';
+import { SessionData } from './SessionData';
+
+const useSessionDataState = createPersistedState<SessionData | null>('sessionData');
 
 const CreateGame = () => {
     const [nickname, setNickname] = useState('');
     const [numberPlayers, setNumberPlayers] = useState('');
     const [pointsToWin, setPointsToWin] = useState('');
     const { web3auth } = useContext(SignerContext);
-    const {sessionData, setSessionData } = useContext(SessionDataContext);
+    const [sessionData, setSessionData] = useSessionDataState(null);
     const navigate = useNavigate();
     const [opened, { open, close }] = useDisclosure(false);
     const [selectedChips, setSelectedChips] = useState<string[]>([]);

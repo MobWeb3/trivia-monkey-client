@@ -5,10 +5,15 @@ import { getRPCProviderOwner, getZeroDevSigner } from '@zerodevapp/sdk';
 import { createUser, userExists } from '../polybase/UserHandler';
 import { useNavigate } from 'react-router-dom';
 import { getConnectedPublicKey } from '../utils/Web3AuthAuthentication';
+import createPersistedState from 'use-persisted-state';
+import { SessionData } from './SessionData';
+
+const useSessionDataState = createPersistedState<SessionData | null>('sessionData');
 
 export const Bootstrap = () => {
     const { signer, web3auth, setSigner, loggedIn, setLoggedIn, setUserInfo } = useContext(SignerContext);
-    const [, setProvider] = useState<SafeEventEmitterProvider | null>(null);
+    const [sessionData, setSessionData] = useSessionDataState(null);
+    // const [, setProvider] = useState<SafeEventEmitterProvider | null>(null);
     const navigate = useNavigate();
 
     const handlePlayClick = async () => {
@@ -36,15 +41,15 @@ export const Bootstrap = () => {
 
     const handleDisconnectClick = async () => {
         await logout();
+        if (sessionData) setSessionData(null);
     }
-
     const login = async () => {
         if (!web3auth) {
             console.log("web3auth not initialized yet");
             return {};
         }
         const web3authProvider = await web3auth.connect();
-        setProvider(web3authProvider);
+        // setProvider(web3authProvider);
         setLoggedIn(true);
 
         const userInfo = await web3auth.getUserInfo();
@@ -58,7 +63,7 @@ export const Bootstrap = () => {
                 owner: getRPCProviderOwner(web3auth.provider),
             })
 
-            setSigner(_signer);
+            setSigner(_signer as any);
             console.log("signer created: ", signer);
             console.log("signer address", await _signer.getAddress());
         } else {
@@ -86,7 +91,7 @@ export const Bootstrap = () => {
             console.error(error);
         }
 
-        setProvider(null);
+        // setProvider(null);
         setLoggedIn(false);
         setUserInfo(null);
         localStorage.removeItem('userInfo');

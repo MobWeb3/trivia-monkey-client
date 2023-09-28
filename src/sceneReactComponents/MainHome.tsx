@@ -11,7 +11,7 @@ import { createChannelListenerWrapper, enterChannelListenerWrapper } from '../ab
 import { getConnectedPublicKey } from '../utils/Web3AuthAuthentication';
 
 function App() {
-  const { signer, web3auth, setSigner } = useContext(SignerContext);
+  const { web3auth, setSigner } = useContext(SignerContext);
   const [, setProvider] = useState<SafeEventEmitterProvider | null>(null);
   const [loggedIn, setLoggedIn] = useState(false);
 
@@ -77,8 +77,8 @@ function App() {
         owner: getRPCProviderOwner(web3auth.provider),
       })
 
-      setSigner(_signer);
-      console.log("signer created: ", signer);
+      // setSigner(_signer);
+      // console.log("signer created: ", signer);
       console.log("signer address", await _signer.getAddress());
     } else {
       const userInfo = await web3auth.getUserInfo();

@@ -48,7 +48,6 @@ export const SignerProvider: React.FC<PropsWithChildren<Props>> = ({ children })
       await web3auth.initModal();
       if (web3auth) {
         setWeb3auth(web3auth);
-        localStorage.setItem('web3auth', JSON.stringify(web3auth));
         // console.log("web3auth: ", web3auth);
         // setWeb3AuthConnector(new Web3AuthConnector({
         //   chains,

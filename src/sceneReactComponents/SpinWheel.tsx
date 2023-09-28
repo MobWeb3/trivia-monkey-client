@@ -8,11 +8,16 @@ import { addMessageListener, removeMessageListener } from '../utils/MessageListe
 import { Messages } from '../utils/Messages';
 import { useNavigate } from 'react-router-dom';
 import { publishStartGameAI, subscribeToStartGameAI } from '../ably/AblyMessages';
-import { setCurrentTurnPlayerId, updatePlayerListOrder } from '../polybase/SessionHandler';
+import { setCurrentTurnPlayerId, updatePlayerListOrder, updateSessionPhase } from '../polybase/SessionHandler';
+import createPersistedState from 'use-persisted-state';
+import { SessionData } from './SessionData';
+import { SessionPhase } from '../game-domain/SessionPhase';
+
+const useSessionDataState = createPersistedState<SessionData | null>('sessionData');
 
 function SpinWheel() {
 
-    const { sessionData } = useContext(SessionDataContext);
+    const [sessionData] = useSessionDataState(null);
     const [game, setGame] = useState<Phaser.Game | null>(null);
     const [mayStartGame, setMayStartGame] = useState(false);
     const [isLoading, setIsLoading] = useState(false); // Add this line
@@ -47,6 +52,8 @@ function SpinWheel() {
                 console.log('playerList', playerList);
                 // set the first player in the list as the current turn player
                 await setCurrentTurnPlayerId({id: sessionData.sessionId, playerId: playerList[0]})
+                // if all players have selected their turn, then we can proceed to the next phase.
+                await updateSessionPhase({ id: sessionData.sessionId, newPhase: SessionPhase.GAME_ACTIVE });
             }
             setIsLoading(false);
             console.log('Naviagting to Game', event.detail);

@@ -17,10 +17,10 @@ export const web3authSolana = new Web3Auth({
       ticker: "SOL",
       tickerName: "solana",
     },
-    uiConfig: {
-      theme: 'light',
-      loginMethodsOrder: ['facebook', 'google'],
-      appLogo: 'https://web3auth.io/images/w3a-L-Favicon-1.svg' // Your App Logo Here
-    },
+    // uiConfig: {
+      // theme: 'light',
+      // loginMethodsOrder: ['facebook', 'google'],
+      // appLogo: 'https://web3auth.io/images/w3a-L-Favicon-1.svg' // Your App Logo Here
+    // },
     web3AuthNetwork: "cyan",
 });

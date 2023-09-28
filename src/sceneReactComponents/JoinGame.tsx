@@ -31,6 +31,7 @@ const JoinGame = () => {
     useEffect(() => {
         const handleAllPlayersJoined = (event: any) => {
             console.log('All players have joined', event.detail);
+            console.log('sessionData', sessionData);
             setSessionData(event.detail);
             // Handle the event here
             

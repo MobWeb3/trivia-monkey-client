@@ -11,12 +11,12 @@ export const web3authEvm = new Web3Auth({
     },
     uiConfig: {
       appName: "Monkey Trivia",
-      appLogo: "https://web3auth.io/images/w3a-L-Favicon-1.svg", // Your App Logo Here
-      theme: "light",
       loginMethodsOrder: ["google", "facebook", "twitter", "reddit", "discord", "twitch", "apple", "line", "github", "kakao", "linkedin", "weibo", "wechat", "email_passwordless"],
       defaultLanguage: "en", // en, de, ja, ko, zh, es, fr, pt, nl
       loginGridCol: 3,
       primaryButton: "externalLogin", // "externalLogin" | "socialLogin" | "emailLogin"
+      mode: "light", // "modal" | "inline"
+      logoLight: "assets/monkeys_avatars/astronaut-monkey1-200x200.png",
     },
     web3AuthNetwork: "cyan",
   });

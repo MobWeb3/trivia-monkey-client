@@ -9,7 +9,7 @@ import { Question } from '../game-domain/Question';
 import { addMessageListener, removeMessageListener } from '../utils/MessageListener';
 import { Messages } from '../utils/Messages';
 import { Button } from '@mantine/core';
-import { getNextTurnPlayerId } from '../polybase/SessionHandler';
+import { getNextTurnPlayerId, getSession } from '../polybase/SessionHandler';
 import { publishTurnCompleted } from '../ably/AblyMessages';
 import createPersistedState from 'use-persisted-state';
 import { SessionData } from './SessionData';
@@ -18,7 +18,7 @@ const useSessionDataState = createPersistedState<SessionData | null>('sessionDat
 
 function AIGame() {
 
-    const [sessionData] = useSessionDataState(null);
+    const [sessionData, setSessionData] = useSessionDataState(null);
     const [showQuestionModal, setShowQuestionModal] = useState(false);
     const [currentQuestion, setCurrentQuestion] = useState<Question | null>(null);
     const [chosenTopic, setChosenTopic] = useState<string | null>(null);
@@ -27,9 +27,15 @@ function AIGame() {
 
     const handleShowQuestion = async (topic:string) => {
 
-        // console.log('handleShowQuestion', event.detail.topic);
-        // setChosenTopic(event.detail.topic);
+        if (!sessionData?.questionSessionId) {
+            const { questionSessionId } = await getSession({ id: sessionData?.sessionId })
+            setSessionData({ ...sessionData, questionSessionId });
+        }
+
+        console.log(`topic ${topic}, questionSessionId ${sessionData?.questionSessionId}`);
         const question: Question = await getQuestion({id:sessionData?.questionSessionId, topic});
+
+        console.log('question', question);
         setCurrentQuestion(question);
         setShowQuestionModal(true);
         setChosenTopic(topic);

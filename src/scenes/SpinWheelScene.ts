@@ -83,8 +83,6 @@ export class SpinWheelScene extends Phaser.Scene {
                     // check if all other players have already selected their turn. To do this we must check the length of 
                     // initialTurnPosition in the Polybase server
                     if (canStartGame) {
-                        // if all players have selected their turn, then we can proceed to the next phase.
-                        await updateSessionPhase({ id: this.sessionId, newPhase: SessionPhase.GAME_ACTIVE });
                         // console.log('GAME_ACTIVE!');
                         sendMessage(Messages.MAY_START_GAME, { sessionId: this.sessionId });
                     }
@@ -119,7 +117,6 @@ export class SpinWheelScene extends Phaser.Scene {
         // console.log('gamePhase: ', this.gamePhase);
         // console.log('gamePhase in preload: ', this.gamePhase);
         if ( this.gamePhase === SessionPhase.TURN_ORDER){
-            // console.log('can turn!');
             this.canSpin = true;
         } 
         

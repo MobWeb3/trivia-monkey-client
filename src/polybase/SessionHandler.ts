@@ -45,8 +45,6 @@ export const updateInitialTurnPosition = async (data: any) => {
 export const getSession = async (data: any) => {
     try {
         const response = await axios.post(`${BASE_URL}/api/polybase/session/getSession`, data);
-        console.log('getSession response data: ', response.data);
-        console.log('getSession response: ', response.data.session);
         return response.data.session;
     } catch (error) {
         console.error(error);

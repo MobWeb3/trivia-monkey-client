@@ -33,7 +33,7 @@ export const login = async (web3auth: Web3Auth) => {
 export const getConnectedPublicKey = async (web3auth: Web3Auth) => {
     const web3authProvider = await web3auth?.connect();
     if (web3authProvider) {
-        const solanaWallet = new SolanaWallet(web3authProvider);
+        const solanaWallet = new SolanaWallet(web3authProvider as any);
         const accounts = await solanaWallet.requestAccounts();
         const account1 = accounts[0];
         if (account1) {
