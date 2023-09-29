@@ -86,7 +86,7 @@ function AIGame() {
 
     return (
         <div style={{ position: 'relative' }}>
-            <Button onClick={() => handleShowQuestion("History")}>
+            <Button onClick={() => handleShowQuestion("Music")}>
                 Show Question
             </Button>
             <QuestionModal 

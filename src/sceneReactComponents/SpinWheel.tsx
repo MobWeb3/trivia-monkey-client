@@ -66,7 +66,7 @@ function SpinWheel() {
             window.removeEventListener(Messages.START_GAME_AI, handleOpenAIGame);
             removeMessageListener(Messages.MAY_START_GAME, enableStartGameButton);
         };
-    }, [mayStartGame]);
+    }, [sessionData, game, navigate]);
 
     const handleStartGame = () => {
         console.log('handleStartGame');

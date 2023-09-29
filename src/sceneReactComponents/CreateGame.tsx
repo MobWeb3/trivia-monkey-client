@@ -1,4 +1,4 @@
-import { useContext, useEffect, useRef, useState } from 'react';
+import { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { createChannelListenerWrapper } from '../ably/ChannelListener';
 import { SignerContext } from '../components/SignerContext';
 import { Messages } from '../utils/Messages';
@@ -29,6 +29,24 @@ const CreateGame = () => {
     const [loading, setLoading] = useState(false);
     const [sessionCreated, setSessionCreated] = useState(false);
     const ref = useRef(null); //qr code ref
+    const qrCode = useMemo(() => new QRCodeStyling({
+        width: 300,
+        height: 300,
+        type: "svg",
+        data: "https://helpful-knowing-ghost.ngrok-free.app/joingame?channelId=1234",
+        image: "https://cryptologos.cc/logos/chimpion-bnana-logo.svg",
+        dotsOptions: {
+            color: "#4267b2",
+            type: "rounded"
+        },
+        backgroundOptions: {
+            color: "#e9ebee",
+        },
+        imageOptions: {
+            crossOrigin: "anonymous",
+            margin: 20
+        }
+    }), []);
 
     useEffect(() => {
         const handleAllPlayersJoined = (event: any) => {
@@ -44,7 +62,7 @@ const CreateGame = () => {
         return () => {
             window.removeEventListener(Messages.ALL_PLAYERS_JOINED, handleAllPlayersJoined);
         };
-    }, [selectedChips, pointsToWin, nickname]);
+    });
 
     useEffect(() => {
         const url =`https://helpful-knowing-ghost.ngrok-free.app/joingame?sessionId=${sessionData?.sessionId}&channelId=${sessionData?.channelId}`;
@@ -55,7 +73,7 @@ const CreateGame = () => {
         if (ref.current) {
             qrCode.append(ref.current);
         }
-      }, [sessionCreated]);
+      }, [sessionCreated, qrCode, sessionData?.channelId, sessionData?.sessionId]);
 
     const handleCreateChannel = async (data: any) => {
         if (web3auth) {
@@ -116,24 +134,7 @@ const CreateGame = () => {
         );
     };
 
-    const qrCode = new QRCodeStyling({
-        width: 300,
-        height: 300,
-        type: "svg",
-        data: "https://helpful-knowing-ghost.ngrok-free.app/joingame?channelId=1234",
-        image: "https://cryptologos.cc/logos/chimpion-bnana-logo.svg",
-        dotsOptions: {
-            color: "#4267b2",
-            type: "rounded"
-        },
-        backgroundOptions: {
-            color: "#e9ebee",
-        },
-        imageOptions: {
-            crossOrigin: "anonymous",
-            margin: 20
-        }
-    });
+
 
     return (
         <>

@@ -41,29 +41,26 @@ const QuestionModal: React.FC<QuestionModalProps> = ({ open, onClose, question, 
     const [showCorrectAnswer, setShowCorrectAnswer] = useState<boolean>(false);
     const [correctAnswerButton, setCorrectAnswerButton] = useState<number | null>(null);
     const [sessionData] = useSessionDataState(null);
+    const [showContinueButton, setShowContinueButton] = useState<boolean>(false);
 
-
+    /* eslint-disable react-hooks/exhaustive-deps */
+    // esling complains because it wants to add OptionButton.A, OptionButton.B, etc. to the dependency array
+    // but we know they are constants.
     useEffect(() => {
         if (selectedButton !== null) {
-            const getCorrectAnswerButton = () => {
-                if (question?.answer === question?.options[0]) {
-                    return OptionButton.A;
-                }
-                if (question?.answer === question?.options[1]) {
-                    return OptionButton.B;
-                }
-                if (question?.answer === question?.options[2]) {
-                    return OptionButton.C;
-                }
-                if (question?.answer === question?.options[3]) {
-                    return OptionButton.D;
-                }
-                return null;
+            let correctAnswerButton = null;
+            if (question?.answer === question?.options[0]) {
+                correctAnswerButton = OptionButton.A;
+            } else if (question?.answer === question?.options[1]) {
+                correctAnswerButton = OptionButton.B;
+            } else if (question?.answer === question?.options[2]) {
+                correctAnswerButton = OptionButton.C;
+            } else if (question?.answer === question?.options[3]) {
+                correctAnswerButton = OptionButton.D;
             }
-    
-            setCorrectAnswerButton(getCorrectAnswerButton());
+            setCorrectAnswerButton(correctAnswerButton);
         }
-    }, [selectedButton]);
+    }, [selectedButton, question]);
 
     useEffect(() => {
         // Reset state when a new question is received
@@ -83,7 +80,7 @@ const QuestionModal: React.FC<QuestionModalProps> = ({ open, onClose, question, 
         const isValid = validateAnswer(chosenAnswer);
         setIsCorrect(isValid);
         setShowCorrectAnswer(true);
-
+        setShowContinueButton(true);
 
         if (isValid) {
             // Add point to player
@@ -91,14 +88,14 @@ const QuestionModal: React.FC<QuestionModalProps> = ({ open, onClose, question, 
             addPointToPlayer({ playerId: sessionData?.clientId, id: sessionData?.sessionId });
         }
 
-        sendMessage(Messages.HIDE_QUESTION, {});
     }
 
     const resetState = async () => {
         setSelectedButton(null);
         setIsCorrect(null);
         setShowCorrectAnswer(false);
-        setCorrectAnswerButton(null);        
+        setCorrectAnswerButton(null);
+        setShowContinueButton(false);      
     }
 
 
@@ -209,10 +206,12 @@ const QuestionModal: React.FC<QuestionModalProps> = ({ open, onClose, question, 
                                         {question?.options[3] ?? placeholderOptionA}
                                     </Button>
                                 </Grid.Col>
-
                             </Grid>
                         </Container>
                     </Card.Section>
+                    {showContinueButton ? <Button onClick={() => sendMessage(Messages.HIDE_QUESTION, {})}>
+                        Continue
+                    </Button> : null}
                 </Card>
             </Modal>
         </div>

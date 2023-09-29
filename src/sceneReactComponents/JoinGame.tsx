@@ -18,7 +18,7 @@ import { SessionData } from './SessionData';
 const useSessionDataState = createPersistedState<SessionData | null>('sessionData');
 
 const JoinGame = () => {
-    const [channelId, setChannelId] = useState('');
+    // const [channelId, setChannelId] = useState('');
     const { web3auth } = useContext(SignerContext);
     const navigate = useNavigate();
     const [sessionData, setSessionData] = useSessionDataState(null);
@@ -62,12 +62,12 @@ const JoinGame = () => {
                     questionSessionId: _sessionData.questionSessionId
                     });
             });
-            setChannelId(channelId as string);
+            // setChannelId(channelId as string);
 
             console.log('JoinGame sessionData state ', sessionData);
             // handleJoinGame({ channelId });
         }
-    }, [location]);
+    });
 
     const handleJoinGame = async (data: any) => {
         if (web3auth) {
@@ -88,8 +88,8 @@ const JoinGame = () => {
 
     const handleJoinButtonClick = () => {
         joinIfAlreadyActiveGame();
-        if (channelId !== '') {
-            handleJoinGame({ channelId });
+        if (sessionData?.channelId !== '') {
+            handleJoinGame({ channelId: sessionData?.channelId });
         }
     };
 
@@ -136,7 +136,7 @@ const JoinGame = () => {
         joined ? <WaitingMessage /> :
         <div>
             <h1>Select topics and Join</h1>
-            <input type="text" placeholder="Channel id" value={channelId} onChange={e => setChannelId(e.target.value)} />
+            {/* <input type="text" placeholder="Channel id" value={sessionData?.channelId} onChange={e => setChannelId(e.target.value)} /> */}
             
 
             <Modal opened={opened} onClose={close} title="Pick topic" radius={'lg'} padding={'xl'}>
