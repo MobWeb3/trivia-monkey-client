@@ -11,6 +11,7 @@ import polyfillNode from 'rollup-plugin-polyfill-node'
 import { VitePWA } from 'vite-plugin-pwa'
 import commonjs from '@rollup/plugin-commonjs';
 import svgr from "vite-plugin-svgr";
+import { fileURLToPath, URL } from 'node:url'
 
 
 // https://vitejs.dev/config/
@@ -22,7 +23,7 @@ export default defineConfig(({ command, mode }) => {
         'borsh', 'bigint-buffer', 'rpc-websockets/dist/lib/client', '@zerodevapp/sdk', 'ably', 'react-dom', 'prop-types', 'phaser', 'lodash.isequal']
 
     return {
-        base: '/',
+        base: './',
         plugins: [
             svgr(),
             react(),
@@ -92,6 +93,7 @@ export default defineConfig(({ command, mode }) => {
                 tty: 'rollup-plugin-node-polyfills/polyfills/tty',
                 domain: 'rollup-plugin-node-polyfills/polyfills/domain',
                 buffer: 'rollup-plugin-node-polyfills/polyfills/buffer-es6',
+                '@': fileURLToPath(new URL('./src', import.meta.url))
             }
         },
         optimizeDeps: {
