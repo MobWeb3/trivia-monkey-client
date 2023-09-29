@@ -17,8 +17,8 @@ export default defineConfig(({ command, mode }) => {
 
     const env = loadEnv(mode, process.cwd(), '')
 
-    const externals =  ['end-of-stream', 'pump', 'lodash.merge', 'lodash', 'react', 'react/jsx-runtime', 'lodash.clonedeep', 'react-dom/client',
-    'borsh', 'bigint-buffer', 'rpc-websockets/dist/lib/client', '@zerodevapp/sdk', 'ably', 'react-dom', 'prop-types', 'phaser', 'lodash.isequal']
+    const externals = ['end-of-stream', 'pump', 'lodash.merge', 'lodash', 'react', 'react/jsx-runtime', 'lodash.clonedeep', 'react-dom/client',
+        'borsh', 'bigint-buffer', 'rpc-websockets/dist/lib/client', '@zerodevapp/sdk', 'ably', 'react-dom', 'prop-types', 'phaser', 'lodash.isequal']
 
     return {
         base: '/',
@@ -107,6 +107,7 @@ export default defineConfig(({ command, mode }) => {
             },
         },
         build: {
+            // sourcemap: true, uncomment this line to debug source maps
             target: "es2020",
             rollupOptions: {
                 plugins: [
@@ -116,6 +117,22 @@ export default defineConfig(({ command, mode }) => {
                     rollupNodePolyFill(),
                     commonjs(),
                 ],
+                output: {
+                    manualChunks: {
+                        'scenes': ['src/scenes/SpinWheelScene.ts', 'src/scenes/AIGameScene.ts'],
+                        'handlers': ['src/game-domain/GenerateQuestionsHandler.ts', /* other handlers */],
+                        'utilities': ['src/utils/MessageListener.ts', /* other utilities */],
+                        'phaser': ['phaser'],
+                        '@zerodevapp': ['@zerodevapp/sdk'],
+                        '@web3auth/solana-provider': ['@web3auth/solana-provider'],
+                        '@web3auth/modal': ['@web3auth/modal'],
+                        '@web3auth/base': ['@web3auth/base'],
+                        // '@ethersproject': ['@ethersproject'],
+                        // '@account-abstraction': ['@account-abstraction'],
+                        // '@solana': ['solana'],
+                        // 'assets': ['public/assets/Screens/in-game-bg-seagreen-1920x1080.png', 'public/assets/Screens/in-game-bg-green-1920x1080.png']
+                    }
+                }
             },
         },
 
