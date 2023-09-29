@@ -1,16 +1,13 @@
 import React, { useContext } from 'react';
 import { SignerContext } from '../components/SignerContext';
-import { getRPCProviderOwner, getZeroDevSigner } from '@zerodevapp/sdk';
-import { createUser, userExists } from '../polybase/UserHandler';
 import { useNavigate } from 'react-router-dom';
-import { getConnectedPublicKey } from '../utils/Web3AuthAuthentication';
 import createPersistedState from 'use-persisted-state';
 import { SessionData } from './SessionData';
 
 const useSessionDataState = createPersistedState<SessionData | null>('sessionData');
 
 export const Bootstrap = () => {
-    const { signer, web3auth, setSigner, loggedIn, setLoggedIn, setUserInfo } = useContext(SignerContext);
+    const { web3auth, loggedIn, setLoggedIn, setUserInfo } = useContext(SignerContext);
     const [sessionData, setSessionData] = useSessionDataState(null);
     // const [, setProvider] = useState<SafeEventEmitterProvider | null>(null);
     const navigate = useNavigate();
@@ -23,59 +20,10 @@ export const Bootstrap = () => {
         
     }
 
-    const handleConnectNowClick = async () => {
-        console.log('Connect Now');
-        const userData = await login();
-        if (!userData.clientId) {
-            console.log('publicKey not initialized yet');
-            return;
-        }
-        const userExist = await userExists(userData.clientId);
-        if (!userExist) {
-            console.log('user does not exist, creating user');
-            // create user
-            await createUser(userData);
-        }
-    }
-
     const handleDisconnectClick = async () => {
         await logout();
         if (sessionData) setSessionData(null);
     }
-    const login = async () => {
-        if (!web3auth) {
-            console.log("web3auth not initialized yet");
-            return {};
-        }
-
-        setLoggedIn(true);
-
-        const userInfo = await web3auth.getUserInfo();
-        setUserInfo(userInfo);
-
-        const evmChain = false;
-
-        if (evmChain) {
-            const _signer = await getZeroDevSigner({
-                projectId: "5682ee04-d8d3-436a-ae63-479e063a23c4",
-                owner: getRPCProviderOwner(web3auth.provider),
-            })
-
-            setSigner(_signer as any);
-            console.log("signer created: ", signer);
-            console.log("signer address", await _signer.getAddress());
-        } else {
-            const publicKey = await getConnectedPublicKey(web3auth);
-            console.log(`publick key: ${publicKey?.toString()}`);
-            // console.log(`userInfo: ${JSON.stringify(userInfo)}`);
-            return {
-                clientId: userInfo.email ?? "",
-                name: userInfo.name ?? "",
-                publicKey: publicKey ?? ""
-            }
-        }
-        return {}
-    };
 
     const logout = async () => {
         if (!web3auth) {
@@ -101,9 +49,7 @@ export const Bootstrap = () => {
             <ControlButtons
                 loggedIn={loggedIn}
                 handlePlayClick={handlePlayClick}
-                handleSettingsClick={handleSettingsClick}
-                handleConnectNowClick={handleConnectNowClick}
-                handleDisconnectClick={handleDisconnectClick}
+                handleSettingsClick={handleSettingsClick}                handleDisconnectClick={handleDisconnectClick}
             />
     );
 }
@@ -113,15 +59,12 @@ interface ControlButtonsProps {
     loggedIn: boolean;
     handlePlayClick: () => void;
     handleSettingsClick: () => void;
-    handleConnectNowClick: () => void;
     handleDisconnectClick: () => void;
 }
 
 export const ControlButtons: React.FC<ControlButtonsProps> = ({
-    loggedIn,
     handlePlayClick,
     handleSettingsClick,
-    handleConnectNowClick,
     handleDisconnectClick
 }) => {
     return (
@@ -141,13 +84,13 @@ export const ControlButtons: React.FC<ControlButtonsProps> = ({
             >
                 Settings
             </button>
-            <button
+            {/* <button
                 key={2}
                 style={{ backgroundColor: '#ffffff' }}
                 onClick={handleConnectNowClick}
             >
                 Connect Now
-            </button>
+            </button> */}
             <button
                 key={3}
                 style={{ backgroundColor: '#ffffff' }}
