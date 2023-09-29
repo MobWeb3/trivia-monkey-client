@@ -43,24 +43,24 @@ const QuestionModal: React.FC<QuestionModalProps> = ({ open, onClose, question, 
     const [sessionData] = useSessionDataState(null);
 
 
-    const getCorrectAnswerButton = () => {
-        if (question?.answer === question?.options[0]) {
-            return OptionButton.A;
-        }
-        if (question?.answer === question?.options[1]) {
-            return OptionButton.B;
-        }
-        if (question?.answer === question?.options[2]) {
-            return OptionButton.C;
-        }
-        if (question?.answer === question?.options[3]) {
-            return OptionButton.D;
-        }
-        return null;
-    }
-
     useEffect(() => {
         if (selectedButton !== null) {
+            const getCorrectAnswerButton = () => {
+                if (question?.answer === question?.options[0]) {
+                    return OptionButton.A;
+                }
+                if (question?.answer === question?.options[1]) {
+                    return OptionButton.B;
+                }
+                if (question?.answer === question?.options[2]) {
+                    return OptionButton.C;
+                }
+                if (question?.answer === question?.options[3]) {
+                    return OptionButton.D;
+                }
+                return null;
+            }
+    
             setCorrectAnswerButton(getCorrectAnswerButton());
         }
     }, [selectedButton]);
@@ -79,8 +79,6 @@ const QuestionModal: React.FC<QuestionModalProps> = ({ open, onClose, question, 
         }
 
         setSelectedButton(optionIndex);
-        const correctAnswerButton = getCorrectAnswerButton();
-        setCorrectAnswerButton(correctAnswerButton);
         const chosenAnswer = question?.options[optionIndex];
         const isValid = validateAnswer(chosenAnswer);
         setIsCorrect(isValid);

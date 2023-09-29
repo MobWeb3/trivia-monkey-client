@@ -1,5 +1,5 @@
 import { Web3Auth } from "@web3auth/modal";
-import { getRPCProviderOwner, getZeroDevSigner } from "@zerodevapp/sdk";
+// import { getRPCProviderOwner, getZeroDevSigner } from "@zerodevapp/sdk";
 import { SolanaWallet } from "@web3auth/solana-provider";
 import { MySolanaWallet } from "../solana/MySolanaWallet";
 import { Connection } from '@solana/web3.js'
@@ -16,10 +16,10 @@ export const login = async (web3auth: Web3Auth) => {
     const evmChain = false;
 
     if (evmChain) {
-        const _signer = await getZeroDevSigner({
-            projectId: "5682ee04-d8d3-436a-ae63-479e063a23c4",
-            owner: getRPCProviderOwner(web3auth.provider),
-        })
+        // const _signer = await getZeroDevSigner({
+        //     projectId: "5682ee04-d8d3-436a-ae63-479e063a23c4",
+        //     owner: getRPCProviderOwner(web3auth.provider),
+        // })
 
     } else {
         const publicKey = await getConnectedPublicKey(web3auth);

@@ -45,7 +45,7 @@ const JoinGame = () => {
         return () => {
             window.removeEventListener(Messages.ALL_PLAYERS_JOINED, handleAllPlayersJoined);
         };
-    }, []);
+    });
 
     useEffect(() => {
         const parsed = queryString.parse(location.search);

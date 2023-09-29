@@ -1,4 +1,4 @@
-import Phaser, { Game } from 'phaser'
+import Phaser from 'phaser'
 
 import { SpinWheelScene } from '../scenes/SpinWheelScene'
 

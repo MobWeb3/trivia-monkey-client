@@ -11,7 +11,7 @@ import { createChannelListenerWrapper, enterChannelListenerWrapper } from '../ab
 import { getConnectedPublicKey } from '../utils/Web3AuthAuthentication';
 
 function App() {
-  const { web3auth, setSigner } = useContext(SignerContext);
+  const { web3auth } = useContext(SignerContext);
   const [, setProvider] = useState<SafeEventEmitterProvider | null>(null);
   const [loggedIn, setLoggedIn] = useState(false);
 

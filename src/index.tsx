@@ -1,8 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
-import * as serviceWorkerRegistration from './shenanigans/serviceWorkerRegistration';
-import reportWebVitals from './shenanigans/reportWebVitals';
 import { SignerProvider } from './components/SignerContext';
 import Bootstrap from './sceneReactComponents/Bootstrap';
 import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';

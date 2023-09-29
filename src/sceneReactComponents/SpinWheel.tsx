@@ -1,8 +1,7 @@
 import './SpinWheel.css';
 import '../sceneConfigs/SpinWheelConfig';
-import { useContext, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import GameInstance from '../sceneConfigs/SpinWheelConfig';
-import { SessionDataContext } from '../components/SessionDataContext';
 import { Button, Loader } from '@mantine/core';
 import { addMessageListener, removeMessageListener } from '../utils/MessageListener';
 import { Messages } from '../utils/Messages';

@@ -16,13 +16,7 @@ export class ChannelHandler {
     // console.log(`data-createChannelListener:`, data);
 
     try {
-      const postResponse = await axios.post(`${baseUrl}/subscribeToChannel`, {
-        channelId: channelId,
 
-      });
-      const connectionStatus = postResponse.data.state.connectionStatus;
-      // console.log(`Connection status: ${connectionStatus}`);
-      // window.dispatchEvent(new CustomEvent(Messages.CHANNEL_CREATED));
       const eventData = { channelInfo: data, channelId: channelId };
       window.dispatchEvent(new CustomEvent(Messages.CHANNEL_CREATED, { detail: eventData }));
       await ChannelHandler.ablyInstance?.enterChannel(channelId, clientId, nickname);

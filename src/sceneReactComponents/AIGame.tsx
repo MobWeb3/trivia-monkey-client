@@ -1,8 +1,7 @@
 import './SpinWheel.css';
 import '../sceneConfigs/AIGameConfig';
-import { useContext, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import GameInstance from '../sceneConfigs/AIGameConfig';
-import { SessionDataContext } from '../components/SessionDataContext';
 import QuestionModal from '../components/QuestionModal';
 import { getQuestion } from '../polybase/QuestionsHandler';
 import { Question } from '../game-domain/Question';

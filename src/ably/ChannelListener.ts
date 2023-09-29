@@ -41,7 +41,7 @@ export const createChannelListenerWrapper = async (web3auth: Web3Auth, data: any
                 // console.log(member.clientId + ' entered realtime-chat');
                 const presence = await channel?.presence.get();
                 // console.log('presence: ', presence);
-                if (presence.length == data.numberPlayers) {
+                if (presence.length === data.numberPlayers) {
 
                     
                     data.sessionId = pbSessionId;

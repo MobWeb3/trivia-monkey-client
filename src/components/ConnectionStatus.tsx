@@ -19,7 +19,7 @@ import { getConnectedPublicKey } from '../utils/Web3AuthAuthentication';
   }
   
   export function ConnectionStatus({ image, name, email, icon, ...others }: UserButtonProps) {
-    const { signer, web3auth, setSigner, loggedIn, setLoggedIn, setUserInfo, userInfo } = useContext(SignerContext);
+    const { web3auth, setSigner, loggedIn, setLoggedIn, setUserInfo, userInfo } = useContext(SignerContext);
     const { sessionData, setSessionData } = useContext(SessionDataContext);
 
     const login = async () => {

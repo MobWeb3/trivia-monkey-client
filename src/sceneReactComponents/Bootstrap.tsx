@@ -1,5 +1,4 @@
-import React, { useContext, useState } from 'react';
-import { SafeEventEmitterProvider } from '@web3auth/base';
+import React, { useContext } from 'react';
 import { SignerContext } from '../components/SignerContext';
 import { getRPCProviderOwner, getZeroDevSigner } from '@zerodevapp/sdk';
 import { createUser, userExists } from '../polybase/UserHandler';
@@ -48,8 +47,7 @@ export const Bootstrap = () => {
             console.log("web3auth not initialized yet");
             return {};
         }
-        const web3authProvider = await web3auth.connect();
-        // setProvider(web3authProvider);
+
         setLoggedIn(true);
 
         const userInfo = await web3auth.getUserInfo();

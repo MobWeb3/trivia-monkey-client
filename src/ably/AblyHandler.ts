@@ -1,5 +1,4 @@
 import Ably from 'ably';
-import { Messages } from '../utils/Messages';
 
 export class AblyHandler {
     public ablyInstance;

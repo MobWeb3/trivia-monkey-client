@@ -3,7 +3,6 @@ import { createChannelListenerWrapper } from '../ably/ChannelListener';
 import { SignerContext } from '../components/SignerContext';
 import { Messages } from '../utils/Messages';
 import { useNavigate } from 'react-router-dom';
-import { SessionDataContext } from '../components/SessionDataContext';
 import { Badge, Button, Group, Input, Modal, SegmentedControl, Loader } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import ModalContent from '../components/ModalContent';
