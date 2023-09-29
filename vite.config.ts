@@ -10,6 +10,7 @@ import builtins from "rollup-plugin-node-builtins";
 import polyfillNode from 'rollup-plugin-polyfill-node'
 import { VitePWA } from 'vite-plugin-pwa'
 import commonjs from '@rollup/plugin-commonjs';
+import svgr from "vite-plugin-svgr";
 
 
 // https://vitejs.dev/config/
@@ -23,6 +24,7 @@ export default defineConfig(({ command, mode }) => {
     return {
         base: '/',
         plugins: [
+            svgr(),
             react(),
             commonjs(),
             checker({
