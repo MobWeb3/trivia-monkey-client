@@ -8,15 +8,13 @@ import { Messages } from '../utils/Messages';
 import { useNavigate } from 'react-router-dom';
 import { publishStartGameAI, subscribeToStartGameAI } from '../ably/AblyMessages';
 import { setCurrentTurnPlayerId, updatePlayerListOrder, updateSessionPhase } from '../polybase/SessionHandler';
-import createPersistedState from 'use-persisted-state';
 import { SessionData } from './SessionData';
 import { SessionPhase } from '../game-domain/SessionPhase';
-
-const useSessionDataState = createPersistedState<SessionData | null>('sessionData');
+import useLocalStorageState from 'use-local-storage-state';
 
 function SpinWheel() {
 
-    const [sessionData] = useSessionDataState(null);
+    const [sessionData] = useLocalStorageState<SessionData>('sessionData', {});
     const [game, setGame] = useState<Phaser.Game | null>(null);
     const [mayStartGame, setMayStartGame] = useState(false);
     const [isLoading, setIsLoading] = useState(false); // Add this line
@@ -72,7 +70,7 @@ function SpinWheel() {
         console.log('handleStartGame');
         console.log('handleStartGame SpinWheel sesionData: ', sessionData);
         if ( sessionData === null ) return;
-        const { clientId, channelId } = sessionData;
+        const { clientId, channelId } = sessionData as SessionData;
         if ( clientId && channelId ) {
             navigate('/aigame');
             publishStartGameAI(clientId, channelId)

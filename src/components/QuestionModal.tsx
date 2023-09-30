@@ -8,12 +8,10 @@ import { addPointToPlayer } from '../polybase/SessionHandler';
 import { sendMessage } from '../utils/MessageListener';
 import { Messages } from '../utils/Messages';
 import { SessionData } from '../sceneReactComponents/SessionData';
-import createPersistedState from 'use-persisted-state';
+import useLocalStorageState from 'use-local-storage-state'
 
 const placeholderQuestionText = "What is the capital of the United States of America?"
 const placeholderOptionA = "Lorem Ipsum long anser that is very long, and more text";
-
-const useSessionDataState = createPersistedState<SessionData | null>('sessionData');
 
 interface QuestionModalProps {
     open: boolean;
@@ -40,7 +38,7 @@ const QuestionModal: React.FC<QuestionModalProps> = ({ open, onClose, question, 
     const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
     const [showCorrectAnswer, setShowCorrectAnswer] = useState<boolean>(false);
     const [correctAnswerButton, setCorrectAnswerButton] = useState<number | null>(null);
-    const [sessionData] = useSessionDataState(null);
+    const [sessionData] = useLocalStorageState<SessionData>('sessionData', {});
     const [showContinueButton, setShowContinueButton] = useState<boolean>(false);
 
     /* eslint-disable react-hooks/exhaustive-deps */

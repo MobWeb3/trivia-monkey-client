@@ -12,16 +12,14 @@ import { generateQuestions } from '../game-domain/GenerateQuestionsHandler';
 import { addQuestions } from '../polybase/QuestionsHandler';
 import { SessionPhase } from '../game-domain/SessionPhase';
 import { login } from '../utils/Web3AuthAuthentication';
-import createPersistedState from 'use-persisted-state';
 import { SessionData } from './SessionData';
-
-const useSessionDataState = createPersistedState<SessionData | null>('sessionData');
+import useLocalStorageState from 'use-local-storage-state';
 
 const JoinGame = () => {
     // const [channelId, setChannelId] = useState('');
     const { web3auth } = useContext(SignerContext);
     const navigate = useNavigate();
-    const [sessionData, setSessionData] = useSessionDataState(null);
+    const [sessionData, setSessionData] = useLocalStorageState<SessionData>('sessionData', {});
     const location = useLocation();
     const [opened, { open, close }] = useDisclosure(false);
     const [selectedChips, setSelectedChips] = useState<string[]>([]);

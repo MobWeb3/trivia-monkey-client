@@ -1,15 +1,12 @@
 import React, { useContext } from 'react';
 import { SignerContext } from '../components/SignerContext';
 import { useNavigate } from 'react-router-dom';
-import createPersistedState from 'use-persisted-state';
 import { SessionData } from './SessionData';
-
-const useSessionDataState = createPersistedState<SessionData | null>('sessionData');
+import useLocalStorageState from 'use-local-storage-state';
 
 export const Bootstrap = () => {
     const { web3auth, loggedIn, setLoggedIn, setUserInfo } = useContext(SignerContext);
-    const [sessionData, setSessionData] = useSessionDataState(null);
-    // const [, setProvider] = useState<SafeEventEmitterProvider | null>(null);
+    const [sessionData, setSessionData] = useLocalStorageState<SessionData>('sessionData', {});    // const [, setProvider] = useState<SafeEventEmitterProvider | null>(null);
     const navigate = useNavigate();
 
     const handlePlayClick = async () => {
@@ -22,7 +19,7 @@ export const Bootstrap = () => {
 
     const handleDisconnectClick = async () => {
         await logout();
-        if (sessionData) setSessionData(null);
+        if (sessionData) setSessionData(undefined);
     }
 
     const logout = async () => {
