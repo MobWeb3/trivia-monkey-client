@@ -2,6 +2,8 @@ import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react-swc'
 import checker from 'vite-plugin-checker';
 import { VitePWA } from 'vite-plugin-pwa'
+import { NodeGlobalsPolyfillPlugin } from '@esbuild-plugins/node-globals-polyfill'
+
 
 let faviconURL = '/favicon.ico'
 
@@ -49,6 +51,7 @@ export default defineConfig(({ command, mode }) => {
         define: {
             VITE_PUBLIC_URL: JSON.stringify(env.VITE_PUBLIC_URL),
             'process.env': {},
+            // "÷ß": "globalThis"
         },
         resolve: {
             alias: {
@@ -80,6 +83,20 @@ export default defineConfig(({ command, mode }) => {
                 tty: 'rollup-plugin-node-polyfills/polyfills/tty',
                 domain: 'rollup-plugin-node-polyfills/polyfills/domain',
                 buffer: 'rollup-plugin-node-polyfills/polyfills/buffer-es6',
+            }
+        },
+        optimizeDeps: {
+            esbuildOptions: {
+                // Node.js global to browser globalThis
+                define: {
+                    global: 'globalThis'
+                },
+                // Enable esbuild polyfill plugins
+                plugins: [
+                    NodeGlobalsPolyfillPlugin({
+                        buffer: true
+                    })
+                ]
             }
         },
         build: {
