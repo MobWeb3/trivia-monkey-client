@@ -12,6 +12,9 @@ import { VitePWA } from 'vite-plugin-pwa'
 import commonjs from '@rollup/plugin-commonjs';
 import svgr from "vite-plugin-svgr";
 import { fileURLToPath, URL } from 'node:url'
+import babel from 'vite-plugin-babel';
+
+let faviconURL = '/favicon.ico'
 
 
 // https://vitejs.dev/config/
@@ -25,9 +28,16 @@ export default defineConfig(({ command, mode }) => {
     return {
         base: './',
         plugins: [
-            svgr(),
+            // babel({
+            //     babelConfig: {
+            //         babelrc: false,
+            //         configFile: false,
+            //         plugins: ['@babel/plugin-transform-runtime']
+            //     }
+            // }),
+            // svgr(),
             react(),
-            commonjs(),
+            // commonjs(),
             checker({
                 overlay: { initialIsOpen: false },
                 typescript: true,
@@ -35,12 +45,10 @@ export default defineConfig(({ command, mode }) => {
                     lintCommand: 'eslint "./src/**/*.{ts,tsx}"',
                 },
             }),
-            viteTsconfigPaths(),
-            svgrPlugin(),
-            polyfillNode(),
+            // svgrPlugin(),
+            // polyfillNode(),
             VitePWA({
-                mode: 'development',
-                base: '/',
+                includeAssets: ['favicon.ico'],
                 manifest: {
                     name: 'Monkey Trivia',
                     short_name: 'mt',
@@ -48,7 +56,6 @@ export default defineConfig(({ command, mode }) => {
                     theme_color: '#212928',
                     background_color: '#212928',
                     display: 'standalone',
-                    start_url: '/',
                     icons: [
                         {
                             src: 'assets/monkeys_avatars/astronaut-monkey1-200x200.png',
@@ -56,28 +63,19 @@ export default defineConfig(({ command, mode }) => {
                             type: 'image/png',
                             purpose: 'any maskable',
                         },
+                        {
+                            src: faviconURL,
+                            sizes: '200x200',
+                            type: 'image/png',
+                        }
                     ],
-                },
-                injectRegister: 'auto',
-                registerType: 'prompt',
-                workbox: {
-                    // clientsClaim: true,
-                    // skipWaiting: true,
-                    // globPatterns: ['**/*.{js,css,html,ico,png,svg,json,vue,txt,woff2}'],
-                    // cleanupOutdatedCaches: true
-                },
-                devOptions: {
-                    enabled: true,
-                    type: 'module',
-                    navigateFallback: 'index.html',
-                },
-                srcDir: 'src',
-            
+                },           
             })
         ],
         define: {
             VITE_PUBLIC_URL: JSON.stringify(env.VITE_PUBLIC_URL),
-            'process.env': {}
+            'process.env': {},
+            // "global": "global"
         },
         resolve: {
             alias: {
@@ -86,75 +84,77 @@ export default defineConfig(({ command, mode }) => {
                 util: 'rollup-plugin-node-polyfills/polyfills/util',
                 sys: 'util',
                 events: 'rollup-plugin-node-polyfills/polyfills/events',
-                stream: 'rollup-plugin-node-polyfills/polyfills/stream',
                 path: 'rollup-plugin-node-polyfills/polyfills/path',
                 querystring: 'rollup-plugin-node-polyfills/polyfills/qs',
                 punycode: 'rollup-plugin-node-polyfills/polyfills/punycode',
-                url: 'rollup-plugin-node-polyfills/polyfills/url',
-                http: 'rollup-plugin-node-polyfills/polyfills/http',
-                https: 'rollup-plugin-node-polyfills/polyfills/http',
-                os: 'rollup-plugin-node-polyfills/polyfills/os',
-                assert: 'rollup-plugin-node-polyfills/polyfills/assert',
                 constants: 'rollup-plugin-node-polyfills/polyfills/constants',
-                _stream_duplex: 'rollup-plugin-node-polyfills/polyfills/readable-stream/duplex',
-                _stream_passthrough: 'rollup-plugin-node-polyfills/polyfills/readable-stream/passthrough',
-                _stream_readable: 'rollup-plugin-node-polyfills/polyfills/readable-stream/readable',
-                _stream_writable: 'rollup-plugin-node-polyfills/polyfills/readable-stream/writable',
-                _stream_transform: 'rollup-plugin-node-polyfills/polyfills/readable-stream/transform',
+                crypto: "empty-module",
+                assert: "empty-module",
+                http: "empty-module",
+                https: "empty-module",
+                os: "empty-module",
+                url: "empty-module",
+                zlib: "empty-module",
+                stream: "empty-module",
+                _stream_duplex: "empty-module",
+                _stream_passthrough: "empty-module",
+                _stream_readable: "empty-module",
+                _stream_writable: "empty-module",
+                _stream_transform: "empty-module",
                 timers: 'rollup-plugin-node-polyfills/polyfills/timers',
                 console: 'rollup-plugin-node-polyfills/polyfills/console',
                 vm: 'rollup-plugin-node-polyfills/polyfills/vm',
-                zlib: 'rollup-plugin-node-polyfills/polyfills/zlib',
                 tty: 'rollup-plugin-node-polyfills/polyfills/tty',
                 domain: 'rollup-plugin-node-polyfills/polyfills/domain',
                 buffer: 'rollup-plugin-node-polyfills/polyfills/buffer-es6',
-                '@': fileURLToPath(new URL('./src', import.meta.url))
             }
         },
         optimizeDeps: {
             // include: ['end-of-stream'],
             // exclude: externals,
-            esbuildOptions: {
-                target: "es2020",
-                supported: { bigint: true },
-                plugins: [
-                    NodeGlobalsPolyfillPlugin({
-                        buffer: true,
-                    }),
-                    NodeModulesPolyfillPlugin(),
-                ],
-            },
+            // esbuildOptions: {
+            //     target: "es2020",
+            //     supported: { bigint: true },
+            //     plugins: [
+            //         NodeGlobalsPolyfillPlugin({
+            //             buffer: true,
+            //         }),
+            //         NodeModulesPolyfillPlugin(),
+            //     ],
+            // },
         },
         build: {
-            
+            commonjsOptions: {
+                transformMixedEsModules: true
+              },
             minify: false,
             sourcemap: true, // uncomment this line to debug source maps
-            target: "es2020",
-            rollupOptions: {
-                plugins: [
-                    // Enable rollup polyfills plugin
-                    // used during production bundling
-                    builtins(),
-                    rollupNodePolyFill(),
-                    commonjs(),
-                ],
-                // output: {
-                //     manualChunks: {
-                //         'scenes': ['src/scenes/SpinWheelScene.ts', 'src/scenes/AIGameScene.ts'],
-                //         'handlers': ['src/game-domain/GenerateQuestionsHandler.ts', /* other handlers */],
-                //         'utilities': ['src/utils/MessageListener.ts', /* other utilities */],
-                //         // 'phaser': ['phaser'],
-                //         '@zerodevapp': ['@zerodevapp/sdk'],
-                //         '@web3auth/solana-provider': ['@web3auth/solana-provider'],
-                //         '@web3auth/modal': ['@web3auth/modal'],
-                //         '@web3auth/base': ['@web3auth/base'],
-                //         // '@ethersproject': ['@ethersproject'],
-                //         // '@account-abstraction': ['@account-abstraction'],
-                //         // '@solana': ['solana'],
-                //         // 'assets': ['public/assets/Screens/in-game-bg-seagreen-1920x1080.png', 'public/assets/Screens/in-game-bg-green-1920x1080.png']
-                //     }
-                // }
-            },
+            // target: "es2020",
+            // rollupOptions: {
+            //     plugins: [
+            //         // Enable rollup polyfills plugin
+            //         // used during production bundling
+            //         // builtins(),
+            //         // rollupNodePolyFill(),
+            //         // commonjs(),
+            //     ],
+            //     // output: {
+            //     //     manualChunks: {
+            //     //         'scenes': ['src/scenes/SpinWheelScene.ts', 'src/scenes/AIGameScene.ts'],
+            //     //         'handlers': ['src/game-domain/GenerateQuestionsHandler.ts', /* other handlers */],
+            //     //         'utilities': ['src/utils/MessageListener.ts', /* other utilities */],
+            //     //         // 'phaser': ['phaser'],
+            //     //         '@zerodevapp': ['@zerodevapp/sdk'],
+            //     //         '@web3auth/solana-provider': ['@web3auth/solana-provider'],
+            //     //         '@web3auth/modal': ['@web3auth/modal'],
+            //     //         '@web3auth/base': ['@web3auth/base'],
+            //     //         // '@ethersproject': ['@ethersproject'],
+            //     //         // '@account-abstraction': ['@account-abstraction'],
+            //     //         // '@solana': ['solana'],
+            //     //         // 'assets': ['public/assets/Screens/in-game-bg-seagreen-1920x1080.png', 'public/assets/Screens/in-game-bg-green-1920x1080.png']
+            //     //     }
+            //     // }
+            // },
         },
 
     }
