@@ -21,8 +21,6 @@
     "@web3auth/solana-provider": "^7.0.2",
     "@zerodevapp/sdk": "^3.1.54",
     "ably": "^1.2.43",
-    "babel-plugin-transform-runtime": "^6.23.0",
-    "babel-runtime": "^6.26.0",
     "phaser": "^3.60.0",
     "qr-code-styling": "^1.6.0-rc.1",
     "query-string": "^8.1.0",
@@ -31,7 +29,7 @@
     "react-router-dom": "^6.15.0",
     "react-timer-hook": "^3.0.7",
     "rollup-plugin-polyfill-node": "^0.12.0",
-    "typescript": "^5.0.4",
+    "typescript": "5.1.4",
     "use-local-storage-state": "^19.1.0"
   },
   "devDependencies": {
