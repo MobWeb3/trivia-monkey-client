@@ -2,7 +2,7 @@ import { Messages } from "../utils/Messages";
 import { generateUniqueId } from "./uniqueId";
 import axios from "axios";
 import {AblyHandler} from "./AblyHandler";
-import { BASE_URL } from "../MonkeyTriviaServiceConstants";
+import { BASE_URL } from "../ApiServiceConfig";
 
 const baseUrl = `${BASE_URL}/api/ably`;
 

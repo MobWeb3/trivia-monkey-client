@@ -4,13 +4,22 @@ import checker from 'vite-plugin-checker';
 import { VitePWA } from 'vite-plugin-pwa'
 import { NodeGlobalsPolyfillPlugin } from '@esbuild-plugins/node-globals-polyfill'
 
-
 let faviconURL = '/favicon.ico'
 
 // https://vitejs.dev/config/
 export default defineConfig(({ command, mode }) => {
-
     const env = loadEnv(mode, process.cwd(), '')
+
+    // let apiUrl: string;
+
+    // if (mode === 'development') {
+    //     console.log("DEV MODE set!!");
+    //     apiUrl = DEV_BASE_URL;
+
+    //     console.log("baseUrl: ", apiUrl);
+    // } else {
+    //     apiUrl = PROD_BASE_URL;
+    // }
 
     return {
         base: './',
@@ -45,13 +54,12 @@ export default defineConfig(({ command, mode }) => {
                             type: 'image/png',
                         }
                     ],
-                },           
+                },
             })
         ],
         define: {
             VITE_PUBLIC_URL: JSON.stringify(env.VITE_PUBLIC_URL),
-            'process.env': {},
-            // "÷ß": "globalThis"
+            'process.env': process.env,
         },
         resolve: {
             alias: {
@@ -102,7 +110,7 @@ export default defineConfig(({ command, mode }) => {
         build: {
             commonjsOptions: {
                 transformMixedEsModules: true
-              },
+            },
             // minify: true,
             // sourcemap: false, // uncomment this line to debug source maps
         },

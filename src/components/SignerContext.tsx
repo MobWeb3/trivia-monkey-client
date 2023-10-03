@@ -29,20 +29,17 @@ interface Props {
   children: React.ReactNode;
 }
 
-// const { chains } = configureChains([polygonMumbai as Chain], [publicProvider()]);
-
 export const SignerProvider: React.FC<PropsWithChildren<Props>> = ({ children }) => {
   const [signer, setSigner] = useState<Signer | null>(null);
   const [web3auth, setWeb3auth] = useState<Web3Auth | null>(JSON.parse(localStorage.getItem('userInfo') || '{}'));
-  // const [, setWeb3AuthConnector] = useState<Web3AuthConnector>();
   const [loggedIn, setLoggedIn] = useState(localStorage.getItem('userInfo') ? true : false);
   const [userInfo, setUserInfo] = useState<any>(JSON.parse(localStorage.getItem('userInfo') || '{}'));
   const [loading, setLoading] = useState(true);
 
 
   const init = async () => {
+    console.log("env variables: ", import.meta.env)
     try {
-
       const web3auth = web3authSolana;
 
       await web3auth.initModal();

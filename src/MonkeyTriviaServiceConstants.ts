@@ -1,1 +1,0 @@
-export const BASE_URL = 'https://tough-shark-literally.ngrok-free.app';

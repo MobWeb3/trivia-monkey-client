@@ -1,6 +1,5 @@
 import axios from 'axios';
-import { BASE_URL } from '../MonkeyTriviaServiceConstants';
-
+import { BASE_URL } from '../ApiServiceConfig';
 
 export const createSession = async (data: any) => {
     try {

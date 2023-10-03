@@ -1,6 +1,6 @@
 
 import axios from 'axios';
-import { BASE_URL } from '../MonkeyTriviaServiceConstants';
+import { BASE_URL } from '../ApiServiceConfig';
 
 export const generateQuestions = async (data: any) => {
     const topics  = data.topics as string[];
