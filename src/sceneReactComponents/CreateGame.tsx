@@ -14,6 +14,7 @@ import { generateQuestions } from '../game-domain/GenerateQuestionsHandler';
 import { updateQuestionSessionId, updateTopics } from '../polybase/SessionHandler';
 import { SessionData } from './SessionData';
 import useLocalStorageState from 'use-local-storage-state';
+import { BASE_URL } from '../ApiServiceConfig';
 
 
 const CreateGame = () => {
@@ -32,7 +33,7 @@ const CreateGame = () => {
         width: 300,
         height: 300,
         type: "svg",
-        data: "https://helpful-knowing-ghost.ngrok-free.app/joingame?channelId=1234",
+        data: "",
         image: "https://cryptologos.cc/logos/chimpion-bnana-logo.svg",
         dotsOptions: {
             color: "#4267b2",
@@ -64,7 +65,7 @@ const CreateGame = () => {
     });
 
     useEffect(() => {
-        const url =`https://helpful-knowing-ghost.ngrok-free.app/joingame?sessionId=${sessionData?.sessionId}&channelId=${sessionData?.channelId}`;
+        const url =`${BASE_URL}/joingame?sessionId=${sessionData?.sessionId}&channelId=${sessionData?.channelId}`;
         qrCode.update({
           data: url,
         });

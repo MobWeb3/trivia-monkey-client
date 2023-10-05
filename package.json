@@ -53,7 +53,7 @@
     "vite-tsconfig-paths": "^4.2.1"
   },
   "scripts": {
-    "start": "vite",
+    "start": "vite --mode prod-service",
     "build": "tsc && vite build",
     "serve": "vite preview",
     "start-dev-service": "vite --mode dev-service",
