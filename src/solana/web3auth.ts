@@ -2,6 +2,7 @@ import { Web3Auth } from "@web3auth/modal";
 import { CHAIN_NAMESPACES } from '@web3auth/base';
 
 const clientId = import.meta.env.VITE_APP_WEB3AUTH_CLIENT_ID ?? "";
+const network = import.meta.env.VITE_APP_WEB3AUTH_NETWORK ?? "sapphire_mainnet";
 
 //https://api.testnet.solana.com
 //https://api.devnet.solana.com
@@ -22,5 +23,5 @@ export const web3authSolana = new Web3Auth({
       // loginMethodsOrder: ['facebook', 'google'],
       // appLogo: 'https://web3auth.io/images/w3a-L-Favicon-1.svg' // Your App Logo Here
     // },
-    web3AuthNetwork: "mainnet",
+    web3AuthNetwork: network,
 });
