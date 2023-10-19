@@ -125,12 +125,14 @@ export class SpinWheelScene extends Phaser.Scene {
 
     }
 
-    // function to spin the wheel
-    spin() {
+     // function to spin the wheel
+     spin() {
         // can we spin the wheel?
         if (this.canSpin) {
             // resetting text field
             this.messageGameText?.setText("");
+            // the wheel will spin round from 2 to 4 times. This is just coreography
+            var rounds = Phaser.Math.Between(2, 4);
             // then will rotate by a random number from 0 to 360 degrees. This is the actual spin
             var degrees = Phaser.Math.Between(0, 1000) % 360;
             // before the wheel ends spinning, we already know the prize according to "degrees" rotation and the number of slices
@@ -140,6 +142,14 @@ export class SpinWheelScene extends Phaser.Scene {
             this.canSpin = false;
             // animation tweeen for the spin: duration 3s, will rotate by (360 * rounds + degrees) degrees
             // the quadratic easing will simulate friction
+            var spinTween = this.tweens.add({
+                targets: this.wheel,
+                angle: 360 * rounds + degrees,
+                ease: 'Cubic.easeOut',
+                duration: 3000,
+                onComplete: this.handleSelectedSlice,
+                callbackScope: this
+            });
         }
     }
 

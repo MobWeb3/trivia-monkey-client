@@ -32,9 +32,9 @@ const JoinGame = () => {
             console.log('sessionData', sessionData);
             setSessionData(event.detail);
             // Handle the event here
-            
+
             // If all players have joined and current player joined, navigate to SpinWheel
-            navigate('/spinwheel');    
+            navigate('/spinwheel');
         };
 
         window.addEventListener(Messages.ALL_PLAYERS_JOINED, handleAllPlayersJoined);
@@ -58,7 +58,7 @@ const JoinGame = () => {
                     sessionId: sessionId as string,
                     channelId: channelId as string,
                     questionSessionId: _sessionData.questionSessionId
-                    });
+                });
             });
             // setChannelId(channelId as string);
 
@@ -72,13 +72,13 @@ const JoinGame = () => {
             await enterChannelListenerWrapper(web3auth, data);
 
             // Generate questions
-            generateQuestions({topics: selectedChips})
-            .then((result) => {
-                // console.log('generateQuestions response: ', result);
-                addQuestions({id: sessionData?.questionSessionId, column: 1, topics: result});
-            });
+            generateQuestions({ topics: selectedChips })
+                .then((result) => {
+                    // console.log('generateQuestions response: ', result);
+                    addQuestions({ id: sessionData?.questionSessionId, column: 1, topics: result });
+                });
             // Update topics to Game session
-            await updateTopics({id:sessionData?.sessionId, topics: selectedChips})
+            await updateTopics({ id: sessionData?.sessionId, topics: selectedChips })
             // console.log('updatedTopics response:', addTopicResponse);
             setJoined(true);
         }
@@ -103,22 +103,37 @@ const JoinGame = () => {
                     });
 
                     // initialize web3auth
-                    if(web3auth) {
+                    if (web3auth) {
                         const userInfo = await login(web3auth);
                         localStorage.setItem('userInfo', JSON.stringify(userInfo));
-                        if (sessionData){
-                          setSessionData({ ...sessionData, clientId: userInfo.email });
+                        if (sessionData) {
+                            setSessionData({ ...sessionData, clientId: userInfo.email });
                         }
                     }
 
                     navigate('/aigame');
                 }
+                else if (gamePhase === SessionPhase.TURN_ORDER) {
+                    await retryLogin();
+                    navigate('/spinwheel');
+                }
             } catch (error) {
                 console.log("joinIfAlreadyActiveGame - Error getting session: ", error);
             }
-            
+
         }
-        
+
+    }
+
+    const retryLogin = async () => {
+        // initialize web3auth
+        if (web3auth) {
+            const userInfo = await login(web3auth);
+            localStorage.setItem('userInfo', JSON.stringify(userInfo));
+            if (sessionData) {
+                setSessionData({ ...sessionData, clientId: userInfo.email });
+            }
+        }
     }
 
     const WaitingMessage = () => {
@@ -126,28 +141,28 @@ const JoinGame = () => {
             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
                 <p>We are waiting for other players to join...</p>
             </div>
-            
+
         );
     };
 
     return (
         joined ? <WaitingMessage /> :
-        <div>
-            <h1>Select topics and Join</h1>
-            {/* <input type="text" placeholder="Channel id" value={sessionData?.channelId} onChange={e => setChannelId(e.target.value)} /> */}
-            
+            <div>
+                <h1>Select topics and Join</h1>
+                {/* <input type="text" placeholder="Channel id" value={sessionData?.channelId} onChange={e => setChannelId(e.target.value)} /> */}
 
-            <Modal opened={opened} onClose={close} title="Pick topic" radius={'lg'} padding={'xl'}>
-                <ModalContent setSelectedChips={setSelectedChips} numberOfPlayers={numberPlayers}></ModalContent>
-                {/* Modal content */}
-            </Modal>
-            <Group justify="center">
-                <Badge size="lg" radius="lg" variant="dot">Selected topics: {selectedChips.join(', ')}</Badge>
-                <Button onClick={open}>Pick a topic</Button>
-            </Group>
 
-            <Button onClick={handleJoinButtonClick} variant="gradient" gradient={{ from: 'orange', to: 'red' }}>Join</Button>
-        </div>
+                <Modal opened={opened} onClose={close} title="Pick topic" radius={'lg'} padding={'xl'}>
+                    <ModalContent setSelectedChips={setSelectedChips} numberOfPlayers={numberPlayers}></ModalContent>
+                    {/* Modal content */}
+                </Modal>
+                <Group justify="center">
+                    <Badge size="lg" radius="lg" variant="dot">Selected topics: {selectedChips.join(', ')}</Badge>
+                    <Button onClick={open}>Pick a topic</Button>
+                </Group>
+
+                <Button onClick={handleJoinButtonClick} variant="gradient" gradient={{ from: 'orange', to: 'red' }}>Join</Button>
+            </div>
 
     );
 };

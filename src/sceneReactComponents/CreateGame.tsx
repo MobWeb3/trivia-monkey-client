@@ -14,7 +14,8 @@ import { generateQuestions } from '../game-domain/GenerateQuestionsHandler';
 import { updateQuestionSessionId, updateTopics } from '../polybase/SessionHandler';
 import { SessionData } from './SessionData';
 import useLocalStorageState from 'use-local-storage-state';
-import { BASE_URL } from '../ApiServiceConfig';
+import { isDev } from '../ApiServiceConfig';
+// import { BASE_URL } from '../ApiServiceConfig';
 
 
 const CreateGame = () => {
@@ -65,7 +66,8 @@ const CreateGame = () => {
     });
 
     useEffect(() => {
-        const url =`${BASE_URL}/joingame?sessionId=${sessionData?.sessionId}&channelId=${sessionData?.channelId}`;
+        const CLIENT_BASE_URL = isDev ? "http://localhost:5173": 'https://trivia-monkey-client.vercel.app';
+        const url =`${CLIENT_BASE_URL}/joingame?sessionId=${sessionData?.sessionId}&channelId=${sessionData?.channelId}`;
         qrCode.update({
           data: url,
         });
@@ -104,11 +106,11 @@ const CreateGame = () => {
                 if (response){
                     const questionSessionId = response.recordData.data.id;
                     // Deploy generation of AI questions
-                    generateQuestions({topics: selectedChips})
-                    .then((result) => {
-                        console.log('generateQuestions response: ', result);
-                        addQuestions({id: questionSessionId, column: 1, topics: result});
-                    });
+                    // generateQuestions({topics: selectedChips})
+                    // .then((result) => {
+                    //     console.log('generateQuestions response: ', result);
+                    //     addQuestions({id: questionSessionId, column: 1, topics: result});
+                    // });
                     // Update topics to Game session
                     const addTopicResponse= await updateTopics({id:sessionData?.sessionId, topics: selectedChips})
                     console.log('updatedTopics response:', addTopicResponse);
