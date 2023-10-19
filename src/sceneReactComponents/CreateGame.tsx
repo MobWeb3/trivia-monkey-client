@@ -106,11 +106,11 @@ const CreateGame = () => {
                 if (response){
                     const questionSessionId = response.recordData.data.id;
                     // Deploy generation of AI questions
-                    // generateQuestions({topics: selectedChips})
-                    // .then((result) => {
-                    //     console.log('generateQuestions response: ', result);
-                    //     addQuestions({id: questionSessionId, column: 1, topics: result});
-                    // });
+                    generateQuestions({topics: selectedChips})
+                    .then((result) => {
+                        console.log('generateQuestions response: ', result);
+                        addQuestions({id: questionSessionId, column: 1, topics: result});
+                    });
                     // Update topics to Game session
                     const addTopicResponse= await updateTopics({id:sessionData?.sessionId, topics: selectedChips})
                     console.log('updatedTopics response:', addTopicResponse);
