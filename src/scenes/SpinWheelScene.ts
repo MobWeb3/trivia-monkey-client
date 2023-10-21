@@ -142,7 +142,7 @@ export class SpinWheelScene extends Phaser.Scene {
             this.canSpin = false;
             // animation tweeen for the spin: duration 3s, will rotate by (360 * rounds + degrees) degrees
             // the quadratic easing will simulate friction
-            var spinTween = this.tweens.add({
+            this.tweens.add({
                 targets: this.wheel,
                 angle: 360 * rounds + degrees,
                 ease: 'Cubic.easeOut',
