@@ -49,9 +49,9 @@ export class AIGameScene extends Phaser.Scene {
     }
 
     async preload() {
-        this.load.image("wheel", "assets/spinners/spinner-test.png");
-        this.load.image("pin", "assets/sprites/pin.png");
-        this.load.image("player", "assets/sprites/monkey-avatar.png");
+        this.load.image("wheel", "src/assets/spinners/spinner-test.png");
+        this.load.image("pin", "src/assets/sprites/pin.png");
+        this.load.image("player", "src/assets/sprites/monkey-avatar.png");
     }
 
     async create() {

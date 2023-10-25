@@ -1,5 +1,4 @@
 import './SpinWheel.css';
-import '../sceneConfigs/SpinWheelConfig';
 import { useEffect, useRef, useState } from 'react';
 import { Button, Loader } from '@mantine/core';
 import { addMessageListener, removeMessageListener, sendMessage } from '../utils/MessageListener';
@@ -10,10 +9,10 @@ import { getSession, setCurrentTurnPlayerId, updateInitialTurnPosition, updatePl
 import { SessionData } from './SessionData';
 import { SessionPhase } from '../game-domain/SessionPhase';
 import useLocalStorageState from 'use-local-storage-state';
-import wheelImage from './../../public/assets/sprites/wheel2.png'; // replace with your actual image path
+import wheelImage from './../assets/sprites/wheel2.png'; // replace with your actual image path
 import './SpinWheel.css';
 import { motion } from 'framer-motion';
-import pinImage from './../../public/assets/sprites/pin.png'; // replace with your actual image path
+import pinImage from './../assets/sprites/pin.png'; // replace with your actual image path
 import { Types } from 'ably';
 import { ChannelHandler } from '../ably/ChannelHandler';
 
@@ -161,7 +160,7 @@ function SpinWheel() {
                 channel.current?.subscribe('turn-selected', async (message) => {
                     console.log('turn selected by: ', message.clientId);
                     const { initialTurnPosition, numberPlayers } = await getSession({ id: sessionData.sessionId });
-                    
+
                     console.log('initialTurnPositions: ', initialTurnPosition);
                     console.log('numberPlayers: ', numberPlayers);
 
