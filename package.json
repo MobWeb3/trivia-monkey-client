@@ -21,6 +21,7 @@
     "@web3auth/solana-provider": "^7.0.2",
     "@zerodevapp/sdk": "^3.1.54",
     "ably": "^1.2.43",
+    "framer-motion": "^10.16.4",
     "phaser": "^3.60.0",
     "qr-code-styling": "^1.6.0-rc.1",
     "query-string": "^8.1.0",
