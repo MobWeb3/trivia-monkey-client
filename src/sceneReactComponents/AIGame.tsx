@@ -25,12 +25,11 @@ function AIGame() {
     const [currentQuestion, setCurrentQuestion] = useState<Question | null>(null);
     const [chosenTopic, setChosenTopic] = useState<string | null>(null);
 
-    // const [canSpin, setCanSpin] = useState(true);
+    const [canSpin, setCanSpin] = useState(false);
     const [message, setMessage] = useState("Loading...");
-    // const [sliceValues, setSliceValues] = useState<string[]>([]);
+    const [selectedSlice, setSelectedSlice] = useState<string | null>(null);
+    const [sliceValues, setSliceValues] = useState<string[]>([]);
     const [session, setSession] = useState<GameSession | null>(null);
-
-
 
     const handleShowQuestion = async (topic: string) => {
 
@@ -96,10 +95,10 @@ function AIGame() {
     useEffect(() => {
         if (session) {
             if (isPlayerTurn()) {
-                // setCanSpin(true);
+                setCanSpin(true);
                 setMessage("Your turn!");
             } else {
-                // setCanSpin(false);
+                setCanSpin(false);
                 setMessage(`Waiting for ${session.currentTurnPlayerId} to finish turn...`);
             }
         }
@@ -130,7 +129,7 @@ function AIGame() {
         console.log('topics: ', topics)
 
         // Get topics
-        // setSliceValues(topics as unknown as string[]);
+        setSliceValues(topics as unknown as string[]);
 
         // Check if game is active
         if (session.gamePhase !== SessionPhase.GAME_ACTIVE) {
@@ -152,8 +151,7 @@ function AIGame() {
 
             const { topics } = session;
             // Get topics
-            // setSliceValues(topics as unknown as string[]);
-            // this.session.gamePhase = gamePhase ?? {};
+            setSliceValues(topics as unknown as string[]);
 
             // Check if game is active
             if (session.gamePhase !== SessionPhase.GAME_ACTIVE) {
@@ -184,8 +182,6 @@ function AIGame() {
         console.log("data: ", data)
         if (!mustSpin) {
           const newPrizeNumber = Math.floor(Math.random() * (6));
-
-        //   setSelectedSlice(sliceValues?.[newPrizeNumber]);
           setPrizeNumber(newPrizeNumber);
           setMustSpin(true);
         }
@@ -205,16 +201,21 @@ function AIGame() {
             />
 
 
-        {/* <p style={{ position: 'absolute', top: '10px', left: '50%', transform: 'translateX(-50%)', color: 'black', fontWeight: 'bold' }}>{message}</p> */}
+        <p style={{ position: 'absolute', top: '10px', left: '50%', transform: 'translateX(-50%)', color: 'black', fontWeight: 'bold' }}>{message}</p>
+        <p style={{ position: 'absolute', top: '30px', left: '50%', transform: 'translateX(-50%)', color: 'black', fontWeight: 'bold' }}>{selectedSlice}</p>
         {data && data.length > 0 && (
             <Wheel
                 mustStartSpinning={mustSpin}
                 prizeNumber={prizeNumber}
                 data={data}
+                onStopSpinning={() => {
+                    setMustSpin(false);
+                    setSelectedSlice(sliceValues[prizeNumber])
+                }}
                 // other props and methods
             />
         )}
-      <button onClick={handleSpinClick}>SPIN</button>
+      { canSpin && <button onClick={handleSpinClick}>SPIN</button>}
         </div>
 
     );
