@@ -41,11 +41,6 @@ export function pollUntilSessionChanges(expectedCurrentPlayerId: string, session
             // Get new session data
             try {
                 const newSession = await getSession({ id: sessionId });
-                // if (!newSession) {
-                //     console.log('session not initialized yet');
-                //     this.messageGameText?.setText("session not initialized yet");
-                // }
-
                 if (expectedCurrentPlayerId === newSession.currentTurnPlayerId) {
                     clearInterval(intervalId);
                     resolve(newSession);

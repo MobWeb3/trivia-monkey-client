@@ -17,7 +17,12 @@ export const publishTurnCompleted = async (clientId: string, channelId: string, 
     await channelHandler?.publishMessage({ channelId, message: Messages.TURN_COMPLETED, details: data });
 }
 
-export const suscribeToTurnCompleted = async (clientId: string, channelId: string) => {
+export const subscribeToTurnCompleted = async (clientId: string, channelId: string) => {
     const channelHandler = await ChannelHandler.getInstance().initChannelHandler(clientId);
     await channelHandler?.subscribeToChannel(channelId, Messages.TURN_COMPLETED);
+}
+
+export const unsubscribeToTurnCompleted = async (clientId: string, channelId: string) => {
+    const channelHandler = await ChannelHandler.getInstance().initChannelHandler(clientId);
+    await channelHandler?.unsubscribeToChannel(channelId, Messages.TURN_COMPLETED);
 }

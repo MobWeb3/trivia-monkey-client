@@ -84,4 +84,12 @@ export class ChannelHandler {
       console.error(`Error: ${error}`);
     }
   }
+
+  public async unsubscribeToChannel(channelId: string, message: string) {
+    try {
+      await ChannelHandler.ablyInstance?.unsubscribeToChannel(channelId, message);
+    } catch (error) {
+      console.error(`Error: ${error}`);
+    }
+  }
 }

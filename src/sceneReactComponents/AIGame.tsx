@@ -6,11 +6,9 @@ import { Question } from '../game-domain/Question';
 import { addMessageListener, removeMessageListener } from '../utils/MessageListener';
 import { Messages } from '../utils/Messages';
 import { getNextTurnPlayerId, getSession } from '../polybase/SessionHandler';
-import { publishTurnCompleted, suscribeToTurnCompleted } from '../ably/AblyMessages';
+import { publishTurnCompleted, subscribeToTurnCompleted, unsubscribeToTurnCompleted } from '../ably/AblyMessages';
 import { SessionData } from './SessionData';
 import useLocalStorageState from 'use-local-storage-state';
-
-// import playerImage from './../assets/sprites/monkey-avatar.png';
 import { GameSession } from '../game-domain/GameSession';
 import { Wheel } from 'react-custom-roulette'
 import { WheelData } from 'react-custom-roulette/dist/components/Wheel/types';
@@ -22,7 +20,6 @@ function AIGame() {
     const [showQuestionModal, setShowQuestionModal] = useState(false);
     const [currentQuestion, setCurrentQuestion] = useState<Question | null>(null);
     const [chosenTopic, setChosenTopic] = useState<string | null>(null);
-
     const [canSpin, setCanSpin] = useState(false);
     const [message, setMessage] = useState("Loading...");
     const [selectedSlice, setSelectedSlice] = useState<string | null>(null);
@@ -51,10 +48,10 @@ function AIGame() {
         const { nextTurnPlayerId } = await getNextTurnPlayerId({ id: sessionData?.sessionId });
         // Publish turn completed // we know clientId is not null because we checked isPlayerTurn
         if (sessionData?.clientId && sessionData.channelId) {
+            console.log("publish completed turn");
             await publishTurnCompleted(sessionData?.clientId, sessionData.channelId, { nextTurnPlayerId });
         }
     }
-
 
     useEffect(() => {
         const setupSessionData = async () => {
@@ -65,9 +62,9 @@ function AIGame() {
             setSession(session);
             // Get session data
             const { topics } = session;
-    
+
             console.log('topics: ', topics)
-    
+
             // Get topics
             setSliceValues(topics as unknown as string[]);
         }
@@ -77,8 +74,9 @@ function AIGame() {
 
     useEffect(() => {
 
+        if (!sessionData?.clientId || !sessionData?.channelId) return;
+
         async function updateTurn(expectedCurrentPlayerId: string) {
-            if (!session || !session.id) return;
             try {
                 const session: GameSession = await pollUntilSessionChanges(expectedCurrentPlayerId, sessionData?.sessionId ?? '');
                 if (!session) return;
@@ -86,14 +84,14 @@ function AIGame() {
                 const { topics } = session;
                 // Get topics
                 setSliceValues(topics as unknown as string[]);
-    
+
             } catch (error) {
                 console.log("error updating session data: ", error);
             }
         }
-
         if (sessionData?.clientId && sessionData?.channelId) {
-            suscribeToTurnCompleted(sessionData?.clientId, sessionData?.channelId);
+            console.log("subscribed to turn completed");
+            subscribeToTurnCompleted(sessionData?.clientId, sessionData?.channelId);
         }
 
         const handleTurnCompleted = async (event: any) => {
@@ -106,8 +104,10 @@ function AIGame() {
         // Return cleanup function
         return () => {
             window.removeEventListener(Messages.TURN_COMPLETED, handleTurnCompleted);
+            if (!sessionData?.clientId || !sessionData?.channelId) return;
+            unsubscribeToTurnCompleted(sessionData?.clientId, sessionData?.channelId)
         };
-    }, [sessionData?.clientId, sessionData?.channelId, sessionData?.sessionId]);// eslint-disable-line react-hooks/exhaustive-deps
+    }, []);// eslint-disable-line react-hooks/exhaustive-deps
 
     useEffect(() => {
         addMessageListener(Messages.HIDE_QUESTION, finishTurnAndSaveState);
@@ -135,11 +135,6 @@ function AIGame() {
             }
         }
     }, [session, sessionData?.clientId]);
-
-
-
-
-
 
 
     const [mustSpin, setMustSpin] = useState(false);
@@ -205,7 +200,5 @@ function AIGame() {
 
     );
 }
-
-
 
 export default AIGame;
