@@ -7,13 +7,13 @@ import { Question } from '../game-domain/Question';
 import { addMessageListener, removeMessageListener } from '../utils/MessageListener';
 import { Messages } from '../utils/Messages';
 import { Button } from '@mantine/core';
-import { getHostId, getNextTurnPlayerId, getSession } from '../polybase/SessionHandler';
-import { publishTurnCompleted } from '../ably/AblyMessages';
+import { getNextTurnPlayerId, getSession } from '../polybase/SessionHandler';
+import { publishTurnCompleted, suscribeToTurnCompleted } from '../ably/AblyMessages';
 import { SessionData } from './SessionData';
 import useLocalStorageState from 'use-local-storage-state';
 
 import wheelImage from './../assets/spinners/spinner-test.png';
-// import pinImage from './../assets/sprites/pin.png';
+import pinImage from './../assets/sprites/pin.png';
 // import playerImage from './../assets/sprites/monkey-avatar.png';
 import { motion } from 'framer-motion';
 import { GameSession } from '../game-domain/GameSession';
@@ -30,7 +30,7 @@ function AIGame() {
 
     const [canSpin, setCanSpin] = useState(true);
     const [selectedSlice, setSelectedSlice] = useState<string | null>(null);
-    const [message, setMessage] = useState("Message");
+    const [message, setMessage] = useState("Loading...");
     const [rotationDegrees, setRotationDegrees] = useState(0);
     const [hasSpun, setHasSpun] = useState(false);
     const [sliceValues, setSliceValues] = useState<string[]>([]);
@@ -64,39 +64,59 @@ function AIGame() {
         } 
     }
 
-    // useEffect(() => {
-    //     console.log('AIGame loaded: ', sessionData);
-
-    //     if (!sceneAddedRef.current) { // Check if the scene has been added
-    //         GameInstance.getInstance();
-    //         console.log('AIGame add scene session', sessionData);
-    //         GameInstance.addScene(sessionData ?? "");
-    //         sceneAddedRef.current = true;
-    //     }
-
-    // }, [sessionData]);
+    useEffect(() => {
+        console.log('AIGame loaded: ', sessionData);
+        setupSessionData();
+    }, [sessionData?.sessionId]);
 
     useEffect(() => {
-
-        const showQuestion = async (event: any) => {
-            console.log('showQuestion event: ', event);
-            await handleShowQuestion(event?.topic);
+        if (sessionData?.clientId && sessionData?.channelId){
+            suscribeToTurnCompleted(sessionData?.clientId, sessionData?.channelId);
         }
 
-        // const hideQuestion = async () => {
-        //     setShowQuestionModal(false);
-        // }
-
-        addMessageListener(Messages.SHOW_QUESTION, showQuestion);
-        addMessageListener(Messages.HIDE_QUESTION, finishTurnAndSaveState);
-
-
-        return () => {
-            removeMessageListener(Messages.SHOW_QUESTION, showQuestion);
-            removeMessageListener(Messages.HIDE_QUESTION, finishTurnAndSaveState)
+        const handleTurnCompleted = async (event: any) => {
+            const { nextTurnPlayerId } = event.detail;
+            await updateTurn(nextTurnPlayerId);
         };
 
+        window.addEventListener(Messages.TURN_COMPLETED, handleTurnCompleted);
+        // Return cleanup function
+        return () => {
+            window.removeEventListener(Messages.TURN_COMPLETED, handleTurnCompleted);
+        };
+    }, [sessionData?.clientId, sessionData?.channelId]);
+
+    useEffect(() => {
+        addMessageListener(Messages.HIDE_QUESTION, finishTurnAndSaveState);
+        return () => {
+            // removeMessageListener(Messages.SHOW_QUESTION, showQuestion);
+            removeMessageListener(Messages.HIDE_QUESTION, finishTurnAndSaveState)
+        };
     });
+
+    useEffect(() => {
+        if (session) {
+            if (isPlayerTurn()) {
+                setCanSpin(true);
+                setMessage("Your turn!");
+            } else {
+                setCanSpin(false);
+                setMessage(`Waiting for ${session.currentTurnPlayerId} to finish turn...`);
+            }
+        }
+    }, [session]);
+
+    useEffect(() => {
+        if (hasSpun && selectedSlice) {
+          setMessage(`Selected slice: ${selectedSlice}`);
+          handleShowQuestion(selectedSlice)
+        }
+    }, [hasSpun, selectedSlice]);
+
+    async function updateTurn(expectedCurrentPlayerId: string) {
+        await updateSessionData(expectedCurrentPlayerId);
+        // this.updatedPlayerInTurnAvatar();
+    }
 
     const spin = async () => {
         if (canSpin) {
@@ -108,24 +128,29 @@ function AIGame() {
             const sliceDegree = fullCircleDegrees / NUM_SLICES;
             const randomOffset = Math.random() * sliceDegree; // random offset within a slice
 
-            const degrees = ((Math.floor(Math.random() * NUM_SLICES) * sliceDegree) + rotationDegrees + randomOffset) % fullCircleDegrees;
-            setSelectedSlice(sliceValues[NUM_SLICES - 1 - Math.floor(degrees / sliceDegree)]);
+            const degrees = (Math.floor(Math.random() * NUM_SLICES) * sliceDegree + randomOffset) % fullCircleDegrees;
+            const selected = sliceValues[Math.round(degrees / sliceDegree) % NUM_SLICES];
+            setSelectedSlice(selected);
             setCanSpin(false);
 
             // Calculate total degrees to rotate
-            const totalDegrees = rotationDegrees + rounds * fullCircleDegrees + degrees;
+            const totalDegrees = fullCircleDegrees + degrees;
             setRotationDegrees(totalDegrees);
 
             // Wait for spinning animation to complete
             await new Promise((resolve) => setTimeout(resolve, 3000)); // Adjust the duration as needed
+            
 
             // Call handleSelectedSlice after spinning is complete
             setHasSpun(true);
-            setMessage("Finished Spinning");
+            // setMessage(`Selected slice: ${selectedSlice}`);
+
+            // if (selectedSlice) await 
         }
     }
 
     function isPlayerTurn(): boolean {
+        console.log('isPlayerTurn: ', sessionData?.clientId, session?.currentTurnPlayerId);
         if (!sessionData?.clientId || !session?.currentTurnPlayerId)
             return false;
         return sessionData.clientId === session.currentTurnPlayerId;
@@ -134,12 +159,13 @@ function AIGame() {
     const setupSessionData = async () => {
 
         if (!sessionData?.sessionId) return;
-        setSession(await pollForCurrentPlayerId(sessionData?.sessionId));
-
+        const session = await pollForCurrentPlayerId(sessionData?.sessionId);
         if (!session) return;
-
+        setSession(session);
         // Get session data
         const { topics, currentTurnPlayerId } = session;
+
+        console.log('topics: ', topics)
 
         // Get topics
         setSliceValues(topics as unknown as string[]);
@@ -150,23 +176,33 @@ function AIGame() {
             // tell page to show that game has not started yet or is over.
             return;
         }
-        // // adding the text field
-        // this.messageGameText = this.add.text(this.cameras.main.centerX, this.cameras.main.centerY / 2 - 100, "", { align: 'center' });
-        // // setting text field registration point in its center
-        // this.messageGameText.setOrigin(0.5);
-        // // aligning the text to center
-        // this.messageGameText.setAlign('center');
-        if (isPlayerTurn()) {
-            setCanSpin(true);
-            // this.messageGameText?.setText("Your turn!");
-        } else {
-            setCanSpin(false);
-            // this.messageGameText?.setText(`Waiting for ${currentTurnPlayerId} to finish turn...`);
-        }
+    }
 
-        // const isHost = await getHostId({ id: sessionData.sessionId }) === sessionData.clientId;
-        // if (isHost) this.isHost = true;
-        // if (numberPlayers) this.session.numberPlayers = numberPlayers;
+    async function updateSessionData(expectedCurrentPlayerId: string) {
+        console.log("current session:", session);
+
+        if (!session || !session.id) return;
+
+        try {
+            const session:GameSession = await pollUntilSessionChanges(expectedCurrentPlayerId, sessionData?.sessionId ?? '');
+            if (!session) return;
+            setSession(session);
+
+            const {topics} = session;
+             // Get topics
+            setSliceValues(topics as unknown as string[]);
+            // this.session.gamePhase = gamePhase ?? {};
+
+            // Check if game is active
+            if (session.gamePhase !== SessionPhase.GAME_ACTIVE) {
+                console.log('Game is not active!');
+                // tell page to show that game has not started yet or is over.
+                return;
+            }
+
+        } catch (error) {
+            console.log("error updating session data: ", error);
+        }
     }
 
     return (
@@ -176,7 +212,7 @@ function AIGame() {
             </Button>
             <QuestionModal 
                 open={showQuestionModal} 
-                onClose={finishTurnAndSaveState} 
+                onClose={() => finishTurnAndSaveState()} 
                 question={currentQuestion}
                 topic={chosenTopic}
                 onExpire={() => finishTurnAndSaveState()}
@@ -188,10 +224,15 @@ function AIGame() {
                 onClick={spin}
                 animate={{ rotate: `${rotationDegrees}deg` }}
                 transition={{ duration: 3, ease: "easeOut"}}
-                style={{ transformOrigin: "center", display: "flex", justifyContent: "center", alignItems: "center", marginTop: "60px" }}
+                style={{ transformOrigin: "center", display: "flex", justifyContent: "center", alignItems: "center" }}
             >
+                {sliceValues.map((sliceValue, index) => {
+                    const sliceAngle = (360 / NUM_SLICES) * index;
+                    return <Slice key={index} sliceValue={sliceValue} angle={sliceAngle} />;
+                })}
                 <img src={wheelImage} alt="Wheel" style={{ objectFit: "fill" }} />
             </motion.div>
+            <img src={pinImage} alt="Pin" style={{ position: 'absolute', top: '55%', left: '50%', transform: 'translate(-50%, -50%)' }} />
 
         </div>
     );
@@ -232,7 +273,7 @@ function pollForCurrentPlayerId(sessionId: string): Promise<any> {
     });
 }
 
-function pollUntilSessionChanges(expectedCurrentPlayerId: string, sessionId: string): Promise<any> {
+function pollUntilSessionChanges(expectedCurrentPlayerId: string, sessionId: string): Promise<GameSession> {
 
     return new Promise(async (resolve, reject) => {
         let tries = 0; // Initialize tries counter
@@ -264,3 +305,22 @@ function pollUntilSessionChanges(expectedCurrentPlayerId: string, sessionId: str
 }
 
 export default AIGame;
+
+type SliceProps = {
+    sliceValue: string;
+    angle: number;
+};
+
+// Slice Component
+const Slice = ({ sliceValue, angle }: SliceProps) => {
+    return (
+        <div style={{
+            position: 'absolute',
+            transform: `rotate(${angle}deg) translate(150px) rotate(-${angle}deg)`, // Adjust the translate value based on your wheel's radius
+            textAlign: 'center',
+            // Add additional styling as needed
+        }}>
+            {sliceValue}
+        </div>
+    );
+};

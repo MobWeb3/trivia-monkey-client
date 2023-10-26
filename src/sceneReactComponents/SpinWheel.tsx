@@ -205,7 +205,6 @@ function SpinWheel() {
                 <img src={wheelImage} alt="Wheel" style={{ objectFit: "contain" }} />
             </motion.div>
             <img src={pinImage} alt="Pin" style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }} />
-            {/* <div id="phaser-container" className="App"></div> */}
         </div>
     );
 }
