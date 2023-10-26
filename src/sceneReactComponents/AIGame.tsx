@@ -12,14 +12,11 @@ import { publishTurnCompleted, suscribeToTurnCompleted } from '../ably/AblyMessa
 import { SessionData } from './SessionData';
 import useLocalStorageState from 'use-local-storage-state';
 
-import wheelImage from './../assets/spinners/spinner-test.png';
-import pinImage from './../assets/sprites/pin.png';
 // import playerImage from './../assets/sprites/monkey-avatar.png';
-import { motion } from 'framer-motion';
 import { GameSession } from '../game-domain/GameSession';
 import { SessionPhase } from '../game-domain/SessionPhase';
-
-
+import { Wheel } from 'react-custom-roulette'
+import { WheelData } from 'react-custom-roulette/dist/components/Wheel/types';
 
 function AIGame() {
 
@@ -28,17 +25,14 @@ function AIGame() {
     const [currentQuestion, setCurrentQuestion] = useState<Question | null>(null);
     const [chosenTopic, setChosenTopic] = useState<string | null>(null);
 
-    const [canSpin, setCanSpin] = useState(true);
-    const [selectedSlice, setSelectedSlice] = useState<string | null>(null);
+    // const [canSpin, setCanSpin] = useState(true);
     const [message, setMessage] = useState("Loading...");
-    const [rotationDegrees, setRotationDegrees] = useState(0);
-    const [hasSpun, setHasSpun] = useState(false);
-    const [sliceValues, setSliceValues] = useState<string[]>([]);
-    const NUM_SLICES = 6;
+    // const [sliceValues, setSliceValues] = useState<string[]>([]);
     const [session, setSession] = useState<GameSession | null>(null);
 
 
-    const handleShowQuestion = async (topic:string) => {
+
+    const handleShowQuestion = async (topic: string) => {
 
         if (!sessionData?.questionSessionId) {
             const { questionSessionId } = await getSession({ id: sessionData?.sessionId })
@@ -46,22 +40,26 @@ function AIGame() {
         }
 
         console.log(`topic ${topic}, questionSessionId ${sessionData?.questionSessionId}`);
-        const question: Question = await getQuestion({id:sessionData?.questionSessionId, topic});
+        const question: Question = await getQuestion({ id: sessionData?.questionSessionId, topic });
 
         console.log('question', question);
         setCurrentQuestion(question);
-        setShowQuestionModal(true);
         setChosenTopic(topic);
+
+        // Wait for spinning animation to complete
+        await new Promise((resolve) => setTimeout(resolve, 3000)); // Adjust the duration as needed
+
+        setShowQuestionModal(true);
     }
-    
+
     const finishTurnAndSaveState = async () => {
         setShowQuestionModal(false);
         // Update turn on polybase
-        const {nextTurnPlayerId} = await getNextTurnPlayerId({id: sessionData?.sessionId});
+        const { nextTurnPlayerId } = await getNextTurnPlayerId({ id: sessionData?.sessionId });
         // Publish turn completed // we know clientId is not null because we checked isPlayerTurn
-        if(sessionData?.clientId && sessionData.channelId) {
+        if (sessionData?.clientId && sessionData.channelId) {
             await publishTurnCompleted(sessionData?.clientId, sessionData.channelId, {nextTurnPlayerId});
-        } 
+        }
     }
 
     useEffect(() => {
@@ -70,11 +68,12 @@ function AIGame() {
     }, [sessionData?.sessionId]);
 
     useEffect(() => {
-        if (sessionData?.clientId && sessionData?.channelId){
+        if (sessionData?.clientId && sessionData?.channelId) {
             suscribeToTurnCompleted(sessionData?.clientId, sessionData?.channelId);
         }
 
         const handleTurnCompleted = async (event: any) => {
+            console.log("event detail: ", event.detail)
             const { nextTurnPlayerId } = event.detail;
             await updateTurn(nextTurnPlayerId);
         };
@@ -97,57 +96,20 @@ function AIGame() {
     useEffect(() => {
         if (session) {
             if (isPlayerTurn()) {
-                setCanSpin(true);
+                // setCanSpin(true);
                 setMessage("Your turn!");
             } else {
-                setCanSpin(false);
+                // setCanSpin(false);
                 setMessage(`Waiting for ${session.currentTurnPlayerId} to finish turn...`);
             }
         }
     }, [session]);
-
-    useEffect(() => {
-        if (hasSpun && selectedSlice) {
-          setMessage(`Selected slice: ${selectedSlice}`);
-          handleShowQuestion(selectedSlice)
-        }
-    }, [hasSpun, selectedSlice]);
 
     async function updateTurn(expectedCurrentPlayerId: string) {
         await updateSessionData(expectedCurrentPlayerId);
         // this.updatedPlayerInTurnAvatar();
     }
 
-    const spin = async () => {
-        if (canSpin) {
-            setMessage("Spinning...");
-            const minRounds = 2;
-            const maxRounds = 4;
-            const rounds = Math.floor(Math.random() * (maxRounds - minRounds + 1)) + minRounds;
-            const fullCircleDegrees = 360;
-            const sliceDegree = fullCircleDegrees / NUM_SLICES;
-            const randomOffset = Math.random() * sliceDegree; // random offset within a slice
-
-            const degrees = (Math.floor(Math.random() * NUM_SLICES) * sliceDegree + randomOffset) % fullCircleDegrees;
-            const selected = sliceValues[Math.round(degrees / sliceDegree) % NUM_SLICES];
-            setSelectedSlice(selected);
-            setCanSpin(false);
-
-            // Calculate total degrees to rotate
-            const totalDegrees = fullCircleDegrees + degrees;
-            setRotationDegrees(totalDegrees);
-
-            // Wait for spinning animation to complete
-            await new Promise((resolve) => setTimeout(resolve, 3000)); // Adjust the duration as needed
-            
-
-            // Call handleSelectedSlice after spinning is complete
-            setHasSpun(true);
-            // setMessage(`Selected slice: ${selectedSlice}`);
-
-            // if (selectedSlice) await 
-        }
-    }
 
     function isPlayerTurn(): boolean {
         console.log('isPlayerTurn: ', sessionData?.clientId, session?.currentTurnPlayerId);
@@ -163,12 +125,12 @@ function AIGame() {
         if (!session) return;
         setSession(session);
         // Get session data
-        const { topics, currentTurnPlayerId } = session;
+        const { topics } = session;
 
         console.log('topics: ', topics)
 
         // Get topics
-        setSliceValues(topics as unknown as string[]);
+        // setSliceValues(topics as unknown as string[]);
 
         // Check if game is active
         if (session.gamePhase !== SessionPhase.GAME_ACTIVE) {
@@ -184,13 +146,13 @@ function AIGame() {
         if (!session || !session.id) return;
 
         try {
-            const session:GameSession = await pollUntilSessionChanges(expectedCurrentPlayerId, sessionData?.sessionId ?? '');
+            const session: GameSession = await pollUntilSessionChanges(expectedCurrentPlayerId, sessionData?.sessionId ?? '');
             if (!session) return;
             setSession(session);
 
-            const {topics} = session;
-             // Get topics
-            setSliceValues(topics as unknown as string[]);
+            const { topics } = session;
+            // Get topics
+            // setSliceValues(topics as unknown as string[]);
             // this.session.gamePhase = gamePhase ?? {};
 
             // Check if game is active
@@ -204,37 +166,57 @@ function AIGame() {
             console.log("error updating session data: ", error);
         }
     }
+    const [mustSpin, setMustSpin] = useState(false);
+    const [prizeNumber, setPrizeNumber] = useState(0);
+
+    const data: WheelData[] = (session?.topics ?? [])?.map((topic, index) => {
+        // console.log(`topic: ${topic} index:${index}`) 
+        return {
+          option: topic,
+          style: {
+            backgroundColor: index % 2 ? 'green' : 'white',
+            textColor: 'black',
+          },
+        };
+      });
+
+    const handleSpinClick = () => {
+        console.log("data: ", data)
+        if (!mustSpin) {
+          const newPrizeNumber = Math.floor(Math.random() * (6));
+
+        //   setSelectedSlice(sliceValues?.[newPrizeNumber]);
+          setPrizeNumber(newPrizeNumber);
+          setMustSpin(true);
+        }
+    }
 
     return (
         <div style={{ position: 'relative' }}>
             <Button onClick={() => handleShowQuestion("Music")}>
                 Show Question
             </Button>
-            <QuestionModal 
-                open={showQuestionModal} 
-                onClose={() => finishTurnAndSaveState()} 
+            <QuestionModal
+                open={showQuestionModal}
+                onClose={() => finishTurnAndSaveState()}
                 question={currentQuestion}
                 topic={chosenTopic}
                 onExpire={() => finishTurnAndSaveState()}
             />
 
 
-            <p style={{ position: 'absolute', top: '10px', left: '50%', transform: 'translateX(-50%)', color: 'black', fontWeight: 'bold' }}>{message}</p>
-            <motion.div 
-                onClick={spin}
-                animate={{ rotate: `${rotationDegrees}deg` }}
-                transition={{ duration: 3, ease: "easeOut"}}
-                style={{ transformOrigin: "center", display: "flex", justifyContent: "center", alignItems: "center" }}
-            >
-                {sliceValues.map((sliceValue, index) => {
-                    const sliceAngle = (360 / NUM_SLICES) * index;
-                    return <Slice key={index} sliceValue={sliceValue} angle={sliceAngle} />;
-                })}
-                <img src={wheelImage} alt="Wheel" style={{ objectFit: "fill" }} />
-            </motion.div>
-            <img src={pinImage} alt="Pin" style={{ position: 'absolute', top: '55%', left: '50%', transform: 'translate(-50%, -50%)' }} />
-
+        {/* <p style={{ position: 'absolute', top: '10px', left: '50%', transform: 'translateX(-50%)', color: 'black', fontWeight: 'bold' }}>{message}</p> */}
+        {data && data.length > 0 && (
+            <Wheel
+                mustStartSpinning={mustSpin}
+                prizeNumber={prizeNumber}
+                data={data}
+                // other props and methods
+            />
+        )}
+      <button onClick={handleSpinClick}>SPIN</button>
         </div>
+
     );
 }
 
@@ -248,12 +230,8 @@ function pollForCurrentPlayerId(sessionId: string): Promise<any> {
                 console.log("polling for session id: ", sessionId);
                 // Get session data
                 const session = await getSession({ id: sessionId });
-                // if (!session) {
-                //     console.log('session not initialized yet');
-                //     this.messageGameText?.setText("session not initialized yet");
-                // }
                 const { currentTurnPlayerId } = session;
-    
+
                 // If currentTurnPlayerId is not null, clear the interval and resolve the Promise
                 if (currentTurnPlayerId) {
                     clearInterval(intervalId);
@@ -286,7 +264,7 @@ function pollUntilSessionChanges(expectedCurrentPlayerId: string, sessionId: str
                 //     console.log('session not initialized yet');
                 //     this.messageGameText?.setText("session not initialized yet");
                 // }
-    
+
                 if (expectedCurrentPlayerId === newSession.currentTurnPlayerId) {
                     clearInterval(intervalId);
                     resolve(newSession);
@@ -305,22 +283,3 @@ function pollUntilSessionChanges(expectedCurrentPlayerId: string, sessionId: str
 }
 
 export default AIGame;
-
-type SliceProps = {
-    sliceValue: string;
-    angle: number;
-};
-
-// Slice Component
-const Slice = ({ sliceValue, angle }: SliceProps) => {
-    return (
-        <div style={{
-            position: 'absolute',
-            transform: `rotate(${angle}deg) translate(150px) rotate(-${angle}deg)`, // Adjust the translate value based on your wheel's radius
-            textAlign: 'center',
-            // Add additional styling as needed
-        }}>
-            {sliceValue}
-        </div>
-    );
-};
