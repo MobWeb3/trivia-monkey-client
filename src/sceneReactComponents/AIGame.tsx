@@ -1,12 +1,10 @@
 import './SpinWheel.css';
-import '../sceneConfigs/AIGameConfig';
 import { useEffect, useState } from 'react';
 import QuestionModal from '../components/QuestionModal';
 import { getQuestion } from '../polybase/QuestionsHandler';
 import { Question } from '../game-domain/Question';
 import { addMessageListener, removeMessageListener } from '../utils/MessageListener';
 import { Messages } from '../utils/Messages';
-import { Button } from '@mantine/core';
 import { getNextTurnPlayerId, getSession } from '../polybase/SessionHandler';
 import { publishTurnCompleted, suscribeToTurnCompleted } from '../ably/AblyMessages';
 import { SessionData } from './SessionData';
@@ -14,7 +12,6 @@ import useLocalStorageState from 'use-local-storage-state';
 
 // import playerImage from './../assets/sprites/monkey-avatar.png';
 import { GameSession } from '../game-domain/GameSession';
-import { SessionPhase } from '../game-domain/SessionPhase';
 import { Wheel } from 'react-custom-roulette'
 import { WheelData } from 'react-custom-roulette/dist/components/Wheel/types';
 
@@ -57,12 +54,43 @@ function AIGame() {
         }
     }
 
+
     useEffect(() => {
-        console.log('AIGame loaded: ', sessionData);
+        const setupSessionData = async () => {
+
+            if (!sessionData?.sessionId) return;
+            const session = await pollForCurrentPlayerId(sessionData?.sessionId);
+            if (!session) return;
+            setSession(session);
+            // Get session data
+            const { topics } = session;
+    
+            console.log('topics: ', topics)
+    
+            // Get topics
+            setSliceValues(topics as unknown as string[]);
+        }
+
         setupSessionData();
     }, [sessionData?.sessionId]);
 
     useEffect(() => {
+
+        async function updateTurn(expectedCurrentPlayerId: string) {
+            if (!session || !session.id) return;
+            try {
+                const session: GameSession = await pollUntilSessionChanges(expectedCurrentPlayerId, sessionData?.sessionId ?? '');
+                if (!session) return;
+                setSession(session);
+                const { topics } = session;
+                // Get topics
+                setSliceValues(topics as unknown as string[]);
+    
+            } catch (error) {
+                console.log("error updating session data: ", error);
+            }
+        }
+
         if (sessionData?.clientId && sessionData?.channelId) {
             suscribeToTurnCompleted(sessionData?.clientId, sessionData?.channelId);
         }
@@ -78,7 +106,7 @@ function AIGame() {
         return () => {
             window.removeEventListener(Messages.TURN_COMPLETED, handleTurnCompleted);
         };
-    }, [sessionData?.clientId, sessionData?.channelId]);
+    }, [sessionData?.clientId, sessionData?.channelId, sessionData?.sessionId]);// eslint-disable-line react-hooks/exhaustive-deps
 
     useEffect(() => {
         addMessageListener(Messages.HIDE_QUESTION, finishTurnAndSaveState);
@@ -89,6 +117,13 @@ function AIGame() {
     });
 
     useEffect(() => {
+        function isPlayerTurn(): boolean {
+            console.log('isPlayerTurn: ', sessionData?.clientId, session?.currentTurnPlayerId);
+            if (!sessionData?.clientId || !session?.currentTurnPlayerId)
+                return false;
+            return sessionData.clientId === session.currentTurnPlayerId;
+        }
+
         if (session) {
             if (isPlayerTurn()) {
                 setCanSpin(true);
@@ -98,68 +133,14 @@ function AIGame() {
                 setMessage(`Waiting for ${session.currentTurnPlayerId} to finish turn...`);
             }
         }
-    }, [session]);
-
-    async function updateTurn(expectedCurrentPlayerId: string) {
-        await updateSessionData(expectedCurrentPlayerId);
-        // this.updatedPlayerInTurnAvatar();
-    }
+    }, [session, sessionData?.clientId]);
 
 
-    function isPlayerTurn(): boolean {
-        console.log('isPlayerTurn: ', sessionData?.clientId, session?.currentTurnPlayerId);
-        if (!sessionData?.clientId || !session?.currentTurnPlayerId)
-            return false;
-        return sessionData.clientId === session.currentTurnPlayerId;
-    }
 
-    const setupSessionData = async () => {
 
-        if (!sessionData?.sessionId) return;
-        const session = await pollForCurrentPlayerId(sessionData?.sessionId);
-        if (!session) return;
-        setSession(session);
-        // Get session data
-        const { topics } = session;
 
-        console.log('topics: ', topics)
 
-        // Get topics
-        setSliceValues(topics as unknown as string[]);
 
-        // Check if game is active
-        if (session.gamePhase !== SessionPhase.GAME_ACTIVE) {
-            console.log('Game is not active!');
-            // tell page to show that game has not started yet or is over.
-            return;
-        }
-    }
-
-    async function updateSessionData(expectedCurrentPlayerId: string) {
-        console.log("current session:", session);
-
-        if (!session || !session.id) return;
-
-        try {
-            const session: GameSession = await pollUntilSessionChanges(expectedCurrentPlayerId, sessionData?.sessionId ?? '');
-            if (!session) return;
-            setSession(session);
-
-            const { topics } = session;
-            // Get topics
-            setSliceValues(topics as unknown as string[]);
-
-            // Check if game is active
-            if (session.gamePhase !== SessionPhase.GAME_ACTIVE) {
-                console.log('Game is not active!');
-                // tell page to show that game has not started yet or is over.
-                return;
-            }
-
-        } catch (error) {
-            console.log("error updating session data: ", error);
-        }
-    }
     const [mustSpin, setMustSpin] = useState(false);
     const [prizeNumber, setPrizeNumber] = useState(0);
 
@@ -206,9 +187,11 @@ function AIGame() {
                             mustStartSpinning={mustSpin}
                             prizeNumber={prizeNumber}
                             data={data}
-                            onStopSpinning={() => {
+                            onStopSpinning={async () => {
                                 setMustSpin(false);
-                                setSelectedSlice(sliceValues[prizeNumber])
+                                const topicSelected = sliceValues[prizeNumber];
+                                setSelectedSlice(topicSelected)
+                                await handleShowQuestion(topicSelected)
                             }}
                         // other props and methods
                         />

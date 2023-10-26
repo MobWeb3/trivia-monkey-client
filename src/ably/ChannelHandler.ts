@@ -8,6 +8,16 @@ const baseUrl = `${BASE_URL}/api/ably`;
 
 export class ChannelHandler {
   static ablyInstance?: AblyHandler;
+  private static instance: ChannelHandler | null = null;
+
+  private constructor() { /* your constructor code here */ }
+
+  public static getInstance(): ChannelHandler {
+    if (!this.instance) {
+        this.instance = new ChannelHandler();
+    }
+    return this.instance;
+}
 
   public async createChannel(data: any) {
     const { clientId, nickname } = data;

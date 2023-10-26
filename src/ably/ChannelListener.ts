@@ -20,7 +20,7 @@ export const createChannelListenerWrapper = async (web3auth: Web3Auth, data: any
     const userInfo = await getUserInfo(web3auth);
     data.clientId = userInfo?.email;
     // console.log('createChannelListenerWrapper data:', data);
-    const channelHandler = await new ChannelHandler().initChannelHandler(data.clientId);
+    const channelHandler = await ChannelHandler.getInstance().initChannelHandler(data.clientId);
     // setAblyInstance(await initAblyHandler(data.clientId) ?? null);
     const channelId = await channelHandler?.createChannel(data);
 
@@ -74,7 +74,7 @@ export const enterChannelListenerWrapper = async (web3auth: Web3Auth, data: any)
     }
     const userInfo = await getUserInfo(web3auth);
     data.clientId = userInfo?.email;
-    const channelHandler = await new ChannelHandler().initChannelHandler(data.clientId);
+    const channelHandler = await ChannelHandler.getInstance().initChannelHandler(data.clientId);
     await channelHandler?.enterChannel(data);
     const channel = ChannelHandler.ablyInstance?.ablyInstance.channels.get(data.channelId);
     channel?.subscribe('start-game', async function (message) {

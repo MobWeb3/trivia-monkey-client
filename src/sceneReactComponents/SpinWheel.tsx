@@ -150,7 +150,7 @@ function SpinWheel() {
         console.log('sessionData in initializeChannel', sessionData);
         if (sessionData?.channelId && sessionData?.clientId) {
             const session = await getSession({ id: sessionData?.sessionId });
-            const channelHandler = await new ChannelHandler().initChannelHandler(sessionData?.clientId);
+            const channelHandler = await ChannelHandler.getInstance().initChannelHandler(sessionData?.clientId);
             await channelHandler?.enterChannel({ channelId: sessionData?.channelId, clientId: sessionData?.clientId, nickname: ""});
             channel.current = ChannelHandler.ablyInstance?.ablyInstance.channels.get(sessionData?.channelId) as Types.RealtimeChannelPromise;
             // console.log('HERE channelId: ', this.channelId);
