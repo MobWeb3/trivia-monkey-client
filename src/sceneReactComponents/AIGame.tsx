@@ -44,10 +44,6 @@ function AIGame() {
         console.log('question', question);
         setCurrentQuestion(question);
         setChosenTopic(topic);
-
-        // Wait for spinning animation to complete
-        await new Promise((resolve) => setTimeout(resolve, 3000)); // Adjust the duration as needed
-
         setShowQuestionModal(true);
     }
 
@@ -57,7 +53,7 @@ function AIGame() {
         const { nextTurnPlayerId } = await getNextTurnPlayerId({ id: sessionData?.sessionId });
         // Publish turn completed // we know clientId is not null because we checked isPlayerTurn
         if (sessionData?.clientId && sessionData.channelId) {
-            await publishTurnCompleted(sessionData?.clientId, sessionData.channelId, {nextTurnPlayerId});
+            await publishTurnCompleted(sessionData?.clientId, sessionData.channelId, { nextTurnPlayerId });
         }
     }
 
@@ -170,28 +166,28 @@ function AIGame() {
     const data: WheelData[] = (session?.topics ?? [])?.map((topic, index) => {
         // console.log(`topic: ${topic} index:${index}`) 
         return {
-          option: topic,
-          style: {
-            backgroundColor: index % 2 ? 'green' : 'white',
-            textColor: 'black',
-          },
+            option: topic,
+            style: {
+                backgroundColor: index % 2 ? 'green' : 'white',
+                textColor: 'black',
+            },
         };
-      });
+    });
 
     const handleSpinClick = () => {
         console.log("data: ", data)
         if (!mustSpin) {
-          const newPrizeNumber = Math.floor(Math.random() * (6));
-          setPrizeNumber(newPrizeNumber);
-          setMustSpin(true);
+            const newPrizeNumber = Math.floor(Math.random() * (6));
+            setPrizeNumber(newPrizeNumber);
+            setMustSpin(true);
         }
     }
 
     return (
         <div style={{ position: 'relative' }}>
-            <Button onClick={() => handleShowQuestion("Music")}>
+            {/* <Button onClick={() => handleShowQuestion("Music")}>
                 Show Question
-            </Button>
+            </Button> */}
             <QuestionModal
                 open={showQuestionModal}
                 onClose={() => finishTurnAndSaveState()}
@@ -201,21 +197,26 @@ function AIGame() {
             />
 
 
-        <p style={{ position: 'absolute', top: '10px', left: '50%', transform: 'translateX(-50%)', color: 'black', fontWeight: 'bold' }}>{message}</p>
-        <p style={{ position: 'absolute', top: '30px', left: '50%', transform: 'translateX(-50%)', color: 'black', fontWeight: 'bold' }}>{selectedSlice}</p>
-        {data && data.length > 0 && (
-            <Wheel
-                mustStartSpinning={mustSpin}
-                prizeNumber={prizeNumber}
-                data={data}
-                onStopSpinning={() => {
-                    setMustSpin(false);
-                    setSelectedSlice(sliceValues[prizeNumber])
-                }}
-                // other props and methods
-            />
-        )}
-      { canSpin && <button onClick={handleSpinClick}>SPIN</button>}
+            <p style={{ position: 'absolute', top: '10px', left: '50%', transform: 'translateX(-50%)', color: 'black', fontWeight: 'bold' }}>{message}</p>
+            <p style={{ position: 'absolute', top: '30px', left: '50%', transform: 'translateX(-50%)', color: 'black', fontWeight: 'bold' }}>{selectedSlice}</p>
+            {data && data.length > 0 && (
+                <div style={{ position: 'relative', display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+                    <div style={{ position: 'absolute', top: '40%', left: '50%', transform: 'translate(-50%, -50%)' }}>
+                        <Wheel
+                            mustStartSpinning={mustSpin}
+                            prizeNumber={prizeNumber}
+                            data={data}
+                            onStopSpinning={() => {
+                                setMustSpin(false);
+                                setSelectedSlice(sliceValues[prizeNumber])
+                            }}
+                        // other props and methods
+                        />
+                        {canSpin && <button onClick={handleSpinClick}>SPIN</button>}
+                    </div>
+                </div>
+            )}
+
         </div>
 
     );
