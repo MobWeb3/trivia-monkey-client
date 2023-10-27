@@ -20,7 +20,6 @@ import { ChannelHandler } from '../ably/ChannelHandler';
 function SpinWheel() {
 
     const [sessionData] = useLocalStorageState<SessionData>('sessionData', {});
-    // const [game, setGame] = useState<Phaser.Game | null>(null);
     const [mayStartGame, setMayStartGame] = useState(false);
     const [isLoading, setIsLoading] = useState(false); // Add this line
 
