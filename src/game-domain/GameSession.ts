@@ -1,13 +1,13 @@
 import { Types } from 'ably';
 
 export interface GameSession {
-    id?: string;
-    channelId?: string;
-    currentPhase?: string;
-    channel?: Types.RealtimeChannelPromise;
-    initialTurnPositions?: any;
-    numberPlayers?: number;
-    gamePhase?: string;
-    topics?: [];
-    currentTurnPlayerId?: string;
+    readonly id?: string;
+    readonly channelId?: string;
+    readonly currentPhase?: string;
+    readonly channel?: Types.RealtimeChannelPromise;
+    readonly initialTurnPositions?: any;
+    readonly numberPlayers?: number;
+    readonly gamePhase?: string;
+    readonly topics?: readonly [];
+    readonly currentTurnPlayerId?: string;
 }

@@ -1,18 +1,18 @@
 import './SpinWheel.css';
-import '../sceneConfigs/AIGameConfig';
-import { useEffect, useRef, useState } from 'react';
-import GameInstance from '../sceneConfigs/AIGameConfig';
+import { useEffect, useState } from 'react';
 import QuestionModal from '../components/QuestionModal';
 import { getQuestion } from '../polybase/QuestionsHandler';
 import { Question } from '../game-domain/Question';
 import { addMessageListener, removeMessageListener } from '../utils/MessageListener';
 import { Messages } from '../utils/Messages';
-import { Button } from '@mantine/core';
 import { getNextTurnPlayerId, getSession } from '../polybase/SessionHandler';
-import { publishTurnCompleted } from '../ably/AblyMessages';
+import { publishTurnCompleted, subscribeToTurnCompleted, unsubscribeToTurnCompleted } from '../ably/AblyMessages';
 import { SessionData } from './SessionData';
 import useLocalStorageState from 'use-local-storage-state';
-
+import { GameSession } from '../game-domain/GameSession';
+import { Wheel } from 'react-custom-roulette'
+import { WheelData } from 'react-custom-roulette/dist/components/Wheel/types';
+import { pollForCurrentPlayerId, pollUntilSessionChanges } from '../polybase/PollHelpers';
 
 function AIGame() {
 
@@ -20,10 +20,13 @@ function AIGame() {
     const [showQuestionModal, setShowQuestionModal] = useState(false);
     const [currentQuestion, setCurrentQuestion] = useState<Question | null>(null);
     const [chosenTopic, setChosenTopic] = useState<string | null>(null);
+    const [canSpin, setCanSpin] = useState(false);
+    const [message, setMessage] = useState("Loading...");
+    const [selectedSlice, setSelectedSlice] = useState<string | null>(null);
+    const [sliceValues, setSliceValues] = useState<string[]>([]);
+    const [session, setSession] = useState<GameSession | null>(null);
 
-    const sceneAddedRef = useRef(false);
-
-    const handleShowQuestion = async (topic:string) => {
+    const handleShowQuestion = async (topic: string) => {
 
         if (!sessionData?.questionSessionId) {
             const { questionSessionId } = await getSession({ id: sessionData?.sessionId })
@@ -31,73 +34,170 @@ function AIGame() {
         }
 
         console.log(`topic ${topic}, questionSessionId ${sessionData?.questionSessionId}`);
-        const question: Question = await getQuestion({id:sessionData?.questionSessionId, topic});
+        const question: Question = await getQuestion({ id: sessionData?.questionSessionId, topic });
 
         console.log('question', question);
         setCurrentQuestion(question);
-        setShowQuestionModal(true);
         setChosenTopic(topic);
+        setShowQuestionModal(true);
     }
-    
+
     const finishTurnAndSaveState = async () => {
         setShowQuestionModal(false);
         // Update turn on polybase
-        const {nextTurnPlayerId} = await getNextTurnPlayerId({id: sessionData?.sessionId});
+        const { nextTurnPlayerId } = await getNextTurnPlayerId({ id: sessionData?.sessionId });
         // Publish turn completed // we know clientId is not null because we checked isPlayerTurn
-        if(sessionData?.clientId && sessionData.channelId) {
-            await publishTurnCompleted(sessionData?.clientId, sessionData.channelId, {nextTurnPlayerId});
-        } 
+        if (sessionData?.clientId && sessionData.channelId) {
+            console.log("publish completed turn");
+            await publishTurnCompleted(sessionData?.clientId, sessionData.channelId, { nextTurnPlayerId });
+        }
     }
 
     useEffect(() => {
-        console.log('AIGame loaded: ', sessionData);
+        const setupSessionData = async () => {
 
-        if (!sceneAddedRef.current) { // Check if the scene has been added
-            GameInstance.getInstance();
-            console.log('AIGame add scene session', sessionData);
-            GameInstance.addScene(sessionData ?? "");
-            sceneAddedRef.current = true;
+            if (!sessionData?.sessionId) return;
+            const session = await pollForCurrentPlayerId(sessionData?.sessionId);
+            if (!session) return;
+            setSession(session);
+            // Get session data
+            const { topics } = session;
+
+            console.log('topics: ', topics)
+
+            // Get topics
+            setSliceValues(topics as unknown as string[]);
         }
 
-    }, [sessionData]);
+        setupSessionData();
+    }, [sessionData?.sessionId]);
 
     useEffect(() => {
 
-        const showQuestion = async (event: any) => {
-            console.log('showQuestion event: ', event);
-            await handleShowQuestion(event?.topic);
+        if (!sessionData?.clientId || !sessionData?.channelId) return;
+
+        async function updateTurn(expectedCurrentPlayerId: string) {
+            try {
+                const session: GameSession = await pollUntilSessionChanges(expectedCurrentPlayerId, sessionData?.sessionId ?? '');
+                if (!session) return;
+                setSession(session);
+                const { topics } = session;
+                // Get topics
+                setSliceValues(topics as unknown as string[]);
+
+            } catch (error) {
+                console.log("error updating session data: ", error);
+            }
+        }
+        if (sessionData?.clientId && sessionData?.channelId) {
+            console.log("subscribed to turn completed");
+            subscribeToTurnCompleted(sessionData?.clientId, sessionData?.channelId);
         }
 
-        // const hideQuestion = async () => {
-        //     setShowQuestionModal(false);
-        // }
-
-        addMessageListener(Messages.SHOW_QUESTION, showQuestion);
-        addMessageListener(Messages.HIDE_QUESTION, finishTurnAndSaveState);
-
-
-        return () => {
-            removeMessageListener(Messages.SHOW_QUESTION, showQuestion);
-            removeMessageListener(Messages.HIDE_QUESTION, finishTurnAndSaveState)
+        const handleTurnCompleted = async (event: any) => {
+            console.log("event detail: ", event.detail)
+            const { nextTurnPlayerId } = event.detail;
+            await updateTurn(nextTurnPlayerId);
         };
 
+        window.addEventListener(Messages.TURN_COMPLETED, handleTurnCompleted);
+        // Return cleanup function
+        return () => {
+            window.removeEventListener(Messages.TURN_COMPLETED, handleTurnCompleted);
+            if (!sessionData?.clientId || !sessionData?.channelId) return;
+            unsubscribeToTurnCompleted(sessionData?.clientId, sessionData?.channelId)
+        };
+    }, []);// eslint-disable-line react-hooks/exhaustive-deps
+
+    useEffect(() => {
+        addMessageListener(Messages.HIDE_QUESTION, finishTurnAndSaveState);
+        return () => {
+            // removeMessageListener(Messages.SHOW_QUESTION, showQuestion);
+            removeMessageListener(Messages.HIDE_QUESTION, finishTurnAndSaveState)
+        };
     });
+
+    useEffect(() => {
+        function isPlayerTurn(): boolean {
+            console.log('isPlayerTurn: ', sessionData?.clientId, session?.currentTurnPlayerId);
+            if (!sessionData?.clientId || !session?.currentTurnPlayerId)
+                return false;
+            return sessionData.clientId === session.currentTurnPlayerId;
+        }
+
+        if (session) {
+            if (isPlayerTurn()) {
+                setCanSpin(true);
+                setMessage("Your turn!");
+            } else {
+                setCanSpin(false);
+                setMessage(`Waiting for ${session.currentTurnPlayerId} to finish turn...`);
+            }
+        }
+    }, [session, sessionData?.clientId]);
+
+
+    const [mustSpin, setMustSpin] = useState(false);
+    const [prizeNumber, setPrizeNumber] = useState(0);
+
+    const data: WheelData[] = (session?.topics ?? [])?.map((topic, index) => {
+        // console.log(`topic: ${topic} index:${index}`) 
+        return {
+            option: topic,
+            style: {
+                backgroundColor: index % 2 ? 'green' : 'white',
+                textColor: 'black',
+            },
+        };
+    });
+
+    const handleSpinClick = () => {
+        console.log("data: ", data)
+        if (!mustSpin) {
+            const newPrizeNumber = Math.floor(Math.random() * (6));
+            setPrizeNumber(newPrizeNumber);
+            setMustSpin(true);
+        }
+    }
 
     return (
         <div style={{ position: 'relative' }}>
-            <Button onClick={() => handleShowQuestion("Music")}>
+            {/* <Button onClick={() => handleShowQuestion("Music")}>
                 Show Question
-            </Button>
-            <QuestionModal 
-                open={showQuestionModal} 
-                onClose={finishTurnAndSaveState} 
+            </Button> */}
+            <QuestionModal
+                open={showQuestionModal}
+                onClose={() => finishTurnAndSaveState()}
                 question={currentQuestion}
                 topic={chosenTopic}
                 onExpire={() => finishTurnAndSaveState()}
             />
-            <div id="phaser-container" className="App"></div>
+
+
+            <p style={{ position: 'absolute', top: '10px', left: '50%', transform: 'translateX(-50%)', color: 'black', fontWeight: 'bold' }}>{message}</p>
+            <p style={{ position: 'absolute', top: '30px', left: '50%', transform: 'translateX(-50%)', color: 'black', fontWeight: 'bold' }}>{selectedSlice}</p>
+            {data && data.length > 0 && (
+                <div style={{ position: 'relative', display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+                    <div style={{ position: 'absolute', top: '40%', left: '50%', transform: 'translate(-50%, -50%)' }}>
+                        <Wheel
+                            mustStartSpinning={mustSpin}
+                            prizeNumber={prizeNumber}
+                            data={data}
+                            onStopSpinning={async () => {
+                                setMustSpin(false);
+                                const topicSelected = sliceValues[prizeNumber];
+                                setSelectedSlice(topicSelected)
+                                await handleShowQuestion(topicSelected)
+                            }}
+                        // other props and methods
+                        />
+                        {canSpin && <button onClick={handleSpinClick}>SPIN</button>}
+                    </div>
+                </div>
+            )}
 
         </div>
+
     );
 }
 

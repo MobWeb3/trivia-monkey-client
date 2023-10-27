@@ -1,5 +1,4 @@
 import './SpinWheel.css';
-import '../sceneConfigs/SpinWheelConfig';
 import { useEffect, useRef, useState } from 'react';
 import { Button, Loader } from '@mantine/core';
 import { addMessageListener, removeMessageListener, sendMessage } from '../utils/MessageListener';
@@ -10,10 +9,10 @@ import { getSession, setCurrentTurnPlayerId, updateInitialTurnPosition, updatePl
 import { SessionData } from './SessionData';
 import { SessionPhase } from '../game-domain/SessionPhase';
 import useLocalStorageState from 'use-local-storage-state';
-import wheelImage from './../../public/assets/sprites/wheel2.png'; // replace with your actual image path
+import wheelImage from './../assets/sprites/wheel2.png'; // replace with your actual image path
 import './SpinWheel.css';
 import { motion } from 'framer-motion';
-import pinImage from './../../public/assets/sprites/pin.png'; // replace with your actual image path
+import pinImage from './../assets/sprites/pin.png'; // replace with your actual image path
 import { Types } from 'ably';
 import { ChannelHandler } from '../ably/ChannelHandler';
 
@@ -21,7 +20,6 @@ import { ChannelHandler } from '../ably/ChannelHandler';
 function SpinWheel() {
 
     const [sessionData] = useLocalStorageState<SessionData>('sessionData', {});
-    // const [game, setGame] = useState<Phaser.Game | null>(null);
     const [mayStartGame, setMayStartGame] = useState(false);
     const [isLoading, setIsLoading] = useState(false); // Add this line
 
@@ -47,10 +45,23 @@ function SpinWheel() {
     });
 
     useEffect(() => {
+        const handleSelectedSlice = async () => {
+            console.log('handleSelectedSlice has run');
+            setCanSpin(false);
+            setMessage(selectedSlice?.toString() ?? "");
+            // Here you can add your logic to update the turn position and publish the 'turn-selected' event
+    
+            // report to our polybase server our turn position.
+            await updateInitialTurnPosition({ initialTurnPosition: selectedSlice, id: sessionData?.sessionId, clientId: sessionData?.clientId});
+    
+            // report through ably that we are done choosing our turn.
+            await channel.current?.publish('turn-selected', { turn: selectedSlice });
+        }
+
         if (hasSpun) {
           handleSelectedSlice();
         }
-      }, [hasSpun]);
+      }, [hasSpun, selectedSlice, sessionData?.clientId, sessionData?.sessionId]);
 
     useEffect(() => {
         console.log('sessionData', sessionData);
@@ -132,24 +143,13 @@ function SpinWheel() {
         }
     }
 
-    const handleSelectedSlice = async () => {
-        console.log('handleSelectedSlice has run');
-        setCanSpin(false);
-        setMessage(selectedSlice?.toString() ?? "");
-        // Here you can add your logic to update the turn position and publish the 'turn-selected' event
 
-        // report to our polybase server our turn position.
-        await updateInitialTurnPosition({ initialTurnPosition: selectedSlice, id: sessionData?.sessionId, clientId: sessionData?.clientId});
-
-        // report through ably that we are done choosing our turn.
-        await channel.current?.publish('turn-selected', { turn: selectedSlice });
-    }
 
     const initializeChannel = async () => {
         console.log('sessionData in initializeChannel', sessionData);
         if (sessionData?.channelId && sessionData?.clientId) {
             const session = await getSession({ id: sessionData?.sessionId });
-            const channelHandler = await new ChannelHandler().initChannelHandler(sessionData?.clientId);
+            const channelHandler = await ChannelHandler.getInstance().initChannelHandler(sessionData?.clientId);
             await channelHandler?.enterChannel({ channelId: sessionData?.channelId, clientId: sessionData?.clientId, nickname: ""});
             channel.current = ChannelHandler.ablyInstance?.ablyInstance.channels.get(sessionData?.channelId) as Types.RealtimeChannelPromise;
             // console.log('HERE channelId: ', this.channelId);
@@ -158,14 +158,13 @@ function SpinWheel() {
                 console.log ("subscribing to turn-selected");
                 channel.current?.subscribe('turn-selected', async (message) => {
                     console.log('turn selected by: ', message.clientId);
-                    const { initialTurnPosition, numberPlayers } = session;
-                    // initialTurnPositions = initialTurnPosition;
-                    // console.log('initialTurnPositions: ', initialTurnPosition);
-                    // console.log('numberPlayers: ', this.numberPlayers);
+                    const { initialTurnPosition, numberPlayers } = await getSession({ id: sessionData.sessionId });
+
+                    console.log('initialTurnPositions: ', initialTurnPosition);
+                    console.log('numberPlayers: ', numberPlayers);
 
                     const initialTurnPositionLength = Object.keys(initialTurnPosition).length;
-                    const canStartGame = numberPlayers &&
-                    initialTurnPositionLength >= numberPlayers;
+                    const canStartGame = initialTurnPositionLength >= numberPlayers;
 
                     // console.log('canStartGame: ', canStartGame);
                     // check if all other players have already selected their turn. To do this we must check the length of 
@@ -205,7 +204,6 @@ function SpinWheel() {
                 <img src={wheelImage} alt="Wheel" style={{ objectFit: "contain" }} />
             </motion.div>
             <img src={pinImage} alt="Pin" style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }} />
-            {/* <div id="phaser-container" className="App"></div> */}
         </div>
     );
 }

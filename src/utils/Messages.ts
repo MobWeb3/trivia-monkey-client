@@ -1,5 +1,5 @@
 /**
- * Messages between Phaser and React
+ * Messages used to trigger events
  * 
  */
 export enum Messages {
