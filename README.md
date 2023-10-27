@@ -1,3 +1,32 @@
-About the game rules:
+# Monkey Trivia: The Game Rules
 
-Let me tell you what the game is about. It's a trivia game. Here are the rules: * Each user is a monkey * This is a board game similar to "maraton de conocimientos" with new features. * Each monkey picks a topic (e.g "Harry Potter", "Mammals", "Tropical flowers") * Monkey can start a session game * The monkey shares an invite code * Other monkeys can join the game up to 6 monkeys if they have the invite code. * The point of the game is to reach the top of a tree. * There is 50 steps to reach the top. * Everyone starts at initial step. * On start every monkey rolls a spinner wheel with numbers 1-6. Whoever gets the biggest number becomes first. Tie numbers do extra spins to break the tie. * First monkey then spins the wheel now to choose a topic. * Monkey is given a question about the topic selected in the spinner wheel or (wheel picker). If question is answered correctly. advances one step. else it stays on the current position. * Previous step repeats until a monkey reaches the top. * The game has a screen to show the wheel when monkey spin it. * The monkey has another screen to show the state of the game (Tree with monkey avatars on different steps of the tree)
+## Objective:
+The aim is to be the first monkey to climb to the top of the tree within 50 rounds.
+
+## Getting Started:
+- **User Roles:** Each participant becomes a monkey for the game.
+- **Host Monkey:** One player serves as the host monkey and initiates the game session.
+- **Invite Code:** The host monkey generates an invite code to share with other players.
+- **Maximum Players:** Up to 6 monkeys (players) can join the game using the invite code.
+
+## Game Structure:
+- **Topic Selection:** Each monkey selects a topic for trivia questions (e.g., "Harry Potter," "Mammals," "Tropical Flowers").
+- **Gameboard:** All monkeys start at the base of a virtual tree.
+
+## Gameplay:
+- **Initial Turn Order:** At the beginning, each monkey spins a wheel numbered 1-6. The monkey with the highest number goes first. In case of a tie, those tied will spin again to break it.
+- **Turn Phases:**
+  - **Spin:** On their turn, the monkey spins a wheel to randomly select a topic from the ones chosen.
+  - **Question:** The monkey is then asked a trivia question based on the topic selected.
+  - **Advancement:** A correct answer allows the monkey to advance one step up the tree. An incorrect answer means the monkey stays in place.
+- **Ignorance Monkey:** This is a virtual monkey that moves ahead one step every time a player answers incorrectly.
+
+## Winning:
+- **Monkey Winner:** The first monkey to reach the top of the tree within 50 rounds wins.
+- **Ignorance Wins:** If the Ignorance Monkey reaches the top before any player does, all players lose.
+
+## User Interface:
+- **Spin Wheel Screen:** A dedicated screen displays the wheel during each monkey's spin.
+- **Gameboard Screen:** Another screen shows the tree with the avatars of the monkeys at their respective positions.
+
+
