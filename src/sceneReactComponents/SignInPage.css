@@ -21,7 +21,7 @@ html {
 
     background-size: cover;
     background-position: center;
-    z-index: -1;
+    z-index: 0;
     display: flex;
     /* Added for centering button */
     justify-content: center;

@@ -4,6 +4,7 @@ import { Button } from '@mantine/core';
 interface CustomButtonProps extends React.ComponentProps<typeof Button> {
     style?: React.CSSProperties;
     children?: React.ReactNode;
+    onClick?: () => void;
 }
 
 export const CustomButton: React.FC<CustomButtonProps> = ({ children, ...props }) => {

@@ -1,65 +1,35 @@
 import React, { useContext } from 'react';
-import { SignerContext } from '../components/SignerContext';
-import { useNavigate } from 'react-router-dom';
-import { SessionData } from './SessionData';
-import useLocalStorageState from 'use-local-storage-state';
 import { Image } from '@mantine/core';
 import './SignInPage.css';
 import { CustomButton } from '../components/CustomButton';
+import { login } from '../utils/Web3AuthAuthentication';
+import { SignerContext } from '../components/SignerContext';
 
 
 export const SignInPage = () => {
-    const { web3auth, loggedIn, setLoggedIn, setUserInfo } = useContext(SignerContext);
-    const [sessionData, setSessionData] = useLocalStorageState<SessionData>('sessionData', {});    // const [, setProvider] = useState<SafeEventEmitterProvider | null>(null);
-    const navigate = useNavigate();
+    const { web3auth } = useContext(SignerContext);
+    // const [sessionData, setSessionData] = useLocalStorageState<SessionData>('sessionData', {});    // const [, setProvider] = useState<SafeEventEmitterProvider | null>(null);
+    // const navigate = useNavigate();
 
-    const handlePlayClick = async () => {
-        navigate("/playlobby");
-    }
-
-    const handleDisconnectClick = async () => {
-        await logout();
-        if (sessionData) setSessionData(undefined);
-    }
-
-    const logout = async () => {
-        if (!web3auth) {
-            console.log('web3auth not initialized yet');
-            return;
+    const handleSignIn = async () => {
+        if (web3auth !== null) {
+            await login(web3auth);
         }
-
-        try {
-            await web3auth.logout();
-        } catch (error) {
-            console.error(error);
-        }
-
-        // setProvider(null);
-        setLoggedIn(false);
-        setUserInfo(null);
-        localStorage.removeItem('userInfo');
-        localStorage.removeItem('web3auth');
-        console.log('Disconnected');
-    };
+    }
 
     return (
         <ControlButtons
-            loggedIn={loggedIn}
-            handlePlayClick={handlePlayClick}
-            handleDisconnectClick={handleDisconnectClick}
+            onSignInClick={handleSignIn}
         />
     );
 }
 
 interface ControlButtonsProps {
-    loggedIn: boolean;
-    handlePlayClick: () => void;
-    handleDisconnectClick: () => void;
+    onSignInClick: () => void;
 }
 
 export const ControlButtons: React.FC<ControlButtonsProps> = ({
-    handlePlayClick,
-    handleDisconnectClick
+    onSignInClick: handlePlayClick,
 }) => {
     return (
         <div className='signInPage'>
@@ -71,7 +41,7 @@ export const ControlButtons: React.FC<ControlButtonsProps> = ({
             </div>
 
             <CustomButton
-            // onClick={handlePlayClick}
+            onClick={handlePlayClick}
             > Sign in to play</CustomButton>
 
             <div className="mobweb3Logo">
