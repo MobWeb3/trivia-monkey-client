@@ -12,11 +12,11 @@ html {
     left: 0;
     height: 100%;
     width: 100%;
-    background-image: url('../assets/Screens/signin/sign-in-screen-430x932.png');
-    background-image: -webkit-image-set(url('../assets/Screens/signin/sign-in-screen-430x932.png') 1x,
-            url('../assets/Screens/signin/sign-in-screen-430x932@2x.png') 2x);
-    background-image: image-set(url('../assets/Screens/signin/sign-in-screen-430x932.png') 1x,
-            url('../assets/Screens/signin/sign-in-screen-430x932@2x.png') 2x);
+    background-image: url('../assets/Screens/create-game/game-background-screen-peppermint-jungle-430x932.png');
+    background-image: -webkit-image-set(url('../assets/Screens/create-game/game-background-screen-peppermint-jungle-430x932.png') 1x,
+            url('../assets/Screens/create-game/game-background-screen-peppermint-jungle-430x932@2x.png') 2x);
+    background-image: image-set(url('../assets/Screens/create-game/game-background-screen-peppermint-jungle-430x932.png') 1x,
+            url('../assets/Screens/create-game/game-background-screen-peppermint-jungle-430x932@2x.png') 2x);
 
 
     background-size: cover;
@@ -35,7 +35,7 @@ html {
 
 .createGameForm {
     position: absolute;
-    top: 20%;
+    top: 10%;
     left: 10%;
     right: 10%;
     /* transform: translateX(-50%); */

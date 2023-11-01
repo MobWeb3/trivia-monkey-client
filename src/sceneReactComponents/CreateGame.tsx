@@ -18,8 +18,8 @@ import './CreateGame.css'
 
 const CreateGame = () => {
     const [nickname, setNickname] = useState('');
-    const [numberPlayers, setNumberPlayers] = useState('');
-    const [pointsToWin, setPointsToWin] = useState('');
+    const [numberPlayers, setNumberPlayers] = useState('2');
+    const [pointsToWin, setPointsToWin] = useState('10');
     const { web3auth } = useContext(SignerContext);
     const [sessionData, setSessionData] = useLocalStorageState<SessionData>('sessionData', {});
     const navigate = useNavigate();
@@ -154,9 +154,10 @@ const CreateGame = () => {
                                 openModal={open}
                                 opened={opened}
                                 numberPlayers={numberPlayers}
-                                closeModal={close}  
+                                closeModal={close}
+                                handlePlayButtonClick={handlePlayButtonClick} 
                             />
-                            <button onClick={handlePlayButtonClick}>Create Game</button>
+                            {/* <button onClick={handlePlayButtonClick}>Create Game</button> */}
                             <p>Welcome {nickname}! Number of players: {numberPlayers} Points to Win: {pointsToWin}</p>
                         </div>
                     )

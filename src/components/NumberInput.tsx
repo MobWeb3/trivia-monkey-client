@@ -8,7 +8,7 @@ export type NumberInputProps = {
 };
 
 export function NumberInputComponent({ setNumberSelected }: NumberInputProps) {
-    const [value, setValue] = useState(1);
+    const [value, setValue] = useState(2);
 
     const increment = () => {
         if (value < 6) {
@@ -32,7 +32,7 @@ export function NumberInputComponent({ setNumberSelected }: NumberInputProps) {
 
             <Grid justify="center" align="flex-start" >
                 <Grid.Col span={4} h='100%'>
-                    <ActionIcon w="100%" h='150%' variant="default" onClick={() => decrement()} style={{ marginTop: '0px' }}>
+                    <ActionIcon w="100%"  variant="default" onClick={() => decrement()} style={{ marginTop: '0px' }}>
                         <strong>-</strong>
                     </ActionIcon>
                 </Grid.Col>
