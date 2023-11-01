@@ -41,6 +41,7 @@ export const CustomButton: React.FC<CustomButtonProps> = ({ children, ...props }
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
+        fontFamily: 'umbrage2',
         ...buttonDimensions,  // Spread in height and padding
         ...props.style,       // Spread in any other style props to override the custom styles if needed
     };

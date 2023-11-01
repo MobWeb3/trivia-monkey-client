@@ -14,6 +14,7 @@ import { generateQuestions } from '../game-domain/GenerateQuestionsHandler';
 import { updateQuestionSessionId, updateTopics } from '../polybase/SessionHandler';
 import { SessionData } from './SessionData';
 import useLocalStorageState from 'use-local-storage-state';
+import CreateGameForm from '../components/CreateGameFields';
 // import { BASE_URL } from '../ApiServiceConfig';
 
 
@@ -137,7 +138,7 @@ const CreateGame = () => {
 
 
     return (
-        <>
+        <div className='createGamePage'>
             {
                 loading ?
                     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', flexDirection:'column' }}>
@@ -148,11 +149,15 @@ const CreateGame = () => {
                     </div> :
                     sessionCreated ? <WaitingMessage /> : (
                         <div>
-                            <h1>Let's create your game...</h1>
-                            <Input
+                            {/* <Input
                                 leftSection={<IconPacman />}
                                 placeholder="Your Name"
                                 radius="md"
+                                styles={{
+                                    input: {
+                                        textAlign: 'center'
+                                    }
+                                }}
                                 onChange={e => setNickname(e.currentTarget.value)} />
                             <NumberInputComponent setNumberSelected={setNumberPlayers}></NumberInputComponent>
                             <SegmentedControl
@@ -162,16 +167,25 @@ const CreateGame = () => {
                                     { value: '30', label: '30' },
                                 ]}
                                 onChange={(value) => setPointsToWin(value)} />
-                            {/* <input type="text" placeholder="Enter points to win" value={pointsToWin} onChange={e => setPointsToWin(e.target.value)} /> */}
                             <Modal opened={opened} onClose={close} title="Pick topic" radius={'lg'} padding={'xl'}>
                                 <ModalContent setSelectedChips={setSelectedChips} numberOfPlayers={parseInt(numberPlayers)}></ModalContent>
-                                {/* Modal content */}
                             </Modal>
                             <Group justify="center">
                                 <Badge size="lg" radius="lg" variant="dot">Selected topics: {selectedChips.join(', ')}</Badge>
 
                                 <Button onClick={open}>Pick a topic</Button>
-                            </Group>
+                            </Group> */}
+                            <CreateGameForm 
+                                setNickname={setNickname}
+                                selectedChips={selectedChips}
+                                setNumberPlayers={setNumberPlayers}
+                                setPointsToWin={setPointsToWin}
+                                setSelectedChips={setSelectedChips}
+                                openModal={open}
+                                opened={opened}
+                                numberPlayers={numberPlayers}
+                                closeModal={close}  
+                            />
                             <button onClick={handlePlayButtonClick}>Create Game</button>
                             <p>Welcome {nickname}! Number of players: {numberPlayers} Points to Win: {pointsToWin}</p>
                         </div>
@@ -179,7 +193,7 @@ const CreateGame = () => {
             }
 
 
-        </>
+        </div>
     );
 };
 
