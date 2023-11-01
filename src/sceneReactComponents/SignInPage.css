@@ -1,0 +1,35 @@
+body, html {
+    margin: 20px;
+    padding: 20px;
+    /* height: 50%; */
+    /* overflow: hidden; */
+}
+
+.signInPage {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    background-image: url('../assets/Screens/sign in/sign-in-screen-430x932.png');
+    background-image: -webkit-image-set(
+        url('../assets/Screens/sign in/sign-in-screen-430x932.png') 1x,
+        url('../assets/Screens/sign in/sign-in-screen-430x932@2x.png') 2x
+    );
+    background-image: image-set(
+        url('../assets/Screens/sign in/sign-in-screen-430x932.png') 1x,
+        url('../assets/Screens/sign in/sign-in-screen-430x932@2x.png') 2x
+    );
+    background-size: cover;
+    background-position: center;
+    z-index: -1;
+    display: flex;  /* Added for centering button */
+    justify-content: center;  /* Added for centering button */
+    align-items: center; 
+}
+
+/* Additional styling for your buttons and other elements */
+.button {
+    background-color: #ffffff;
+    /* ...other styles */
+}

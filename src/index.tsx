@@ -2,11 +2,10 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import { SignerProvider } from './components/SignerContext';
-import Bootstrap from './sceneReactComponents/Bootstrap';
+import SignInPage from './sceneReactComponents/SignInPage';
 import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 import PlayLobby from './sceneReactComponents/PlayLobby';
 import CreateGame from './sceneReactComponents/CreateGame';
-import { ConnectionStatus } from './components/ConnectionStatus';
 import JoinGame from './sceneReactComponents/JoinGame';
 import SpinWheel from './sceneReactComponents/SpinWheel';
 import { SessionDataProvider } from './components/SessionDataContext';
@@ -24,10 +23,9 @@ root.render(
         <SessionDataProvider>
         <MantineProvider>
           <Router>
-            <ConnectionStatus image={''} name={''} email={'connecgted'} />
             <Routes>
               <Route path="/playlobby" element={<PlayLobby />} />
-              <Route path="*" element={<Bootstrap />} />
+              <Route path="*" element={<SignInPage />} />
               <Route path="/creategame" element={<CreateGame />} />
               <Route path="/joingame" element={<JoinGame />} />
               <Route path="/spinwheel" element={<SpinWheel />} />

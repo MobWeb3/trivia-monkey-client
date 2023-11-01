@@ -3,18 +3,17 @@ import { SignerContext } from '../components/SignerContext';
 import { useNavigate } from 'react-router-dom';
 import { SessionData } from './SessionData';
 import useLocalStorageState from 'use-local-storage-state';
+import './SignInPage.css';
+import { CustomButton } from '../components/CustomButton';
 
-export const Bootstrap = () => {
+
+export const SignInPage = () => {
     const { web3auth, loggedIn, setLoggedIn, setUserInfo } = useContext(SignerContext);
     const [sessionData, setSessionData] = useLocalStorageState<SessionData>('sessionData', {});    // const [, setProvider] = useState<SafeEventEmitterProvider | null>(null);
     const navigate = useNavigate();
 
     const handlePlayClick = async () => {
         navigate("/playlobby");
-    }
-
-    const handleSettingsClick = async () => {
-        
     }
 
     const handleDisconnectClick = async () => {
@@ -46,57 +45,38 @@ export const Bootstrap = () => {
             <ControlButtons
                 loggedIn={loggedIn}
                 handlePlayClick={handlePlayClick}
-                handleSettingsClick={handleSettingsClick}                handleDisconnectClick={handleDisconnectClick}
+                handleDisconnectClick={handleDisconnectClick}
             />
     );
 }
 
-
 interface ControlButtonsProps {
     loggedIn: boolean;
     handlePlayClick: () => void;
-    handleSettingsClick: () => void;
     handleDisconnectClick: () => void;
 }
 
 export const ControlButtons: React.FC<ControlButtonsProps> = ({
     handlePlayClick,
-    handleSettingsClick,
     handleDisconnectClick
 }) => {
     return (
-        <div>
-            {/* <h1 style={{ textAlign: 'center' }}>{!loggedIn ? 'Site is not connected' : 'Site is connected'}</h1> */}
-            <button
-                key={0}
-                style={{ backgroundColor: '#ffffff' }}
-                onClick={handlePlayClick}
-            >
-                Play
-            </button>
-            <button
-                key={1}
-                style={{ backgroundColor: '#ffffff' }}
-                onClick={handleSettingsClick}
-            >
-                Settings
-            </button>
-            {/* <button
-                key={2}
-                style={{ backgroundColor: '#ffffff' }}
-                onClick={handleConnectNowClick}
-            >
-                Connect Now
-            </button> */}
+        <div className='signInPage'>
+            {/* <h1 style={{ textAlign: 'center' }}>{!loggedIn ? 'Site is not connected' : 'Site is connected'}</h1>
+            <Button size="xxl">Regular md</Button>
             <button
                 key={3}
                 style={{ backgroundColor: '#ffffff' }}
                 onClick={handleDisconnectClick}
             >
                 Disconnect
-            </button>
+            </button> */}
+
+            <CustomButton
+                // onClick={handlePlayClick}
+            > Sign in to play</CustomButton>
         </div>
     );
 };
 
-export default Bootstrap;
+export default SignInPage;
