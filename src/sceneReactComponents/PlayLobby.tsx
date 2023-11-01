@@ -2,6 +2,9 @@ import { useNavigate } from "react-router-dom";
 import CustomButton from "../components/CustomButton";
 import { Flex, Image } from '@mantine/core';
 import './PlayLobby.css'
+import monkeyTriviaLogo from '../assets/Screens/signin/monkey-trivia-arched-name-400x200.png';
+import mobweb3Logo from '../assets/Screens/signin/monkey-trivia-by-mobweb3-yellowcolorbackground-200x40.png';
+import mobweb3LogoM from '../assets/Screens/signin/monkey-trivia-mobweb3-logo-200x200.png';
 
 const PlayLobbyScene = () => {
     const navigate = useNavigate();
@@ -17,7 +20,7 @@ const PlayLobbyScene = () => {
             <div className="monkeyTriviaLogo">
                 <Image
                     radius="md"
-                    src="src/assets/Screens/signin/monkey-trivia-arched-name-400x200.png"
+                    src={monkeyTriviaLogo}
                 />
             </div>
             <Flex
@@ -36,16 +39,15 @@ const PlayLobbyScene = () => {
             <div className="mobweb3Logo">
                 <Image
                     radius="md"
-                    src="src/assets/Screens/signin/monkey-trivia-by-mobweb3-yellowcolorbackground-200x40.png"
+                    src={mobweb3Logo}
                 />
             </div>
             <div className="mobweb3LogoM">
                 <Image
                     radius="md"
-                    src="src/assets/Screens/signin/monkey-trivia-mobweb3-logo-200x200.png"
+                    src={mobweb3LogoM}
                 />
             </div>
-
         </div>
     );
 
