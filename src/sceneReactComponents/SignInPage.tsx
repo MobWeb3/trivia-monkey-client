@@ -5,7 +5,9 @@ import { CustomButton } from '../components/CustomButton';
 import { login } from '../utils/Web3AuthAuthentication';
 import { SignerContext } from '../components/SignerContext';
 import { useNavigate } from 'react-router-dom';
-
+import monkeyTriviaLogo from '../assets/Screens/signin/monkey-trivia-arched-name-400x200.png';
+import mobweb3Logo from '../assets/Screens/signin/monkey-trivia-by-mobweb3-yellowcolorbackground-200x40.png';
+import mobweb3LogoM from '../assets/Screens/signin/monkey-trivia-mobweb3-logo-200x200.png';
 
 export const SignInPage = () => {
     const { web3auth } = useContext(SignerContext);
@@ -35,31 +37,32 @@ export const ControlButtons: React.FC<ControlButtonsProps> = ({
 }) => {
     return (
         <div className='signInPage'>
-            <div className="monkeyTriviaLogo">
-                <Image
-                    radius="md"
-                    src="src/assets/Screens/signin/monkey-trivia-arched-name-400x200.png"
-                />
-            </div>
+
+            <Image      className='topImage'
+                        radius="md"
+                        src={monkeyTriviaLogo}
+                    />
 
             <CustomButton
-            onClick={handlePlayClick}
-            > Sign in to play</CustomButton>
+                onClick={handlePlayClick}
+                > Sign in to play</CustomButton>
 
             <div className="mobweb3Logo">
                 <Image
                     radius="md"
-                    src="src/assets/Screens/signin/monkey-trivia-by-mobweb3-yellowcolorbackground-200x40.png"
+                    src={mobweb3Logo}
                 />
             </div>
             <div className="mobweb3LogoM">
                 <Image
                     radius="md"
-                    src="src/assets/Screens/signin/monkey-trivia-mobweb3-logo-200x200.png"
+                    src={mobweb3LogoM}
                 />
             </div>
         </div>
     );
 };
+
+
 
 export default SignInPage;
