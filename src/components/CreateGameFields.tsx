@@ -50,8 +50,7 @@ const CreateGameForm: React.FC<CreateGameFormProps> = ({
             </div>
 
             <div style={{ width: '90%', margin: '0 auto' }}>  {/* This div will constrain the width and center the Input component */}
-
-            <NumberInputComponent setNumberSelected={setNumberPlayers} />
+                <NumberInputComponent setNumberSelected={setNumberPlayers} />
             </div>
             <SegmentedControl
                 data={[
