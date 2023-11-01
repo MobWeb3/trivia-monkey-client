@@ -3,11 +3,8 @@ import { createChannelListenerWrapper } from '../ably/ChannelListener';
 import { SignerContext } from '../components/SignerContext';
 import { Messages } from '../utils/Messages';
 import { useNavigate } from 'react-router-dom';
-import { Badge, Button, Group, Input, Modal, SegmentedControl, Loader } from '@mantine/core';
+import { Loader } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import ModalContent from '../components/ModalContent';
-import { NumberInputComponent } from '../components/NumberInput';
-import { IconPacman } from '@tabler/icons-react';
 import QRCodeStyling from "qr-code-styling";
 import { addQuestions, createQuestionSession } from '../polybase/QuestionsHandler';
 import { generateQuestions } from '../game-domain/GenerateQuestionsHandler';
@@ -15,13 +12,14 @@ import { updateQuestionSessionId, updateTopics } from '../polybase/SessionHandle
 import { SessionData } from './SessionData';
 import useLocalStorageState from 'use-local-storage-state';
 import CreateGameForm from '../components/CreateGameFields';
+import './CreateGame.css'
 // import { BASE_URL } from '../ApiServiceConfig';
 
 
 const CreateGame = () => {
     const [nickname, setNickname] = useState('');
-    const [numberPlayers, setNumberPlayers] = useState('');
-    const [pointsToWin, setPointsToWin] = useState('');
+    const [numberPlayers, setNumberPlayers] = useState('2');
+    const [pointsToWin, setPointsToWin] = useState('10');
     const { web3auth } = useContext(SignerContext);
     const [sessionData, setSessionData] = useLocalStorageState<SessionData>('sessionData', {});
     const navigate = useNavigate();
@@ -135,8 +133,6 @@ const CreateGame = () => {
         );
     };
 
-
-
     return (
         <div className='createGamePage'>
             {
@@ -148,33 +144,7 @@ const CreateGame = () => {
                         </div>
                     </div> :
                     sessionCreated ? <WaitingMessage /> : (
-                        <div>
-                            {/* <Input
-                                leftSection={<IconPacman />}
-                                placeholder="Your Name"
-                                radius="md"
-                                styles={{
-                                    input: {
-                                        textAlign: 'center'
-                                    }
-                                }}
-                                onChange={e => setNickname(e.currentTarget.value)} />
-                            <NumberInputComponent setNumberSelected={setNumberPlayers}></NumberInputComponent>
-                            <SegmentedControl
-                                data={[
-                                    { value: '10', label: '10' },
-                                    { value: '20', label: '20' },
-                                    { value: '30', label: '30' },
-                                ]}
-                                onChange={(value) => setPointsToWin(value)} />
-                            <Modal opened={opened} onClose={close} title="Pick topic" radius={'lg'} padding={'xl'}>
-                                <ModalContent setSelectedChips={setSelectedChips} numberOfPlayers={parseInt(numberPlayers)}></ModalContent>
-                            </Modal>
-                            <Group justify="center">
-                                <Badge size="lg" radius="lg" variant="dot">Selected topics: {selectedChips.join(', ')}</Badge>
-
-                                <Button onClick={open}>Pick a topic</Button>
-                            </Group> */}
+                        <div className='createGameForm'>                    
                             <CreateGameForm 
                                 setNickname={setNickname}
                                 selectedChips={selectedChips}
@@ -184,9 +154,10 @@ const CreateGame = () => {
                                 openModal={open}
                                 opened={opened}
                                 numberPlayers={numberPlayers}
-                                closeModal={close}  
+                                closeModal={close}
+                                handlePlayButtonClick={handlePlayButtonClick} 
                             />
-                            <button onClick={handlePlayButtonClick}>Create Game</button>
+                            {/* <button onClick={handlePlayButtonClick}>Create Game</button> */}
                             <p>Welcome {nickname}! Number of players: {numberPlayers} Points to Win: {pointsToWin}</p>
                         </div>
                     )
