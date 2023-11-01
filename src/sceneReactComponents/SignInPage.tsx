@@ -3,6 +3,7 @@ import { SignerContext } from '../components/SignerContext';
 import { useNavigate } from 'react-router-dom';
 import { SessionData } from './SessionData';
 import useLocalStorageState from 'use-local-storage-state';
+import { Image } from '@mantine/core';
 import './SignInPage.css';
 import { CustomButton } from '../components/CustomButton';
 
@@ -42,11 +43,11 @@ export const SignInPage = () => {
     };
 
     return (
-            <ControlButtons
-                loggedIn={loggedIn}
-                handlePlayClick={handlePlayClick}
-                handleDisconnectClick={handleDisconnectClick}
-            />
+        <ControlButtons
+            loggedIn={loggedIn}
+            handlePlayClick={handlePlayClick}
+            handleDisconnectClick={handleDisconnectClick}
+        />
     );
 }
 
@@ -62,19 +63,29 @@ export const ControlButtons: React.FC<ControlButtonsProps> = ({
 }) => {
     return (
         <div className='signInPage'>
-            {/* <h1 style={{ textAlign: 'center' }}>{!loggedIn ? 'Site is not connected' : 'Site is connected'}</h1>
-            <Button size="xxl">Regular md</Button>
-            <button
-                key={3}
-                style={{ backgroundColor: '#ffffff' }}
-                onClick={handleDisconnectClick}
-            >
-                Disconnect
-            </button> */}
+            <div className="monkeyTriviaLogo">
+                <Image
+                    radius="md"
+                    src="src/assets/Screens/signin/monkey-trivia-arched-name-400x200.png"
+                />
+            </div>
 
             <CustomButton
-                // onClick={handlePlayClick}
+            // onClick={handlePlayClick}
             > Sign in to play</CustomButton>
+
+            <div className="mobweb3Logo">
+                <Image
+                    radius="md"
+                    src="src/assets/Screens/signin/monkey-trivia-by-mobweb3-yellowcolorbackground-200x40.png"
+                />
+            </div>
+            <div className="mobweb3LogoM">
+                <Image
+                    radius="md"
+                    src="src/assets/Screens/signin/monkey-trivia-mobweb3-logo-200x200.png"
+                />
+            </div>
         </div>
     );
 };
