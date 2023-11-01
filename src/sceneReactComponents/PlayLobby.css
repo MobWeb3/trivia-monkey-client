@@ -1,0 +1,58 @@
+body,
+html {
+    margin: 20px;
+    padding: 20px;
+    /* height: 50%; */
+    /* overflow: hidden; */
+}
+
+.playLobbyPage {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    background-image: url('../assets/Screens/signin/sign-in-screen-430x932.png');
+    background-image: -webkit-image-set(url('../assets/Screens/signin/sign-in-screen-430x932.png') 1x,
+            url('../assets/Screens/signin/sign-in-screen-430x932@2x.png') 2x);
+    background-image: image-set(url('../assets/Screens/signin/sign-in-screen-430x932.png') 1x,
+            url('../assets/Screens/signin/sign-in-screen-430x932@2x.png') 2x);
+
+
+    background-size: cover;
+    background-position: center;
+    z-index: 0;
+    display: flex;
+    /* Added for centering button */
+    justify-content: center;
+    /* Added for centering button */
+    align-items: center;
+}
+
+.monkeyTriviaLogo {
+    position: absolute;
+    top: 10%;
+    left: 0;
+    /* transform: translateX(-50%); */
+    z-index: 0;
+    /* Add other styles for the image */
+}
+
+.mobweb3Logo {
+    position: absolute;
+    top: 90%;
+    left: 15%;
+    /* transform: translateX(-50%); */
+    z-index: 0;
+    margin-right: 20px; /* Add margin to create spacing */
+
+}
+.mobweb3LogoM {
+    position: absolute;
+    top: 89%;
+    left: calc(65% + 15px); /* Add 2 pixels to the left position of mobweb3Logo */
+
+    /* transform: translateX(-50%); */
+    z-index: 0;
+    /* Add other styles for the image */
+}
