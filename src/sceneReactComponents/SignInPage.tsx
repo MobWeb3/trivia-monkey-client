@@ -4,17 +4,19 @@ import './SignInPage.css';
 import { CustomButton } from '../components/CustomButton';
 import { login } from '../utils/Web3AuthAuthentication';
 import { SignerContext } from '../components/SignerContext';
+import { useNavigate } from 'react-router-dom';
 
 
 export const SignInPage = () => {
     const { web3auth } = useContext(SignerContext);
     // const [sessionData, setSessionData] = useLocalStorageState<SessionData>('sessionData', {});    // const [, setProvider] = useState<SafeEventEmitterProvider | null>(null);
-    // const navigate = useNavigate();
+    const navigate = useNavigate();
 
     const handleSignIn = async () => {
         if (web3auth !== null) {
             await login(web3auth);
         }
+        navigate('/playlobby');
     }
 
     return (
