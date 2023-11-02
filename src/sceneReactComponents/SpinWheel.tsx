@@ -17,8 +17,10 @@ import { Types } from 'ably';
 import { ChannelHandler } from '../ably/ChannelHandler';
 import Spaces, { Space } from '@ably/spaces';
 import { Realtime } from 'ably';
-// import avatarImage from './../assets'
+import { SpaceProvider, SpacesProvider } from "@ably/spaces/react";
+
 import avatarImage from '../assets/monkeys_avatars/astronaut-monkey1-200x200.png';
+import AvatarStack from '../components/avatar_stack/AvatarStack';
 const VITE_APP_ABLY_API_KEY = import.meta.env.VITE_APP_ABLY_API_KEY ?? "";
 
 function SpinWheel() {
@@ -37,7 +39,7 @@ function SpinWheel() {
 
     const clientRef = useRef<Types.RealtimePromise | null>(null);
     const spacesRef = useRef<Spaces | null>(null);
-    
+
 
 
     const slices = 12;
@@ -46,7 +48,7 @@ function SpinWheel() {
     const navigate = useNavigate();
     useEffect(() => {
         initializeChannel();
-    
+
         // Cleanup function
         return () => {
             // Code to clean up the channel
@@ -56,9 +58,9 @@ function SpinWheel() {
     useEffect(() => {
         const getSpace = async () => {
             if (!clientRef.current) {
-                clientRef.current = new Realtime.Promise({key: VITE_APP_ABLY_API_KEY, clientId: sessionData?.clientId});
+                clientRef.current = new Realtime.Promise({ key: VITE_APP_ABLY_API_KEY, clientId: sessionData?.clientId });
             }
-            
+
             if (!spacesRef.current) {
                 spacesRef.current = new Spaces(clientRef.current);
             }
@@ -73,10 +75,10 @@ function SpinWheel() {
                 console.log("space members:", spaceState.members);
             });
         }
-        if (!space && sessionData?.sessionId && sessionData?.clientId){
-            getSpace();                   
+        if (!space && sessionData?.sessionId && sessionData?.clientId) {
+            getSpace();
         }
-        
+
     }, [sessionData?.sessionId, sessionData?.clientId, sessionData?.channelId, space, setSpace]);
 
     useEffect(() => {
@@ -85,18 +87,18 @@ function SpinWheel() {
             setCanSpin(false);
             setMessage(selectedSlice?.toString() ?? "");
             // Here you can add your logic to update the turn position and publish the 'turn-selected' event
-    
+
             // report to our polybase server our turn position.
-            await updateInitialTurnPosition({ initialTurnPosition: selectedSlice, id: sessionData?.sessionId, clientId: sessionData?.clientId});
-    
+            await updateInitialTurnPosition({ initialTurnPosition: selectedSlice, id: sessionData?.sessionId, clientId: sessionData?.clientId });
+
             // report through ably that we are done choosing our turn.
             await channel.current?.publish('turn-selected', { turn: selectedSlice });
         }
 
         if (hasSpun) {
-          handleSelectedSlice();
+            handleSelectedSlice();
         }
-      }, [hasSpun, selectedSlice, sessionData?.clientId, sessionData?.sessionId]);
+    }, [hasSpun, selectedSlice, sessionData?.clientId, sessionData?.sessionId]);
 
     useEffect(() => {
         console.log('sessionData', sessionData);
@@ -110,20 +112,20 @@ function SpinWheel() {
 
         console.log('SpinWheel useEffect');
 
-        if ( sessionData && sessionData.clientId && sessionData.channelId) {
+        if (sessionData && sessionData.clientId && sessionData.channelId) {
             const { clientId, channelId } = sessionData;
             subscribeToStartGameAI(clientId, channelId);
         }
 
-        const handleOpenAIGame = async (event:any) => {
+        const handleOpenAIGame = async (event: any) => {
             // update order list        
             //make call to polybase to set the first in turn
             setIsLoading(true);
             if (sessionData) {
-                const playerList = (await updatePlayerListOrder({id: sessionData.sessionId})).playerList;
+                const playerList = (await updatePlayerListOrder({ id: sessionData.sessionId })).playerList;
                 console.log('playerList', playerList);
                 // set the first player in the list as the current turn player
-                await setCurrentTurnPlayerId({id: sessionData.sessionId, playerId: playerList[0]})
+                await setCurrentTurnPlayerId({ id: sessionData.sessionId, playerId: playerList[0] })
                 // if all players have selected their turn, then we can proceed to the next phase.
                 await updateSessionPhase({ id: sessionData.sessionId, newPhase: SessionPhase.GAME_ACTIVE });
             }
@@ -144,9 +146,9 @@ function SpinWheel() {
     const handleStartGame = () => {
         console.log('handleStartGame');
         console.log('handleStartGame SpinWheel sesionData: ', sessionData);
-        if ( sessionData === null ) return;
+        if (sessionData === null) return;
         const { clientId, channelId } = sessionData as SessionData;
-        if ( clientId && channelId ) {
+        if (clientId && channelId) {
             navigate('/aigame');
             publishStartGameAI(clientId, channelId)
         }
@@ -185,12 +187,12 @@ function SpinWheel() {
         if (sessionData?.channelId && sessionData?.clientId) {
             const session = await getSession({ id: sessionData?.sessionId });
             const channelHandler = await ChannelHandler.getInstance().initChannelHandler(sessionData?.clientId);
-            await channelHandler?.enterChannel({ channelId: sessionData?.channelId, clientId: sessionData?.clientId, nickname: ""});
+            await channelHandler?.enterChannel({ channelId: sessionData?.channelId, clientId: sessionData?.clientId, nickname: "" });
             channel.current = ChannelHandler.ablyInstance?.ablyInstance.channels.get(sessionData?.channelId) as Types.RealtimeChannelPromise;
             // console.log('HERE channelId: ', this.channelId);
             // console.log('HERE channel: ', this.channel);
-            if(session.hostPlayerId === sessionData?.clientId) {
-                console.log ("subscribing to turn-selected");
+            if (session.hostPlayerId === sessionData?.clientId) {
+                console.log("subscribing to turn-selected");
                 channel.current?.subscribe('turn-selected', async (message) => {
                     console.log('turn selected by: ', message.clientId);
                     const { initialTurnPosition, numberPlayers } = await getSession({ id: sessionData.sessionId });
@@ -214,32 +216,47 @@ function SpinWheel() {
         }
     }
 
+    function getSpaces() {
+        if (spacesRef.current !== null) {
+            const spaces: Spaces = spacesRef.current;
+            return spaces;
+        }
+        return new Spaces(new Realtime.Promise({ key: VITE_APP_ABLY_API_KEY, clientId: sessionData?.clientId }))
+    }
+
     return (
-        <div style={{ position: 'relative', display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-            
-            { isLoading ? <Loader /> :
-            mayStartGame ? (
-                <Button
-                    style={{ position: 'absolute', bottom: '100px', left: '50%', transform: 'translateX(-50%)' }}
-                    loading={false}
-                    variant="gradient"
-                    gradient={{ from: 'teal', to: 'lime', deg: 105 }}
-                    onClick={handleStartGame}
+        <div>
+            <SpacesProvider client={getSpaces()}>
+                <SpaceProvider name="avatar-stack">
+                    <AvatarStack />
+                </SpaceProvider>
+            </SpacesProvider>
+            <div style={{ position: 'relative', display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+                {isLoading ? <Loader /> :
+                    mayStartGame ? (
+                        <Button
+                            style={{ position: 'absolute', bottom: '100px', left: '50%', transform: 'translateX(-50%)' }}
+                            loading={false}
+                            variant="gradient"
+                            gradient={{ from: 'teal', to: 'lime', deg: 105 }}
+                            onClick={handleStartGame}
+                        >
+                            Start Game
+                        </Button>) : null
+                }
+                <p style={{ position: 'absolute', top: '10px', left: '50%', transform: 'translateX(-50%)', color: 'black', fontWeight: 'bold' }}>{message}</p>
+                <motion.div
+                    onClick={spin}
+                    animate={{ rotate: `${rotationDegrees}deg` }}
+                    transition={{ duration: 3, ease: "easeOut" }}
+                    style={{ transformOrigin: "center", display: "flex", justifyContent: "center", alignItems: "center" }}
                 >
-                    Start Game
-                </Button> ) : null
-            }
-            <p style={{ position: 'absolute', top: '10px', left: '50%', transform: 'translateX(-50%)', color: 'black', fontWeight: 'bold' }}>{message}</p>
-            <motion.div 
-                onClick={spin}
-                animate={{ rotate: `${rotationDegrees}deg` }}
-                transition={{ duration: 3, ease: "easeOut"}}
-                style={{ transformOrigin: "center", display: "flex", justifyContent: "center", alignItems: "center" }}
-            >
-                <img src={wheelImage} alt="Wheel" style={{ objectFit: "contain" }} />
-            </motion.div>
-            <img src={pinImage} alt="Pin" style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }} />
+                    <img src={wheelImage} alt="Wheel" style={{ objectFit: "contain" }} />
+                </motion.div>
+                <img src={pinImage} alt="Pin" style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }} />
+            </div>
         </div>
+
     );
 }
 
