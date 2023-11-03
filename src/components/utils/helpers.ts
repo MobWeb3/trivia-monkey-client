@@ -8,7 +8,7 @@ export const OVERLAP_AMOUNT = 40;
 export const AVATAR_WIDTH = 48;
 
 export type Member = Omit<SpaceMember, "profileData"> & {
-  profileData: { memberColor: string; name: string };
+  profileData: { memberColor: string; name: string; avatar: string };
 };
 
 export const getSpaceNameFromUrl = () => {

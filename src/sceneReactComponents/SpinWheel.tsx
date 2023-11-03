@@ -15,11 +15,10 @@ import { motion } from 'framer-motion';
 import pinImage from './../assets/sprites/pin.png'; // replace with your actual image path
 import { Types } from 'ably';
 import { ChannelHandler } from '../ably/ChannelHandler';
-import Spaces, { Space } from '@ably/spaces';
+import Spaces from '@ably/spaces';
 import { Realtime } from 'ably';
 import { SpaceProvider, SpacesProvider } from "@ably/spaces/react";
 
-import avatarImage from '../assets/monkeys_avatars/astronaut-monkey1-200x200.png';
 import AvatarStack from '../components/avatar_stack/AvatarStack';
 const VITE_APP_ABLY_API_KEY = import.meta.env.VITE_APP_ABLY_API_KEY ?? "";
 
@@ -34,7 +33,7 @@ function SpinWheel() {
     const [message, setMessage] = useState("Message");
     const [rotationDegrees, setRotationDegrees] = useState(0);
     const channel = useRef<Types.RealtimeChannelPromise | null>(null);
-    const [space, setSpace] = useLocalStorageState<Space>('spaces', {});
+    // const [space, setSpace] = useLocalStorageState<Space>('spaces', {});
     const [hasSpun, setHasSpun] = useState(false);
 
     const clientRef = useRef<Types.RealtimePromise | null>(null);
@@ -65,21 +64,22 @@ function SpinWheel() {
                 spacesRef.current = new Spaces(clientRef.current);
             }
 
-            const space = await spacesRef.current.get(sessionData?.channelId as string)
-            setSpace(space);
-            space.enter({
-                username: sessionData?.clientId,
-                avatar: avatarImage,
-            });
-            space.subscribe('update', (spaceState) => {
-                console.log("space members:", spaceState.members);
-            });
+            
+            // const space = await spacesRef.current.get(sessionData?.channelId as string)
+            // setSpace(space);
+            // space.enter({
+            //     username: sessionData?.clientId,
+            //     avatar: avatarImage,
+            // });
+            // space.subscribe('update', (spaceState) => {
+            //     console.log("space members:", spaceState.members);
+            // });
         }
-        if (!space && sessionData?.sessionId && sessionData?.clientId) {
+        if (sessionData?.sessionId && sessionData?.clientId) {
             getSpace();
         }
 
-    }, [sessionData?.sessionId, sessionData?.clientId, sessionData?.channelId, space, setSpace]);
+    }, [sessionData?.sessionId, sessionData?.clientId, sessionData?.channelId]);
 
     useEffect(() => {
         const handleSelectedSlice = async () => {
