@@ -1,6 +1,7 @@
-import { Chip, Group, Select } from '@mantine/core';
+import { Chip, Group } from '@mantine/core';
 import { useState } from 'react';
-import { GeneralTopics, numberOfQuestionPlayerCanChoose } from '../game-domain/Topics';
+import { GeneralTopics, numberOfQuestionPlayerCanChoose } from '../../game-domain/Topics';
+import "./PickTopicComponent.css"
 
 // Define the Mantine colors
 const mantineColors = ['blue', 'cyan', 'teal', 'green', 'lightGreen', 'lime', 'yellow', 'amber', 'orange', 'deepOrange', 'red', 'pink', 'purple', 'deepPurple', 'lightBlue', 'indigo'];
@@ -13,7 +14,7 @@ type ModalContentProps = {
 };
 
 
-export const ModalContent = (props: ModalContentProps) => {
+export const PickTopicComponent = (props: ModalContentProps) => {
 
     const [selectedChips, setSelectedChips] = useState<string[]>([]);
     const [chipsDisabled, setChipsDisabled] = useState(false);
@@ -40,13 +41,13 @@ export const ModalContent = (props: ModalContentProps) => {
     return (
         <Chip.Group multiple>
             <Group justify={'center'}>
-                <Select
+                {/* <Select
                 label="Select topic"
                 placeholder="Search and select"
                 searchable
                 data={['React', 'Angular', 'Svelte', 'Vue']}
-                /> 
-                <Chip
+                />  */}
+                {/* <Chip
                         key={"customTopic"}
                         color={'teal'}
                         value={"Custom Topic"}
@@ -55,7 +56,7 @@ export const ModalContent = (props: ModalContentProps) => {
                         size={'md'}
                         variant="filled"
                         onClick={() => handleChipSelect("customTopic")}>{"Write any topic..."}
-                </Chip>
+                </Chip> */}
                 {Object.values(GeneralTopics).map((topicKey, index) => { 
                     const sequentialColor = mantineColors[index % mantineColors.length];
                     return <Chip
@@ -74,4 +75,4 @@ export const ModalContent = (props: ModalContentProps) => {
     );
 };
 
-export default ModalContent;
+export default PickTopicComponent;

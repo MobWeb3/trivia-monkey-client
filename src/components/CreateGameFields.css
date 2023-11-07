@@ -1,0 +1,13 @@
+.ModalContent {
+    width: 100%;
+    height: fit-content;
+    margin: 0;
+    padding: 0;
+  }
+
+  .Modal {
+    width: 100%;
+    position: absolute;
+    left: 0;
+    right: 0;
+  }

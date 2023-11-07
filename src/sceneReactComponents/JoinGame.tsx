@@ -5,7 +5,7 @@ import { Messages } from '../utils/Messages';
 import { useLocation, useNavigate } from 'react-router-dom';
 import queryString from 'query-string';
 import { Badge, Button, Group, Modal } from '@mantine/core';
-import ModalContent from '../components/ModalContent';
+import ModalContent from '../components/topics/PickTopicComponent';
 import { useDisclosure } from '@mantine/hooks';
 import { getSession, updateTopics } from '../polybase/SessionHandler';
 import { generateQuestions } from '../game-domain/GenerateQuestionsHandler';
