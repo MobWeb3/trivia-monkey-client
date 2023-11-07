@@ -2,6 +2,7 @@ import { Chip, Group } from '@mantine/core';
 import { useState } from 'react';
 import { GeneralTopics, numberOfQuestionPlayerCanChoose } from '../../game-domain/Topics';
 import "./PickTopicComponent.css"
+import DisplayBadge from './DisplayBadge';
 
 // Define the Mantine colors
 const mantineColors = ['blue', 'cyan', 'teal', 'green', 'lightGreen', 'lime', 'yellow', 'amber', 'orange', 'deepOrange', 'red', 'pink', 'purple', 'deepPurple', 'lightBlue', 'indigo'];
@@ -57,6 +58,8 @@ export const PickTopicComponent = (props: ModalContentProps) => {
                         variant="filled"
                         onClick={() => handleChipSelect("customTopic")}>{"Write any topic..."}
                 </Chip> */}
+
+                <DisplayBadge text="Topics" style={{ width: '100%' }}/>
                 {Object.values(GeneralTopics).map((topicKey, index) => { 
                     const sequentialColor = mantineColors[index % mantineColors.length];
                     return <Chip
