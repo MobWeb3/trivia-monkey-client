@@ -31,12 +31,12 @@ export const PickTopicComponent = (props: ModalContentProps) => {
 
     useEffect(() => {
         const chipsAvailable = () => {
-            console.log("selectedChipsRef.current.length: ", selectedChips.length);
-            console.log("numberQuestions: ", numberQuestions);
+            // console.log("selectedChipsRef.current.length: ", selectedChips.length);
+            // console.log("numberQuestions: ", numberQuestions);
             // return selectedChips.length < numberQuestions;
             // Get the number of chips available
             const chipsAvailable = numberQuestions - selectedChips.length;
-            console.log("chipsAvailable: ", chipsAvailable);
+            // console.log("chipsAvailable: ", chipsAvailable);
             return chipsAvailable;
         }
         // If chips are available, then disable the rest of the chips
