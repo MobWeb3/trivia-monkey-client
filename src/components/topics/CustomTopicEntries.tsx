@@ -11,12 +11,12 @@ const CustomTopicEntries: React.FC<CustomTopicEntriesProps> = ({ entrySize }) =>
     for (let i = 0; i < entrySize; i++) {
         inputs.push(<Input 
             key={i}
-            size="lg"
+            size="xl"
             radius="lg" 
             placeholder="Enter topic..."
             style={{ 
-                margin: '20px', 
-                bottom: '10px',
+                marginTop:  '10px',
+                marginBottom: '10px',
             }} 
             />
         );

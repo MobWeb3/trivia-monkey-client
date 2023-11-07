@@ -4,6 +4,7 @@ import { GeneralTopics, numberOfQuestionPlayerCanChoose } from '../../game-domai
 import "./PickTopicComponent.css"
 import DisplayBadge from './DisplayBadge';
 import CustomTopicEntries from './CustomTopicEntries';
+import CustomButton from '../CustomButton';
 
 // Define the Mantine colors
 const mantineColors = ['blue', 'cyan', 'teal', 'green', 'lightGreen', 'lime', 'yellow', 'amber', 'orange', 'deepOrange', 'red', 'pink', 'purple', 'deepPurple', 'lightBlue', 'indigo'];
@@ -42,7 +43,7 @@ export const PickTopicComponent = (props: ModalContentProps) => {
         // const chipsAvailable = chipsAvailable();
         if (chipsAvailable() > 0) {
             setChipDisabled(false);
-            
+
         } else { // Otherwise, disable the rest of the chips
             setChipDisabled(true);
         }
@@ -69,23 +70,7 @@ export const PickTopicComponent = (props: ModalContentProps) => {
             ...props.style
         }}>
             <Chip.Group multiple>
-                <Group justify="center" gap="lg">
-                    {/* <Select
-                label="Select topic"
-                placeholder="Search and select"
-                searchable
-                data={['React', 'Angular', 'Svelte', 'Vue']}
-                />  */}
-                    {/* <Chip
-                        key={"customTopic"}
-                        color={'teal'}
-                        value={"Custom Topic"}
-                        radius={'md'}
-                        disabled = {!selectedChips.includes('customTopic')}
-                        size={'md'}
-                        variant="filled"
-                        onClick={() => handleChipSelect("customTopic")}>{"Write any topic..."}
-                </Chip> */}
+                <Group justify="center" gap="sm">
 
                     <DisplayBadge text="Topics" fontSize='30px' style={{ width: '100%' }} />
                     {Object.values(GeneralTopics).map((topicKey, index) => {
@@ -101,14 +86,17 @@ export const PickTopicComponent = (props: ModalContentProps) => {
                             style={{
                                 border: '1px solid #2c2c2c',
                                 borderRadius: '15%',
+                                fontFamily: 'umbrage2',
                             }}
                             onClick={() => handleChipSelect(topicKey)}>{topicKey}
                         </Chip>
                     })}
+                    <DisplayBadge text="Topic of choice" fontSize='30px' />
+                    <CustomTopicEntries entrySize={chipsAvailable} />
+                    <CustomButton fontSize='30px'>Done</CustomButton>
                 </Group>
             </Chip.Group>
-            <DisplayBadge text="Topic of choice" fontSize='30px' />
-            <CustomTopicEntries entrySize={chipsAvailable}/>
+
         </div>
     );
 };

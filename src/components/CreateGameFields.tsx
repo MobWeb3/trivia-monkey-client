@@ -93,30 +93,28 @@ const CreateGameForm: React.FC<CreateGameFormProps> = ({
             </Flex>
             <div className='ModalContent'>
                 {/* # For some reason I need to position to the left around -%13 to center the modal. */}
-                <Modal 
+                <Modal
                     pos={"absolute"}
                     left={'-13%'}
-                    yOffset={'8dvh'} 
-                    opened={opened} 
-                    onClose={closeModal} 
-                    radius={'xl'} 
+                    yOffset={'5dvh'}
+                    opened={opened}
+                    onClose={closeModal}
+                    radius={'xl'}
                     // padding={'s'} 
                     withCloseButton={false}
                     styles={{
                         body: { backgroundColor: '#1AB2C7' },
                     }}
                 >
-                    <PickTopicComponent 
-                        setSelectedChips={setSelectedChips} 
+                    <PickTopicComponent
+                        setSelectedChips={setSelectedChips}
                         numberOfPlayers={parseInt(numberPlayers)}
                         style={
                             {
                                 backgroundColor: '#1AB2C7',
                             }
                         }
-                        // style={{ backgroundColor: '#1AB2C7' }}
                     />
-                    {/* Modal content */}
                 </Modal>
             </div>
         </>

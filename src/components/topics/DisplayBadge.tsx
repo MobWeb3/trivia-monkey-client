@@ -21,7 +21,7 @@ const DisplayBadge: React.FC<DisplayBadgeProps> = ({ background, fontSize, text,
         justifyContent: 'center',
         alignItems: 'center',
         fontFamily: 'umbrage2',
-        margin: '20px', // Add margin of 10px to all sides
+        margin: '10px', // Add margin of 10px to all sides
         
         ...props.style,       // Spread in any other style props to override the custom styles if needed
 
