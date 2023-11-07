@@ -1,5 +1,5 @@
 import { Chip, Group } from '@mantine/core';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { GeneralTopics, numberOfQuestionPlayerCanChoose } from '../../game-domain/Topics';
 import "./PickTopicComponent.css"
 import DisplayBadge from './DisplayBadge';
@@ -18,30 +18,48 @@ type ModalContentProps = {
 export const PickTopicComponent = (props: ModalContentProps) => {
 
     const [selectedChips, setSelectedChips] = useState<string[]>([]);
-    const [chipsDisabled, setChipsDisabled] = useState(false);
+    // const selectedChipsRef = useRef<string[]>([]);
+    // const chipDisabledRef = useRef<boolean>(false);
+    const [chipDisabled, setChipDisabled] = useState(false);
 
+    // lets create a useEffect that handless the rest of the chips that are not selected
+    // wether they are disabled or not
 
     const numberQuestions = numberOfQuestionPlayerCanChoose(props.numberOfPlayers);
 
-    // Inside ModalContent component
+    useEffect(() => {
+        const chipsAvailable = () => {
+            console.log("selectedChipsRef.current.length: ", selectedChips.length);
+            console.log("numberQuestions: ", numberQuestions);
+            return selectedChips.length < numberQuestions;
+        };
+
+        // If chips are available, then disable the rest of the chips
+        if (chipsAvailable()) {
+            setChipDisabled(false);
+        } else { // Otherwise, disable the rest of the chips
+            setChipDisabled(true);
+        }
+    }
+    , [numberQuestions, selectedChips]);
+
+
+
     const handleChipSelect = (chipValue: string) => {
-        // Create a new array with the new chip value
-        const newSelectedChips = [...selectedChips, chipValue];
-    
-        // Update the selectedChips state
-        setSelectedChips(newSelectedChips);
-        props.setSelectedChips(newSelectedChips);
-    
-        // Now check if the length of newSelectedChips is greater than or equal to numberQuestions
-        if (newSelectedChips.length >= numberQuestions) {
-            // alert(`You can only select up to ${numberQuestions} topics.`);
-            setChipsDisabled(true);
+        if (selectedChips.includes(chipValue)) {
+            // If chipValue is already in selectedChips, remove it
+            setSelectedChips(selectedChips.filter(chip => chip !== chipValue));
+        } else {
+            // If chipValue is not in selectedChips, add it
+            setSelectedChips([...selectedChips, chipValue]);
         }
     };
 
+
+
     return (
         <Chip.Group multiple>
-            <Group justify={'center'}>
+            <Group justify="center" gap="lg">
                 {/* <Select
                 label="Select topic"
                 placeholder="Search and select"
@@ -67,9 +85,13 @@ export const PickTopicComponent = (props: ModalContentProps) => {
                         color={sequentialColor}
                         value={topicKey}
                         radius={'md'}
-                        size={'md'}
-                        disabled = {chipsDisabled && !selectedChips.includes(topicKey)}
+                        size={'xl'}
+                        disabled = {chipDisabled && !selectedChips.includes(topicKey)}
                         variant="filled"
+                        style={{
+                            border: '1px solid #2c2c2c',
+                            borderRadius: '15%',
+                        }}
                         onClick={() => handleChipSelect(topicKey)}>{topicKey}
                     </Chip>
                 })}
