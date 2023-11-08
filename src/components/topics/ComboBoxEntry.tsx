@@ -1,39 +1,52 @@
 import { useState } from 'react';
 import { Combobox, ComboboxProps, TextInput, useCombobox } from '@mantine/core';
 import { IconSearch, IconCircleLetterX } from '@tabler/icons-react';
-
-const groceries = ['🍎 Apples', '🍌 Bananas', '🥦 Broccoli', '🥕 Carrots', '🍫 Chocolate'];
+import { getTopicEntries } from '../../metaphor/metaphor';
 
 interface MyComboboxProps extends ComboboxProps {
     // other props...
     key: string | number;
+    value: string;
+    setValue: (value: string) => void;
+    setId: (value: string) => void;
 }
 
-export function ComboboxEntry(props: MyComboboxProps) {
+export function ComboboxEntry({value, setValue, key, setId}: MyComboboxProps) {
     const combobox = useCombobox();
-    const [value, setValue] = useState('');
-    const shouldFilterOptions = !groceries.some((item) => item === value);
-    const filteredOptions = shouldFilterOptions
-        ? groceries.filter((item) => item.toLowerCase().includes(value.toLowerCase().trim()))
-        : groceries;
+    const [data, setData] = useState<{ value: string, label: string }[]>([]);
 
-    const options = filteredOptions.map((item) => (
-        <Combobox.Option value={item} key={item}>
-            {item}
+    // const shouldFilterOptions = !groceries.some((item) => item === value);
+    // const filteredOptions = shouldFilterOptions
+    //     ? groceries.filter((item) => item.toLowerCase().includes(value.toLowerCase().trim()))
+    //     : groceries;
+
+    // const dataOptions = data.map((item) => item.value);
+
+    const options = data.map((item) => (
+        <Combobox.Option value={item.label} key={item.value}>
+            {item.label}
         </Combobox.Option>
     ));
+
+    // search for id in data given the label
+    const getOptionId = (label:string) => {
+        const item = data.find((item) => item.label === label);
+        return item ? item.value : '';
+    }
 
     return (
         <Combobox
 
             onOptionSubmit={(optionValue) => {
+                console.log("optionValue: ", optionValue);
                 setValue(optionValue);
+                setId(getOptionId(optionValue));
                 combobox.closeDropdown();
             }}
             store={combobox}
         >
             <Combobox.Target
-                key={props.key}
+                key={key}
 
             >
                 <TextInput
@@ -60,6 +73,13 @@ export function ComboboxEntry(props: MyComboboxProps) {
                                 event.stopPropagation();
                                 console.log("event: ", event)
                                 console.log("clicked on search:", value);
+                                combobox.openDropdown();
+                                if (value.length > 2) {
+                                    console.log("searching for: ", value);
+                                    const response = (await getTopicEntries(value));
+                                    console.log("response: ", response);
+                                    setData(response.slice(0,10).map((item) => ({ value: item.id, label: item.title })));    
+                                }
                             }}
                         >
                             {false ? <IconCircleLetterX /> : <IconSearch />}
