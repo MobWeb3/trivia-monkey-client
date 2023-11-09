@@ -153,7 +153,11 @@ const JoinGame = () => {
 
 
                 <Modal opened={opened} onClose={close} title="Pick topic" radius={'lg'} padding={'xl'}>
-                    <ModalContent setSelectedChips={setSelectedChips} numberOfPlayers={numberPlayers}></ModalContent>
+                    <ModalContent 
+                        setSelectedTopics={setSelectedChips}
+                        selectedTopics={selectedChips}
+                        numberOfPlayers={numberPlayers}>
+                    </ModalContent>
                     {/* Modal content */}
                 </Modal>
                 <Group justify="center">

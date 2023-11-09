@@ -11,16 +11,19 @@ const mantineColors = ['blue', 'cyan', 'teal', 'green', 'lightGreen', 'lime', 'y
 
 type ModalContentProps = {
     // Define your prop types here
-    setSelectedChips: (value: any) => void;
+    setSelectedTopics: (selectedTopic: string[]) => void;
+    selectedTopics: string[];
     numberOfPlayers: number;
     style?: React.CSSProperties;
     setCustomTopicEntries?: (customTopicEntries: string[]) => void;
     setCustomTopicEntriesIds?: (customTopicEntriesIds: string[]) => void;
+    closeModal?: () => void;
+    children?: React.ReactNode;
 };
 
-export const PickTopicComponent = (props: ModalContentProps) => {
+export const PickTopicComponent = ({selectedTopics, setSelectedTopics, ...props}: ModalContentProps) => {
 
-    const [selectedChips, setSelectedChips] = useState<string[]>([]);
+    // const [selectedChips, setSelectedChips] = useState<string[]>([]);
     const [chipsAvailable, setChipsAvailable] = useState<number>(0);
     const [chipDisabled, setChipDisabled] = useState(false);
 
@@ -33,7 +36,7 @@ export const PickTopicComponent = (props: ModalContentProps) => {
             // console.log("numberQuestions: ", numberQuestions);
             // return selectedChips.length < numberQuestions;
             // Get the number of chips available
-            const chipsAvailable = numberQuestions - selectedChips.length;
+            const chipsAvailable = numberQuestions - selectedTopics.length;
             // console.log("chipsAvailable: ", chipsAvailable);
             return chipsAvailable;
         }
@@ -47,15 +50,18 @@ export const PickTopicComponent = (props: ModalContentProps) => {
         }
         setChipsAvailable(chipsAvailable());
     }
-        , [numberQuestions, selectedChips]);
+        , [numberQuestions, selectedTopics]);
 
     const handleChipSelect = (chipValue: string) => {
-        if (selectedChips.includes(chipValue)) {
+
+        if (setSelectedTopics === undefined) return;
+
+        if (selectedTopics.includes(chipValue)) {
             // If chipValue is already in selectedChips, remove it
-            setSelectedChips(selectedChips.filter(chip => chip !== chipValue));
+            setSelectedTopics(selectedTopics.filter(chip => chip !== chipValue));
         } else {
             // If chipValue is not in selectedChips, add it
-            setSelectedChips([...selectedChips, chipValue]);
+            setSelectedTopics([...selectedTopics, chipValue]);
         }
     };
 
@@ -75,7 +81,7 @@ export const PickTopicComponent = (props: ModalContentProps) => {
                             value={topicKey}
                             radius={'md'}
                             size={'xl'}
-                            disabled={chipDisabled && !selectedChips.includes(topicKey)}
+                            disabled={chipDisabled && !selectedTopics.includes(topicKey)}
                             variant="filled"
                             style={{
                                 border: '1px solid #2c2c2c',
@@ -91,7 +97,7 @@ export const PickTopicComponent = (props: ModalContentProps) => {
                         setCustomTopicEntriesIds = {(props.setCustomTopicEntriesIds)}
                         setCustomTopicEntries = {props.setCustomTopicEntries}
                     />
-                    <CustomButton fontSize='30px'>Done</CustomButton>
+                    <CustomButton fontSize='30px' onClick={props.closeModal}>Done</CustomButton>
                 </Group>
             </Chip.Group>
 

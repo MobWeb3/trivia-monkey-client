@@ -5,13 +5,13 @@ import { getTopicEntries } from '../../metaphor/metaphor';
 
 interface MyComboboxProps extends ComboboxProps {
     // other props...
-    key: string | number;
+    // key: string | number;
     value: string;
     setValue: (value: string) => void;
     setId: (value: string) => void;
 }
 
-export function ComboboxEntry({ value, setValue, key, setId }: MyComboboxProps) {
+export function ComboboxEntry({ value, setValue, setId }: MyComboboxProps) {
     const combobox = useCombobox();
     const [data, setData] = useState<{ value: string, label: string }[]>([]);
     const [searching, setSearching] = useState(false);
@@ -55,7 +55,7 @@ export function ComboboxEntry({ value, setValue, key, setId }: MyComboboxProps) 
             store={combobox}
         >
             <Combobox.Target
-                key={key}
+                // key={key}
             >
                 <TextInput
                     placeholder="Enter topic..."

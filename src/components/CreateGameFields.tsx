@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Input, SegmentedControl, Modal, Flex, Container } from '@mantine/core';
 import { NumberInputComponent } from '../components/NumberInput';
 import { IconPacman } from '@tabler/icons-react';
@@ -11,12 +11,14 @@ interface CreateGameFormProps {
     setNickname: (nickname: string) => void;
     setNumberPlayers: (numberPlayers: string) => void;
     setPointsToWin: (pointsToWin: string) => void;
-    setSelectedChips: (selectedChips: string[]) => void;
+    // setSelectedChips: (selectedChips: string[]) => void;
+    // selectedChips: string[];
+    setSelectedTopics: (customTopicEntries: string[]) => void;
+    selectedTopics: string[];
     openModal: () => void;
     closeModal: () => void;
     opened: boolean;
     numberPlayers: string;
-    selectedChips: string[];
     handlePlayButtonClick: () => void;
 }
 
@@ -24,7 +26,10 @@ const CreateGameForm: React.FC<CreateGameFormProps> = ({
     setNickname,
     setNumberPlayers,
     setPointsToWin,
-    setSelectedChips,
+    // setSelectedChips,
+    // selectedChips,
+    setSelectedTopics,
+    selectedTopics,
     openModal,
     closeModal,
     opened,
@@ -33,10 +38,16 @@ const CreateGameForm: React.FC<CreateGameFormProps> = ({
 }) => {
 
     // Custom topic entries labels
-    const [customTopicEntries, setCustomTopicEntries] = useState<string[]>([]);
+    // const [customTopicEntries, setCustomTopicEntries] = useState<string[]>([]);
 
     // Ids for the custom topic entries
     const [customTopicEntriesIds, setCustomTopicEntriesIds] = useState<string[]>([]);
+
+    useEffect(() => {
+        console.log('customTopicEntries: ', selectedTopics);
+        console.log('customTopicEntriesIds: ', customTopicEntriesIds);
+        // console.log('selectedChips: ', selectedChips);
+    } , [customTopicEntriesIds, selectedTopics]);
 
     return (
         <>
@@ -83,7 +94,7 @@ const CreateGameForm: React.FC<CreateGameFormProps> = ({
                     ]}
                     onChange={(value) => setPointsToWin(value)}
 
-                    style={{ fontFamily: 'umbrage2', marginBottom: '10px'}}
+                    style={{ fontFamily: 'umbrage2', marginBottom: '10px' }}
                 />
                 <CustomButton
                     fontSize={"32px"}
@@ -95,8 +106,12 @@ const CreateGameForm: React.FC<CreateGameFormProps> = ({
                         marginBottom: '5px',
                     }}>Pick a topic
                 </CustomButton>
-                <SelectedTopicEntries entrySize={3} selectedTopicEntries={customTopicEntries}/>
-                <CustomButton 
+                <SelectedTopicEntries 
+                    entrySize={selectedTopics.length} 
+                    selectedTopics={selectedTopics}
+                    setSelectedTopics={setSelectedTopics}
+                />
+                <CustomButton
                     onClick={handlePlayButtonClick}
                     style={{
                         marginTop: '5px',
@@ -121,10 +136,10 @@ const CreateGameForm: React.FC<CreateGameFormProps> = ({
                     }}
                 >
                     <PickTopicComponent
-                        setSelectedChips={setSelectedChips}
+                        setSelectedTopics={setSelectedTopics}
+                        selectedTopics={selectedTopics}
                         numberOfPlayers={parseInt(numberPlayers)}
-                        setCustomTopicEntries={setCustomTopicEntries}
-                        setCustomTopicEntriesIds={setCustomTopicEntriesIds}
+                        closeModal={closeModal}
                         style={
                             {
                                 backgroundColor: '#1AB2C7',

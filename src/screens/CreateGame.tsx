@@ -24,7 +24,7 @@ const CreateGame = () => {
     const [sessionData, setSessionData] = useLocalStorageState<SessionData>('sessionData', {});
     const navigate = useNavigate();
     const [opened, { open, close }] = useDisclosure(false);
-    const [selectedChips, setSelectedChips] = useState<string[]>([]);
+    const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
     const [loading, setLoading] = useState(false);
     const [sessionCreated, setSessionCreated] = useState(false);
     const ref = useRef(null); //qr code ref
@@ -90,7 +90,7 @@ const CreateGame = () => {
         // console.log('handlePlayButtonClick A');
         if (nickname !== '' && numberPlayers !== '' && pointsToWin !== '') {
             // console.log('handlePlayButtonClick B');
-            const sessionData = await handleCreateChannel({ nickname, numberPlayers, pointsToWin, topics: selectedChips });
+            const sessionData = await handleCreateChannel({ nickname, numberPlayers, pointsToWin, topics: selectedTopics });
             console.log('handlePlayButtonClick C, sessionData', sessionData);
             // Create AI session question database record in Polybase
             if (sessionData){
@@ -103,13 +103,13 @@ const CreateGame = () => {
                 if (response){
                     const questionSessionId = response.recordData.data.id;
                     // Deploy generation of AI questions
-                    generateQuestions({topics: selectedChips})
+                    generateQuestions({topics: selectedTopics})
                     .then((result) => {
                         console.log('generateQuestions response: ', result);
                         addQuestions({id: questionSessionId, column: 1, topics: result});
                     });
                     // Update topics to Game session
-                    const addTopicResponse= await updateTopics({id:sessionData?.sessionId, topics: selectedChips})
+                    const addTopicResponse= await updateTopics({id:sessionData?.sessionId, topics: selectedTopics})
                     console.log('updatedTopics response:', addTopicResponse);
 
                     // Set questionSessionId in the Game session records
@@ -147,10 +147,10 @@ const CreateGame = () => {
                         <div className='createGameForm'>                    
                             <CreateGameForm 
                                 setNickname={setNickname}
-                                selectedChips={selectedChips}
+                                selectedTopics={selectedTopics}
+                                setSelectedTopics={setSelectedTopics}
                                 setNumberPlayers={setNumberPlayers}
                                 setPointsToWin={setPointsToWin}
-                                setSelectedChips={setSelectedChips}
                                 openModal={open}
                                 opened={opened}
                                 numberPlayers={numberPlayers}

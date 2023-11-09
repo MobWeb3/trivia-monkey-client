@@ -3,19 +3,19 @@ import SelectedTopic from './SelectedTopic';
 
 interface SelectedTopicEntriesProps {
     entrySize: number;
-    selectedTopicEntries: string[];
-    // setCustomTopicEntries: (customTopicEntries: string[]) => void;
-    // setCustomTopicEntriesIds: (customTopicEntriesIds: string[]) => void;
+    selectedTopics: string[];
+    setSelectedTopics?: (customTopicEntries: string[]) => void;
+    // selectedChips: string[];
 }
 
-const SelectedTopicEntries: React.FC<SelectedTopicEntriesProps> = ({ entrySize, selectedTopicEntries }) => {
+const SelectedTopicEntries: React.FC<SelectedTopicEntriesProps> = ({ entrySize, selectedTopics }) => {
     const inputs = [];
 
     for (let i = 0; i < entrySize; i++) {
         inputs.push(
             <SelectedTopic
                 key={i}
-                text={selectedTopicEntries[i]}
+                text={selectedTopics[i]}
             /> 
         );
     }
