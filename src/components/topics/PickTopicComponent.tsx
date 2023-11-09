@@ -9,14 +9,14 @@ import CustomButton from '../CustomButton';
 // Define the Mantine colors
 const mantineColors = ['blue', 'cyan', 'teal', 'green', 'lightGreen', 'lime', 'yellow', 'amber', 'orange', 'deepOrange', 'red', 'pink', 'purple', 'deepPurple', 'lightBlue', 'indigo'];
 
-
 type ModalContentProps = {
     // Define your prop types here
     setSelectedChips: (value: any) => void;
     numberOfPlayers: number;
     style?: React.CSSProperties;
+    setCustomTopicEntries?: (customTopicEntries: string[]) => void;
+    setCustomTopicEntriesIds?: (customTopicEntriesIds: string[]) => void;
 };
-
 
 export const PickTopicComponent = (props: ModalContentProps) => {
 
@@ -24,9 +24,7 @@ export const PickTopicComponent = (props: ModalContentProps) => {
     const [chipsAvailable, setChipsAvailable] = useState<number>(0);
     const [chipDisabled, setChipDisabled] = useState(false);
 
-    // lets create a useEffect that handless the rest of the chips that are not selected
-    // wether they are disabled or not
-
+    // Number of questions the player can choose in total
     const numberQuestions = numberOfQuestionPlayerCanChoose(props.numberOfPlayers);
 
     useEffect(() => {
@@ -51,8 +49,6 @@ export const PickTopicComponent = (props: ModalContentProps) => {
     }
         , [numberQuestions, selectedChips]);
 
-
-
     const handleChipSelect = (chipValue: string) => {
         if (selectedChips.includes(chipValue)) {
             // If chipValue is already in selectedChips, remove it
@@ -62,8 +58,6 @@ export const PickTopicComponent = (props: ModalContentProps) => {
             setSelectedChips([...selectedChips, chipValue]);
         }
     };
-
-
 
     return (
         <div style={{
@@ -92,7 +86,11 @@ export const PickTopicComponent = (props: ModalContentProps) => {
                         </Chip>
                     })}
                     <DisplayBadge text="Topic of choice" fontSize='30px' />
-                    <CustomTopicEntries entrySize={chipsAvailable} />
+                    <CustomTopicEntries 
+                        entrySize={chipsAvailable} 
+                        setCustomTopicEntriesIds = {(props.setCustomTopicEntriesIds)}
+                        setCustomTopicEntries = {props.setCustomTopicEntries}
+                    />
                     <CustomButton fontSize='30px'>Done</CustomButton>
                 </Group>
             </Chip.Group>

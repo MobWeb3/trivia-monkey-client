@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Combobox, ComboboxProps, TextInput, useCombobox } from '@mantine/core';
 import { IconSearch, IconCircleLetterX } from '@tabler/icons-react';
 import { getTopicEntries } from '../../metaphor/metaphor';
@@ -11,9 +11,11 @@ interface MyComboboxProps extends ComboboxProps {
     setId: (value: string) => void;
 }
 
-export function ComboboxEntry({value, setValue, key, setId}: MyComboboxProps) {
+export function ComboboxEntry({ value, setValue, key, setId }: MyComboboxProps) {
     const combobox = useCombobox();
     const [data, setData] = useState<{ value: string, label: string }[]>([]);
+    const [searching, setSearching] = useState(false);
+    const [optionSelected, setOptionSelected] = useState(false);
 
     // const shouldFilterOptions = !groceries.some((item) => item === value);
     // const filteredOptions = shouldFilterOptions
@@ -29,10 +31,14 @@ export function ComboboxEntry({value, setValue, key, setId}: MyComboboxProps) {
     ));
 
     // search for id in data given the label
-    const getOptionId = (label:string) => {
+    const getOptionId = (label: string) => {
         const item = data.find((item) => item.label === label);
         return item ? item.value : '';
     }
+
+    useEffect(() => {
+        // console.log('searching:', searching);
+    }, [searching]);
 
     return (
         <Combobox
@@ -42,12 +48,14 @@ export function ComboboxEntry({value, setValue, key, setId}: MyComboboxProps) {
                 setValue(optionValue);
                 setId(getOptionId(optionValue));
                 combobox.closeDropdown();
+
+                // replace right section with X
+                setOptionSelected(true);
             }}
             store={combobox}
         >
             <Combobox.Target
                 key={key}
-
             >
                 <TextInput
                     placeholder="Enter topic..."
@@ -69,20 +77,29 @@ export function ComboboxEntry({value, setValue, key, setId}: MyComboboxProps) {
                     rightSection={
                         <div
                             onClick={async (event) => {
-                                event.preventDefault();
-                                event.stopPropagation();
-                                console.log("event: ", event)
-                                console.log("clicked on search:", value);
-                                combobox.openDropdown();
-                                if (value.length > 2) {
+                                // event.preventDefault();
+                                // event.stopPropagation();
+                                // console.log("event: ", event)
+                                // console.log("clicked on search:", value);
+
+                                if (value.length > 2 && !optionSelected) {
                                     console.log("searching for: ", value);
+                                    setSearching(true);
                                     const response = (await getTopicEntries(value));
+                                    setSearching(false);
                                     console.log("response: ", response);
-                                    setData(response.slice(0,10).map((item) => ({ value: item.id, label: item.title })));    
+                                    setData(response.slice(0, 10).map((item) => ({ value: item.id, label: item.title })));
+                                    combobox.openDropdown();
+                                }
+
+                                if (optionSelected) {
+                                    setData([]);
+                                    setValue('');
+                                    setOptionSelected(false);
                                 }
                             }}
                         >
-                            {false ? <IconCircleLetterX /> : <IconSearch />}
+                            {optionSelected ? <IconCircleLetterX /> : <IconSearch />}
                         </div>
                     }
                 />
@@ -90,7 +107,8 @@ export function ComboboxEntry({value, setValue, key, setId}: MyComboboxProps) {
 
             <Combobox.Dropdown>
                 <Combobox.Options>
-                    {options.length === 0 ? <Combobox.Empty>Nothing found</Combobox.Empty> : options}
+                    {options.length === 0 ? <Combobox.Empty >Nothing found</Combobox.Empty> : options}
+                    <Combobox.Empty hidden={!searching}>Searching...</Combobox.Empty>
                 </Combobox.Options>
             </Combobox.Dropdown>
         </Combobox>

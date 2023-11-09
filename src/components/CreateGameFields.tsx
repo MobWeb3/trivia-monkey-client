@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Input, SegmentedControl, Modal, Flex, Container } from '@mantine/core';
 import { NumberInputComponent } from '../components/NumberInput';
 import { IconPacman } from '@tabler/icons-react';
 import PickTopicComponent from './topics/PickTopicComponent';
 import CustomButton from './CustomButton';
 import './CreateGameFields.css';
+import SelectedTopicEntries from './topics/SelectedTopicEntries';
 
 interface CreateGameFormProps {
     setNickname: (nickname: string) => void;
@@ -30,10 +31,17 @@ const CreateGameForm: React.FC<CreateGameFormProps> = ({
     numberPlayers,
     handlePlayButtonClick
 }) => {
+
+    // Custom topic entries labels
+    const [customTopicEntries, setCustomTopicEntries] = useState<string[]>([]);
+
+    // Ids for the custom topic entries
+    const [customTopicEntriesIds, setCustomTopicEntriesIds] = useState<string[]>([]);
+
     return (
         <>
             <Flex
-                gap="lg"
+                gap="sm"
                 justify="center"
                 align="center"
                 direction="column"
@@ -75,21 +83,27 @@ const CreateGameForm: React.FC<CreateGameFormProps> = ({
                     ]}
                     onChange={(value) => setPointsToWin(value)}
 
-                    style={{ fontFamily: 'umbrage2', fontSizeAdjust: '' }}
+                    style={{ fontFamily: 'umbrage2', marginBottom: '10px'}}
                 />
-                {/* <Group justify="center">
-                <Badge size="lg" radius="lg" variant="dot">
-                    Selected topics: {selectedChips.join(', ')}
-                </Badge>
-                <Button onClick={openModal}>Pick a topic</Button>
-            </Group> */}
                 <CustomButton
                     fontSize={"32px"}
                     onClick={openModal}
                     background='linear-gradient(to bottom right, #FDD673, #D5B45B)'
                     color='#2B2C21'
-                >Pick a topic</CustomButton>
-                <CustomButton onClick={handlePlayButtonClick}>Create Game</CustomButton>
+                    style={{
+                        marginTop: '5px',
+                        marginBottom: '5px',
+                    }}>Pick a topic
+                </CustomButton>
+                <SelectedTopicEntries entrySize={3} selectedTopicEntries={customTopicEntries}/>
+                <CustomButton 
+                    onClick={handlePlayButtonClick}
+                    style={{
+                        marginTop: '5px',
+                        marginBottom: '5px',
+                    }}
+                >Create Game
+                </CustomButton>
             </Flex>
             <div className='ModalContent'>
                 {/* # For some reason I need to position to the left around -%13 to center the modal. */}
@@ -109,6 +123,8 @@ const CreateGameForm: React.FC<CreateGameFormProps> = ({
                     <PickTopicComponent
                         setSelectedChips={setSelectedChips}
                         numberOfPlayers={parseInt(numberPlayers)}
+                        setCustomTopicEntries={setCustomTopicEntries}
+                        setCustomTopicEntriesIds={setCustomTopicEntriesIds}
                         style={
                             {
                                 backgroundColor: '#1AB2C7',

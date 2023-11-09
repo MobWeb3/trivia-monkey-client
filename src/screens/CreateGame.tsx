@@ -157,8 +157,6 @@ const CreateGame = () => {
                                 closeModal={close}
                                 handlePlayButtonClick={handlePlayButtonClick} 
                             />
-                            {/* <button onClick={handlePlayButtonClick}>Create Game</button> */}
-                            <p>Welcome {nickname}! Number of players: {numberPlayers} Points to Win: {pointsToWin}</p>
                         </div>
                     )
             }

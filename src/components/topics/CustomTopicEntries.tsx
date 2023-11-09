@@ -3,9 +3,11 @@ import { ComboboxEntry } from './ComboBoxEntry';
 
 interface CustomTopicEntriesProps {
     entrySize: number;
+    setCustomTopicEntries?: (customTopicEntries: string[]) => void;
+    setCustomTopicEntriesIds?: (customTopicEntriesIds: string[]) => void;
 }
 
-const CustomTopicEntries: React.FC<CustomTopicEntriesProps> = ({ entrySize }) => {
+const CustomTopicEntries: React.FC<CustomTopicEntriesProps> = ({ entrySize, setCustomTopicEntries, setCustomTopicEntriesIds }) => {
     const inputs = [];
 
     // const toggleDropdown = (index: number) => {
@@ -26,17 +28,6 @@ const CustomTopicEntries: React.FC<CustomTopicEntriesProps> = ({ entrySize }) =>
 
     }, [entrySize, inputValues, inputIds]); // Empty dependency array means this effect runs once on mount
 
-    // useEffect(() => {
-    //     // open the dropdown if it is not already opened
-
-    //     for (let i = 0; i < entrySize; i++) {
-    //         if (dropdownOpenedArray[i] === false && inputValues[i].length > 1) {
-    //             toggleDropdown(i);
-    //         }
-    //     }
-    // }, []);
-
-
     for (let i = 0; i < entrySize; i++) {
         inputs.push(
             <ComboboxEntry
@@ -46,11 +37,15 @@ const CustomTopicEntries: React.FC<CustomTopicEntriesProps> = ({ entrySize }) =>
                     const newInputValues = [...inputValues];
                     newInputValues[i] = newValue;
                     setInputValues(newInputValues);
+                    if (setCustomTopicEntries)
+                        setCustomTopicEntries(newInputValues);
                 }}
                 setId={(newId) => {
                     const newInputIds = [...inputIds];
                     newInputIds[i] = newId;
                     setInputIds(newInputIds);
+                    if (setCustomTopicEntriesIds)
+                        setCustomTopicEntriesIds(newInputIds);
                 }}
             />
         );
