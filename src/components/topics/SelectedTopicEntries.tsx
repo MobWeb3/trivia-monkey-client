@@ -1,21 +1,21 @@
-import React, {  } from 'react';
+import React, { useContext } from 'react';
 import SelectedTopic from './SelectedTopic';
+import { TopicContext } from './TopicContext';
 
 interface SelectedTopicEntriesProps {
     entrySize: number;
-    selectedTopics: string[];
-    setSelectedTopics?: (customTopicEntries: string[]) => void;
-    // selectedChips: string[];
 }
 
-const SelectedTopicEntries: React.FC<SelectedTopicEntriesProps> = ({ entrySize, selectedTopics }) => {
+const SelectedTopicEntries: React.FC<SelectedTopicEntriesProps> = ({ entrySize }) => {
     const inputs = [];
+
+    const { topics } = useContext(TopicContext);
 
     for (let i = 0; i < entrySize; i++) {
         inputs.push(
             <SelectedTopic
                 key={i}
-                text={selectedTopics[i]}
+                text={topics[i][0]}
             /> 
         );
     }

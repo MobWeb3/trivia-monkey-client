@@ -1,45 +1,44 @@
 // import { Chip, Group } from '@mantine/core';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { GeneralTopics, numberOfQuestionPlayerCanChoose } from '../../game-domain/Topics';
 import "./PickTopicComponent.css"
 import DisplayBadge from './DisplayBadge';
 import CustomTopicEntries from './CustomTopicEntries';
 import CustomButton from '../CustomButton';
 import { ChipGroup } from './Chip';
-
-// Define the Mantine colors
+import { TopicContext } from './TopicContext';
 
 type ModalContentProps = {
     // Define your prop types here
-    setSelectedTopics: React.Dispatch<React.SetStateAction<string[]>>;
-    selectedTopics: string[];
+    // setSelectedTopics: React.Dispatch<React.SetStateAction<string[]>>;
+    // selectedTopics: string[];
     numberOfPlayers: number;
     style?: React.CSSProperties;
-    setCustomTopicEntries?: (customTopicEntries: string[]) => void;
-    setCustomTopicEntriesIds?: (customTopicEntriesIds: string[]) => void;
+    // setCustomTopicEntries?: (customTopicEntries: string[]) => void;
+    // setCustomTopicEntriesIds?: (customTopicEntriesIds: string[]) => void;
     closeModal?: () => void;
     children?: React.ReactNode;
 };
 
-export const PickTopicComponent = ({selectedTopics, setSelectedTopics, ...props}: ModalContentProps) => {
+export const PickTopicComponent = ({...props }: ModalContentProps) => {
 
-    // const [selectedChips, setSelectedChips] = useState<string[]>([]);
     const [chipsAvailable, setChipsAvailable] = useState<number>(0);
     const [chipDisabled, setChipDisabled] = useState(false);
-    // const selectedTopicsRef = useRef<string[]>(selectedTopics);
-
+    const { topics } = useContext(TopicContext);
+    
     // Number of questions the player can choose in total
     const numberQuestions = numberOfQuestionPlayerCanChoose(props.numberOfPlayers);
 
     useEffect(() => {
-        console.log("selectedTopics: ", selectedTopics);
+        console.log(`selectedTopics:`, topics.map((topic) => topic[0]));
+        // console.log("chipsAvailable: ", chipsAvailable);
         const chipsAvailable = () => {
             // console.log("selectedChipsRef.current.length: ", selectedChips.length);
             // console.log("numberQuestions: ", numberQuestions);
             // return selectedChips.length < numberQuestions;
             // Get the number of chips available
-            const chipsAvailable = numberQuestions - selectedTopics.length;
-            // console.log("chipsAvailable: ", chipsAvailable);
+            const chipsAvailable = numberQuestions - topics.length;
+            console.log("chipsAvailable: ", chipsAvailable);
             return chipsAvailable;
         }
         // If chips are available, then disable the rest of the chips
@@ -52,7 +51,7 @@ export const PickTopicComponent = ({selectedTopics, setSelectedTopics, ...props}
         }
         setChipsAvailable(chipsAvailable());
     }
-        , [numberQuestions, selectedTopics]);
+        , [numberQuestions, topics]);
 
     return (
         <div style={{
@@ -101,27 +100,26 @@ export const PickTopicComponent = ({selectedTopics, setSelectedTopics, ...props}
             <div style={{ padding: '5px' }}>
                 <ChipGroup
                     options={Object.values(GeneralTopics)}
-                    selectedOptions={selectedTopics}
-                    setSelectedOptions={setSelectedTopics}
                     disabled={chipDisabled}
                 />
-                    <DisplayBadge text="Topic of choice" fontSize='30px' />
-                    <CustomTopicEntries 
-                        entrySize={chipsAvailable} 
-                        setCustomTopicEntriesIds = {(props.setCustomTopicEntriesIds)}
-                        setCustomTopicEntries = {props.setCustomTopicEntries}
-                    />
-                    
+                <DisplayBadge text="Topic of choice" fontSize='30px' />
+                <CustomTopicEntries
+                    entrySize={chipsAvailable}
+                    // setSelectedTopicIds={(props.setCustomTopicEntriesIds)}
+                    // setSelectedTopic={setSelectedTopics}
+                    // selectedTopics={selectedTopics}
+                />
+
             </div>
 
             <div style={{
                 display: 'flex',
                 justifyContent: 'center',
             }}>
-                <CustomButton 
+                <CustomButton
                     fontSize='30px'
                     onClick={props.closeModal}
-                    style={{ marginTop: '0px'}}
+                    style={{ marginTop: '0px' }}
                 >Done</CustomButton>
             </div>
 

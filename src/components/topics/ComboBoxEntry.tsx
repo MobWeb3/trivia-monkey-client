@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { Combobox, ComboboxProps, TextInput, useCombobox } from '@mantine/core';
 import { IconSearch, IconCircleLetterX } from '@tabler/icons-react';
 import { getTopicEntries } from '../../metaphor/metaphor';
+import { Topic, TopicContext } from './TopicContext';
 
 interface MyComboboxProps extends ComboboxProps {
     // other props...
@@ -16,13 +17,7 @@ export function ComboboxEntry({ value, setValue, setId }: MyComboboxProps) {
     const [data, setData] = useState<{ value: string, label: string }[]>([]);
     const [searching, setSearching] = useState(false);
     const [optionSelected, setOptionSelected] = useState(false);
-
-    // const shouldFilterOptions = !groceries.some((item) => item === value);
-    // const filteredOptions = shouldFilterOptions
-    //     ? groceries.filter((item) => item.toLowerCase().includes(value.toLowerCase().trim()))
-    //     : groceries;
-
-    // const dataOptions = data.map((item) => item.value);
+    const { topics, setTopics } = useContext(TopicContext);
 
     const options = data.map((item) => (
         <Combobox.Option value={item.label} key={item.value}>
@@ -37,12 +32,11 @@ export function ComboboxEntry({ value, setValue, setId }: MyComboboxProps) {
     }
 
     useEffect(() => {
-        // console.log('searching:', searching);
-    }, [searching]);
+        console.log("topics: ", topics);
+    }, [topics]);
 
     return (
         <Combobox
-
             onOptionSubmit={(optionValue) => {
                 console.log("optionValue: ", optionValue);
                 setValue(optionValue);
@@ -67,7 +61,13 @@ export function ComboboxEntry({ value, setValue, setId }: MyComboboxProps) {
                         marginBottom: '10px',
                     }}
                     onChange={(event) => {
-                        setValue(event.currentTarget.value);
+                        const value = event.currentTarget.value;
+                        setValue(value);
+                        // lets update the topics using setTopics with the new value
+                        const topic: Topic = [value, getOptionId(value)];
+                        //previous topics and add new topic
+                        setTopics([...topics, topic]);
+  
                         combobox.openDropdown();
                         combobox.updateSelectedOptionIndex();
                     }}
@@ -94,7 +94,7 @@ export function ComboboxEntry({ value, setValue, setId }: MyComboboxProps) {
 
                                 if (optionSelected) {
                                     setData([]);
-                                    setValue('');
+                                    // setValue('');
                                     setOptionSelected(false);
                                 }
                             }}

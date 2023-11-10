@@ -22,7 +22,7 @@ const JoinGame = () => {
     const [sessionData, setSessionData] = useLocalStorageState<SessionData>('sessionData', {});
     const location = useLocation();
     const [opened, { open, close }] = useDisclosure(false);
-    const [selectedChips, setSelectedChips] = useState<string[]>([]);
+    const [selectedChips] = useState<string[]>([]);
     const [numberPlayers, setNumberPlayers] = useState<number>(0);
     const [joined, setJoined] = useState(false);
 
@@ -154,8 +154,6 @@ const JoinGame = () => {
 
                 <Modal opened={opened} onClose={close} title="Pick topic" radius={'lg'} padding={'xl'}>
                     <ModalContent 
-                        setSelectedTopics={setSelectedChips}
-                        selectedTopics={selectedChips}
                         numberOfPlayers={numberPlayers}>
                     </ModalContent>
                     {/* Modal content */}

@@ -13,6 +13,7 @@ import { SessionData } from './SessionData';
 import useLocalStorageState from 'use-local-storage-state';
 import CreateGameForm from '../components/CreateGameFields';
 import './CreateGame.css'
+import { TopicProvider } from '../components/topics/TopicContext';
 // import { BASE_URL } from '../ApiServiceConfig';
 
 
@@ -24,7 +25,7 @@ const CreateGame = () => {
     const [sessionData, setSessionData] = useLocalStorageState<SessionData>('sessionData', {});
     const navigate = useNavigate();
     const [opened, { open, close }] = useDisclosure(false);
-    const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
+    const [selectedTopics] = useState<string[]>([]);
     const [loading, setLoading] = useState(false);
     const [sessionCreated, setSessionCreated] = useState(false);
     const ref = useRef(null); //qr code ref
@@ -144,19 +145,19 @@ const CreateGame = () => {
                         </div>
                     </div> :
                     sessionCreated ? <WaitingMessage /> : (
-                        <div className='createGameForm'>                    
-                            <CreateGameForm 
-                                setNickname={setNickname}
-                                selectedTopics={selectedTopics}
-                                setSelectedTopics={setSelectedTopics}
-                                setNumberPlayers={setNumberPlayers}
-                                setPointsToWin={setPointsToWin}
-                                openModal={open}
-                                opened={opened}
-                                numberPlayers={numberPlayers}
-                                closeModal={close}
-                                handlePlayButtonClick={handlePlayButtonClick} 
-                            />
+                        <div className='createGameForm'>
+                            <TopicProvider>
+                                <CreateGameForm
+                                    setNickname={setNickname}
+                                    setNumberPlayers={setNumberPlayers}
+                                    setPointsToWin={setPointsToWin}
+                                    openModal={open}
+                                    opened={opened}
+                                    numberPlayers={numberPlayers}
+                                    closeModal={close}
+                                    handlePlayButtonClick={handlePlayButtonClick}
+                                />
+                            </TopicProvider>
                         </div>
                     )
             }

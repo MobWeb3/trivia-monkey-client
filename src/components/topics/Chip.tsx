@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useContext } from 'react';
+import { Topic, TopicContext } from './TopicContext';
 
 type ChipProps = {
     label: string;
@@ -8,8 +9,7 @@ type ChipProps = {
     disabled: boolean;
 };
 
-const mantineColors = ['blue', 'cyan', 'teal', 'green', 'lightGreen', 'lime', 'yellow', 'amber', 'orange', 'deepOrange', 'red', 'pink', 'purple', 'deepPurple', 'lightBlue', 'indigo'];
-
+const mantineColors = ['#f44336', '#ce7e00', '#8fce00', '#2986cc', '#c90076', '#8e7cc3', '#a64d79'];
 
 // Custom Chip component
 export const Chip: React.FC<ChipProps> = ({ label, isSelected, onSelect, color, disabled }) => {
@@ -18,8 +18,9 @@ export const Chip: React.FC<ChipProps> = ({ label, isSelected, onSelect, color, 
             style={{
                 backgroundColor: isSelected ? color : 'white',
                 // borderColor: color,
-                borderRadius: '10%',
-                // padding: '10px 20px',
+                boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)',
+                padding: '5px',
+                borderRadius: '30px',
                 fontFamily: 'umbrage2',
                 cursor: disabled ? 'not-allowed' : 'pointer',
                 opacity: disabled ? 0.5 : 1,
@@ -34,20 +35,34 @@ export const Chip: React.FC<ChipProps> = ({ label, isSelected, onSelect, color, 
 
 type ChipGroupProps = {
     options: string[];
-    selectedOptions: string[];
-    setSelectedOptions: (options: string[]) => void;
     disabled: boolean;
 };
 
 
 // Custom ChipGroup component
-export const ChipGroup: React.FC<ChipGroupProps> = ({ options, selectedOptions, setSelectedOptions, disabled }) => {
+export const ChipGroup: React.FC<ChipGroupProps> = ({ options, disabled }) => {
+
+    const { topics, setTopics } = useContext(TopicContext);
+
+    const isSelected = (option:string) => {
+        // get all the topic labels
+        const topicLabelsSelected = topics.map((topic) => topic[0]);
+        return topicLabelsSelected.includes(option)
+    };
+        
     const handleSelect = (option: string) => {
-        const isSelected = selectedOptions.includes(option);
+        // get all the topic labels
+        const topicLabelsSelected = topics.map((topic) => topic[0]);
+        const isSelected = topicLabelsSelected.includes(option);
+
         if (isSelected) {
-            setSelectedOptions(selectedOptions.filter((o) => o !== option));
+            // remove the topic from the list to deselect it
+            const newTopics = topics.filter((topic) => topic[0] !== option);
+            setTopics(newTopics);
         } else {
-            setSelectedOptions([...selectedOptions, option]);
+            // add the topic to the list to select it
+            const newTopic = [option, ''] as Topic;
+            setTopics([...topics, newTopic]);
         }
     };
 
@@ -62,10 +77,10 @@ export const ChipGroup: React.FC<ChipGroupProps> = ({ options, selectedOptions, 
                 <Chip
                     key={option}
                     label={option}
-                    isSelected={selectedOptions.includes(option)}
+                    isSelected={isSelected(option)}
                     onSelect={() => handleSelect(option)}
                     color={mantineColors[index % mantineColors.length]}
-                    disabled={disabled && !selectedOptions.includes(option)}
+                    disabled={disabled && !isSelected(option)}
                 />
             ))}
         </div>

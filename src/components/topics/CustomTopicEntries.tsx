@@ -3,22 +3,14 @@ import { ComboboxEntry } from './ComboBoxEntry';
 
 interface CustomTopicEntriesProps {
     entrySize: number;
-    setCustomTopicEntries?: (customTopicEntries: string[]) => void;
-    setCustomTopicEntriesIds?: (customTopicEntriesIds: string[]) => void;
+    selectedTopics?: string[];
+    setSelectedTopic?: (topics: string[]) => void;
+    setSelectedTopicIds?: (topicIds: string[]) => void;
 }
 
-const CustomTopicEntries: React.FC<CustomTopicEntriesProps> = ({ entrySize, setCustomTopicEntries, setCustomTopicEntriesIds }) => {
+const CustomTopicEntries: React.FC<CustomTopicEntriesProps> = ({ entrySize, setSelectedTopic, setSelectedTopicIds, selectedTopics }) => {
     const inputs = [];
-
-    // const toggleDropdown = (index: number) => {
-    //     const newDropdownOpenedArray = [...dropdownOpenedArray];
-    //     newDropdownOpenedArray[index] = !newDropdownOpenedArray[index];
-    //     setDropdownOpenedArray(newDropdownOpenedArray);
-
-    //     console.log(`clicked on search index: ${index}`);
-    // }
-
-    const [inputValues, setInputValues] = useState<string[]>(new Array(entrySize).fill(''));
+    
     const [inputIds, setInputIds] = useState<string[]>(new Array(entrySize).fill(''));
 
     // useEffect(() => {
@@ -28,24 +20,27 @@ const CustomTopicEntries: React.FC<CustomTopicEntriesProps> = ({ entrySize, setC
 
     // }, [entrySize, inputValues, inputIds]); // Empty dependency array means this effect runs once on mount
 
+    if (!selectedTopics) {
+        return;
+    }
+
     for (let i = 0; i < entrySize; i++) {
         inputs.push(
             <ComboboxEntry
                 key={i}
-                value={inputValues[i] ?? ''} 
+                value={selectedTopics[i] ?? ''}
                 setValue={(newValue) => {
-                    const newInputValues = [...inputValues];
+                    const newInputValues = [...selectedTopics];
                     newInputValues[i] = newValue;
-                    setInputValues(newInputValues);
-                    if (setCustomTopicEntries)
-                        setCustomTopicEntries(newInputValues);
+                    if (setSelectedTopic)
+                        setSelectedTopic(newInputValues);
                 }}
                 setId={(newId) => {
                     const newInputIds = [...inputIds];
                     newInputIds[i] = newId;
                     setInputIds(newInputIds);
-                    if (setCustomTopicEntriesIds)
-                        setCustomTopicEntriesIds(newInputIds);
+                    if (setSelectedTopicIds)
+                        setSelectedTopicIds(newInputIds);
                 }}
             />
         );

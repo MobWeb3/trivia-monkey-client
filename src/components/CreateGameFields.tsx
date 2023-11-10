@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { Input, SegmentedControl, Modal, Flex, Container } from '@mantine/core';
 import { NumberInputComponent } from '../components/NumberInput';
 import { IconPacman } from '@tabler/icons-react';
@@ -6,15 +6,12 @@ import PickTopicComponent from './topics/PickTopicComponent';
 import CustomButton from './CustomButton';
 import './CreateGameFields.css';
 import SelectedTopicEntries from './topics/SelectedTopicEntries';
+import { TopicContext, TopicProvider } from './topics/TopicContext';
 
 interface CreateGameFormProps {
     setNickname: (nickname: string) => void;
     setNumberPlayers: (numberPlayers: string) => void;
     setPointsToWin: (pointsToWin: string) => void;
-    // setSelectedChips: (selectedChips: string[]) => void;
-    // selectedChips: string[];
-    setSelectedTopics: React.Dispatch<React.SetStateAction<string[]>>;
-    selectedTopics: string[];
     openModal: () => void;
     closeModal: () => void;
     opened: boolean;
@@ -26,10 +23,6 @@ const CreateGameForm: React.FC<CreateGameFormProps> = ({
     setNickname,
     setNumberPlayers,
     setPointsToWin,
-    // setSelectedChips,
-    // selectedChips,
-    setSelectedTopics,
-    selectedTopics,
     openModal,
     closeModal,
     opened,
@@ -41,13 +34,12 @@ const CreateGameForm: React.FC<CreateGameFormProps> = ({
     // const [customTopicEntries, setCustomTopicEntries] = useState<string[]>([]);
 
     // Ids for the custom topic entries
-    const [customTopicEntriesIds, setCustomTopicEntriesIds] = useState<string[]>([]);
+    // const [customTopicEntriesIds, setCustomTopicEntriesIds] = useState<string[]>([]);
+    const { topics } = useContext(TopicContext);
 
     useEffect(() => {
-        // console.log('customTopicEntries: ', selectedTopics);
-        // console.log('customTopicEntriesIds: ', customTopicEntriesIds);
-        // console.log('selectedChips: ', selectedChips);
-    } , [customTopicEntriesIds, selectedTopics]);
+        console.log('topics in CreateGameFields component: ', topics.map((topic) => topic[0]));
+    } , [topics]);
 
     return (
         <>
@@ -107,9 +99,7 @@ const CreateGameForm: React.FC<CreateGameFormProps> = ({
                     }}>Pick a topic
                 </CustomButton>
                 <SelectedTopicEntries 
-                    entrySize={selectedTopics.length} 
-                    selectedTopics={selectedTopics}
-                    setSelectedTopics={setSelectedTopics}
+                    entrySize={topics.length} 
                 />
                 <CustomButton
                     onClick={handlePlayButtonClick}
@@ -129,23 +119,20 @@ const CreateGameForm: React.FC<CreateGameFormProps> = ({
                     opened={opened}
                     onClose={closeModal}
                     radius={'xl'}
-                    // padding={'s'} 
                     withCloseButton={false}
                     styles={{
                         body: { backgroundColor: '#1AB2C7' },
                     }}
                 >
-                    <PickTopicComponent
-                        setSelectedTopics={setSelectedTopics}
-                        selectedTopics={selectedTopics}
-                        numberOfPlayers={parseInt(numberPlayers)}
-                        closeModal={closeModal}
-                        style={
-                            {
-                                backgroundColor: '#1AB2C7',
+                        <PickTopicComponent
+                            numberOfPlayers={parseInt(numberPlayers)}
+                            closeModal={closeModal}
+                            style={
+                                {
+                                    backgroundColor: '#1AB2C7',
+                                }
                             }
-                        }
-                    />
+                        />
                 </Modal>
             </div>
         </>
