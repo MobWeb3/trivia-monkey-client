@@ -20,36 +20,70 @@ type ModalContentProps = {
     children?: React.ReactNode;
 };
 
-export const PickTopicComponent = ({...props }: ModalContentProps) => {
+export const PickTopicComponent = ({numberOfPlayers, ...props }: ModalContentProps) => {
 
-    const [chipsAvailable, setChipsAvailable] = useState<number>(0);
+    // Number of questions the player can choose in total
+    const numberQuestions = numberOfQuestionPlayerCanChoose(numberOfPlayers);
+
+    // const [chipsAvailable, setChipsAvailable] = useState<number>(0);
+    const [customEntriesAvailable, setCustomEntriesAvailable] = useState<number>(numberQuestions);
     const [chipDisabled, setChipDisabled] = useState(false);
     const { topics } = useContext(TopicContext);
     
-    // Number of questions the player can choose in total
-    const numberQuestions = numberOfQuestionPlayerCanChoose(props.numberOfPlayers);
+
 
     useEffect(() => {
         console.log(`selectedTopics:`, topics.map((topic) => topic[0]));
-        // console.log("chipsAvailable: ", chipsAvailable);
-        const chipsAvailable = () => {
-            // console.log("selectedChipsRef.current.length: ", selectedChips.length);
-            // console.log("numberQuestions: ", numberQuestions);
-            // return selectedChips.length < numberQuestions;
-            // Get the number of chips available
-            const chipsAvailable = numberQuestions - topics.length;
-            console.log("chipsAvailable: ", chipsAvailable);
-            return chipsAvailable;
-        }
-        // If chips are available, then disable the rest of the chips
-        // const chipsAvailable = chipsAvailable();
-        if (chipsAvailable() > 0) {
-            setChipDisabled(false);
 
+        // Get number of selected chips. Chips are selected if label is not empty and id is empty.
+        const selectedChips = () => {
+            let count = 0;
+            topics.forEach((topic) => {
+                if (topic[1] === "") {
+                    count++;
+                }
+            });
+            return count;
+        }
+
+        console.log("selectedChips: ", selectedChips());
+
+        //Get count number of occupied entries. entries that contain an id
+        function occupiedEntriesNumber() {
+
+            //iterate through topics and count the number of entries that contain an id
+            let count = 0;
+            topics.forEach((topic) => {
+                if (topic[1] !== "") {
+                    count++;
+                }
+            });
+
+            return count;
+        }
+        console.log("occupiedEntriesNumber: ", occupiedEntriesNumber());
+
+        const entriesAvailable = () => {
+            // Get the number of chips available
+            const entriesAvailable = numberQuestions - selectedChips();
+            console.log("entriesAvailable: ", entriesAvailable);
+            return entriesAvailable;
+        }
+
+        // return the count number of chips available
+        const chipsAvailable = () => {
+            // Get the count of chips available. Combination of chips and custom entries should not exceed numberQuestions
+            return numberQuestions - occupiedEntriesNumber() - selectedChips();
+        }
+        console.log("chipsAvailable: ", chipsAvailable());
+
+        // If there are chips available, enable the chips
+        if (chipsAvailable() > 0) {
+            setChipDisabled(false)
         } else { // Otherwise, disable the rest of the chips
             setChipDisabled(true);
         }
-        setChipsAvailable(chipsAvailable());
+        setCustomEntriesAvailable(entriesAvailable());
     }
         , [numberQuestions, topics]);
 
@@ -60,43 +94,6 @@ export const PickTopicComponent = ({...props }: ModalContentProps) => {
         }}>
             <DisplayBadge text="Topics" fontSize='30px' />
 
-            {/* <Chip.Group multiple>
-                <Group justify="center" gap="sm">
-
-                    {Object.values(GeneralTopics).map((topicKey, index) => {
-                        const sequentialColor = mantineColors[index % mantineColors.length];
-                        return <Chip
-                            key={`${topicKey}-${isChecked}`}
-                            checked={isChecked(index, topicKey)}
-                            color={sequentialColor}
-                            value={topicKey}
-                            radius={'md'}
-                            size={'xl'}
-                            disabled={chipDisabled && !selectedTopics.includes(topicKey)}
-                            variant="filled"
-                            style={{
-                                border: '1px solid #2c2c2c',
-                                borderRadius: '15%',
-                                fontFamily: 'umbrage2',
-                            }}
-                    
-
-                            onChange={(value) => console.log('changed ', value)}
-                            onClick={() => handleChipSelect(topicKey)}
-                            >
-                                {topicKey}
-                        </Chip>
-                    })}
-                    <DisplayBadge text="Topic of choice" fontSize='30px' />
-                    <CustomTopicEntries 
-                        entrySize={chipsAvailable} 
-                        setCustomTopicEntriesIds = {(props.setCustomTopicEntriesIds)}
-                        setCustomTopicEntries = {props.setCustomTopicEntries}
-                    />
-                    <CustomButton fontSize='30px' onClick={props.closeModal}>Done</CustomButton>
-                </Group>
-            </Chip.Group> */}
-
             <div style={{ padding: '5px' }}>
                 <ChipGroup
                     options={Object.values(GeneralTopics)}
@@ -104,10 +101,7 @@ export const PickTopicComponent = ({...props }: ModalContentProps) => {
                 />
                 <DisplayBadge text="Topic of choice" fontSize='30px' />
                 <CustomTopicEntries
-                    entrySize={chipsAvailable}
-                    // setSelectedTopicIds={(props.setCustomTopicEntriesIds)}
-                    // setSelectedTopic={setSelectedTopics}
-                    // selectedTopics={selectedTopics}
+                    entrySize={customEntriesAvailable}
                 />
 
             </div>
@@ -122,7 +116,6 @@ export const PickTopicComponent = ({...props }: ModalContentProps) => {
                     style={{ marginTop: '0px' }}
                 >Done</CustomButton>
             </div>
-
         </div>
     );
 };
