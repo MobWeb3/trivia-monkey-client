@@ -6,7 +6,7 @@ import PickTopicComponent from './topics/PickTopicComponent';
 import CustomButton from './CustomButton';
 import './CreateGameFields.css';
 import SelectedTopicEntries from './topics/SelectedTopicEntries';
-import { TopicContext, TopicProvider } from './topics/TopicContext';
+import { TopicContext } from './topics/TopicContext';
 
 interface CreateGameFormProps {
     setNickname: (nickname: string) => void;
@@ -29,12 +29,6 @@ const CreateGameForm: React.FC<CreateGameFormProps> = ({
     numberPlayers,
     handlePlayButtonClick
 }) => {
-
-    // Custom topic entries labels
-    // const [customTopicEntries, setCustomTopicEntries] = useState<string[]>([]);
-
-    // Ids for the custom topic entries
-    // const [customTopicEntriesIds, setCustomTopicEntriesIds] = useState<string[]>([]);
     const { topics } = useContext(TopicContext);
 
     useEffect(() => {

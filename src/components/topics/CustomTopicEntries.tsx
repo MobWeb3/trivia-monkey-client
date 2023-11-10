@@ -1,47 +1,30 @@
-import React, { useState } from 'react';
+import React, { useContext } from 'react';
 import { ComboboxEntry } from './ComboBoxEntry';
+import { TopicContext } from './TopicContext';
 
 interface CustomTopicEntriesProps {
     entrySize: number;
-    selectedTopics?: string[];
-    setSelectedTopic?: (topics: string[]) => void;
-    setSelectedTopicIds?: (topicIds: string[]) => void;
 }
 
-const CustomTopicEntries: React.FC<CustomTopicEntriesProps> = ({ entrySize, setSelectedTopic, setSelectedTopicIds, selectedTopics }) => {
+const CustomTopicEntries: React.FC<CustomTopicEntriesProps> = ({ entrySize}) => {
     const inputs = [];
-    
-    const [inputIds, setInputIds] = useState<string[]>(new Array(entrySize).fill(''));
+    const { topics } = useContext(TopicContext);
 
-    // useEffect(() => {
-    //     // inputValuesRef.current = inputValues;
-    //     console.log(`inputValues `, inputValues);
-    //     console.log('inputIds', inputIds);
+    const getValue = (index: number) => {
 
-    // }, [entrySize, inputValues, inputIds]); // Empty dependency array means this effect runs once on mount
-
-    if (!selectedTopics) {
-        return;
+        if (topics && topics.length > 0) {
+            if (topics[index] === undefined) return '';
+            if (topics[index][1] === '') return '';
+            return topics[index][0];
+        }
+        return '';
     }
 
     for (let i = 0; i < entrySize; i++) {
         inputs.push(
             <ComboboxEntry
                 key={i}
-                value={selectedTopics[i] ?? ''}
-                setValue={(newValue) => {
-                    const newInputValues = [...selectedTopics];
-                    newInputValues[i] = newValue;
-                    if (setSelectedTopic)
-                        setSelectedTopic(newInputValues);
-                }}
-                setId={(newId) => {
-                    const newInputIds = [...inputIds];
-                    newInputIds[i] = newId;
-                    setInputIds(newInputIds);
-                    if (setSelectedTopicIds)
-                        setSelectedTopicIds(newInputIds);
-                }}
+                savedValue={getValue(i)}
             />
         );
     }

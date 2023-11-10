@@ -6,16 +6,14 @@ import { Topic, TopicContext } from './TopicContext';
 
 interface MyComboboxProps extends ComboboxProps {
     // other props...
-    // key: string | number;
-    value: string;
-    setValue: (value: string) => void;
-    setId: (value: string) => void;
+    savedValue: string
 }
 
-export function ComboboxEntry({ value, setValue, setId }: MyComboboxProps) {
+export function ComboboxEntry({ savedValue }: MyComboboxProps) {
     const combobox = useCombobox();
     const [data, setData] = useState<{ value: string, label: string }[]>([]);
     const [searching, setSearching] = useState(false);
+    const [currentValue, setCurrentValue] = useState<string>(savedValue);
     const [optionSelected, setOptionSelected] = useState(false);
     const { topics, setTopics } = useContext(TopicContext);
 
@@ -39,8 +37,9 @@ export function ComboboxEntry({ value, setValue, setId }: MyComboboxProps) {
         <Combobox
             onOptionSubmit={(optionValue) => {
                 console.log("optionValue: ", optionValue);
-                setValue(optionValue);
-                setId(getOptionId(optionValue));
+                const topic: Topic = [optionValue, getOptionId(optionValue)];
+                //previous topics and add new topic
+                setTopics([...topics, topic]);
                 combobox.closeDropdown();
 
                 // replace right section with X
@@ -53,7 +52,7 @@ export function ComboboxEntry({ value, setValue, setId }: MyComboboxProps) {
             >
                 <TextInput
                     placeholder="Enter topic..."
-                    value={value}
+                    value={currentValue}
                     size="xl"
                     radius="lg"
                     style={{
@@ -62,30 +61,21 @@ export function ComboboxEntry({ value, setValue, setId }: MyComboboxProps) {
                     }}
                     onChange={(event) => {
                         const value = event.currentTarget.value;
-                        setValue(value);
-                        // lets update the topics using setTopics with the new value
-                        const topic: Topic = [value, getOptionId(value)];
-                        //previous topics and add new topic
-                        setTopics([...topics, topic]);
-  
+                        setCurrentValue(value);
                         combobox.openDropdown();
-                        combobox.updateSelectedOptionIndex();
+                        // combobox.updateSelectedOptionIndex();
                     }}
                     onClick={() => combobox.openDropdown()}
                     onFocus={() => combobox.openDropdown()}
                     onBlur={() => combobox.closeDropdown()}
                     rightSection={
                         <div
-                            onClick={async (event) => {
-                                // event.preventDefault();
-                                // event.stopPropagation();
-                                // console.log("event: ", event)
-                                // console.log("clicked on search:", value);
-
-                                if (value.length > 2 && !optionSelected) {
-                                    console.log("searching for: ", value);
+                            onClick={async () => {
+  
+                                if (currentValue.length > 2 && !optionSelected) {
+                                    console.log("searching for: ", currentValue);
                                     setSearching(true);
-                                    const response = (await getTopicEntries(value));
+                                    const response = (await getTopicEntries(currentValue));
                                     setSearching(false);
                                     console.log("response: ", response);
                                     setData(response.slice(0, 10).map((item) => ({ value: item.id, label: item.title })));

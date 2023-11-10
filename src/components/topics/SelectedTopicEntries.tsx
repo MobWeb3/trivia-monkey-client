@@ -12,6 +12,7 @@ const SelectedTopicEntries: React.FC<SelectedTopicEntriesProps> = ({ entrySize }
     const { topics } = useContext(TopicContext);
 
     for (let i = 0; i < entrySize; i++) {
+        if (topics[i][0] === undefined) continue;
         inputs.push(
             <SelectedTopic
                 key={i}
