@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useState } from 'react';
 import { Combobox, ComboboxProps, TextInput, useCombobox } from '@mantine/core';
 import { IconSearch, IconCircleLetterX } from '@tabler/icons-react';
 import { getTopicEntries } from '../../metaphor/metaphor';
@@ -28,14 +28,10 @@ export function ComboboxEntry({ savedValue }: MyComboboxProps) {
         return item ? item.value : '';
     }
 
-    useEffect(() => {
-        console.log("topics: ", topics);
-    }, [topics]);
-
     return (
         <Combobox
             onOptionSubmit={(optionValue) => {
-                console.log("optionValue: ", optionValue);
+                // console.log("optionValue: ", optionValue);
                 const topic: Topic = [optionValue, getOptionId(optionValue)];
                 //previous topics and add new topic
                 setTopics([...topics, topic]);

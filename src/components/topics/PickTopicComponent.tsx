@@ -28,7 +28,7 @@ export const PickTopicComponent = ({numberOfPlayers, ...props }: ModalContentPro
 
 
     useEffect(() => {
-        console.log(`selectedTopics:`, topics.map((topic) => topic[0]));
+        // console.log(`selectedTopics:`, topics.map((topic) => topic[0]));
 
         // Get number of selected chips. Chips are selected if label is not empty and id is empty.
         const selectedChips = () => {
@@ -41,7 +41,7 @@ export const PickTopicComponent = ({numberOfPlayers, ...props }: ModalContentPro
             return count;
         }
 
-        console.log("selectedChips: ", selectedChips());
+        // console.log("selectedChips: ", selectedChips());
 
         //Get count number of occupied entries. entries that contain an id
         function occupiedEntriesNumber() {
@@ -56,12 +56,12 @@ export const PickTopicComponent = ({numberOfPlayers, ...props }: ModalContentPro
 
             return count;
         }
-        console.log("occupiedEntriesNumber: ", occupiedEntriesNumber());
+        // console.log("occupiedEntriesNumber: ", occupiedEntriesNumber());
 
         const entriesAvailable = () => {
             // Get the number of chips available
             const entriesAvailable = numberQuestions - selectedChips();
-            console.log("entriesAvailable: ", entriesAvailable);
+            // console.log("entriesAvailable: ", entriesAvailable);
             return entriesAvailable;
         }
 
@@ -70,7 +70,7 @@ export const PickTopicComponent = ({numberOfPlayers, ...props }: ModalContentPro
             // Get the count of chips available. Combination of chips and custom entries should not exceed numberQuestions
             return numberQuestions - occupiedEntriesNumber() - selectedChips();
         }
-        console.log("chipsAvailable: ", chipsAvailable());
+        // console.log("chipsAvailable: ", chipsAvailable());
 
         // If there are chips available, enable the chips
         if (chipsAvailable() > 0) {

@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from 'react';
+import React, { useContext } from 'react';
 import { Input, SegmentedControl, Modal, Flex, Container } from '@mantine/core';
 import { NumberInputComponent } from '../components/NumberInput';
 import { IconPacman } from '@tabler/icons-react';
@@ -31,9 +31,9 @@ const CreateGameForm: React.FC<CreateGameFormProps> = ({
 }) => {
     const { topics } = useContext(TopicContext);
 
-    useEffect(() => {
-        console.log('topics in CreateGameFields component: ', topics.map((topic) => topic[0]));
-    } , [topics]);
+    // useEffect(() => {
+    //     // console.log('topics in CreateGameFields component: ', topics.map((topic) => topic[0]));
+    // } , [topics]);
 
     return (
         <>
