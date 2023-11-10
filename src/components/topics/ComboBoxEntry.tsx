@@ -14,7 +14,6 @@ export function ComboboxEntry({ savedValue }: MyComboboxProps) {
     const [data, setData] = useState<{ value: string, label: string }[]>([]);
     const [searching, setSearching] = useState(false);
     const [currentValue, setCurrentValue] = useState<string>(savedValue);
-    const [optionSelected, setOptionSelected] = useState(false);
     const { topics, setTopics } = useContext(TopicContext);
 
     const options = data.map((item) => (
@@ -41,9 +40,7 @@ export function ComboboxEntry({ savedValue }: MyComboboxProps) {
                 //previous topics and add new topic
                 setTopics([...topics, topic]);
                 combobox.closeDropdown();
-
-                // replace right section with X
-                setOptionSelected(true);
+                setCurrentValue(optionValue);
             }}
             store={combobox}
         >
@@ -63,16 +60,15 @@ export function ComboboxEntry({ savedValue }: MyComboboxProps) {
                         const value = event.currentTarget.value;
                         setCurrentValue(value);
                         combobox.openDropdown();
-                        // combobox.updateSelectedOptionIndex();
                     }}
                     onClick={() => combobox.openDropdown()}
                     onFocus={() => combobox.openDropdown()}
                     onBlur={() => combobox.closeDropdown()}
-                    rightSection={
+                    leftSection={
                         <div
                             onClick={async () => {
   
-                                if (currentValue.length > 2 && !optionSelected) {
+                                if (currentValue.length > 2) {
                                     console.log("searching for: ", currentValue);
                                     setSearching(true);
                                     const response = (await getTopicEntries(currentValue));
@@ -81,15 +77,27 @@ export function ComboboxEntry({ savedValue }: MyComboboxProps) {
                                     setData(response.slice(0, 10).map((item) => ({ value: item.id, label: item.title })));
                                     combobox.openDropdown();
                                 }
-
-                                if (optionSelected) {
-                                    setData([]);
-                                    // setValue('');
-                                    setOptionSelected(false);
-                                }
                             }}
                         >
-                            {optionSelected ? <IconCircleLetterX /> : <IconSearch />}
+                            {<IconSearch />}
+                        </div>
+                    }
+                    rightSection={
+                        <div
+                            onClick={() => {
+                                setData([]);
+                                // remove the topic from the list to deselect it
+                                const newTopics = topics.filter((topic) => { 
+                                    // console.log("topic: ", topic);
+                                    // console.log("currentValue: ", currentValue);
+                                    return topic[0] !== currentValue}
+                                );
+                                // console.log("newTopics: ", newTopics);
+                                setTopics(newTopics);
+                                setCurrentValue('');
+                            }}
+                        >
+                          {  currentValue.length > 2 ? <IconCircleLetterX /> : null}
                         </div>
                     }
                 />

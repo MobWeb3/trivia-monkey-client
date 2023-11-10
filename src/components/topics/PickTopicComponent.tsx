@@ -9,13 +9,8 @@ import { ChipGroup } from './Chip';
 import { TopicContext } from './TopicContext';
 
 type ModalContentProps = {
-    // Define your prop types here
-    // setSelectedTopics: React.Dispatch<React.SetStateAction<string[]>>;
-    // selectedTopics: string[];
     numberOfPlayers: number;
     style?: React.CSSProperties;
-    // setCustomTopicEntries?: (customTopicEntries: string[]) => void;
-    // setCustomTopicEntriesIds?: (customTopicEntriesIds: string[]) => void;
     closeModal?: () => void;
     children?: React.ReactNode;
 };
