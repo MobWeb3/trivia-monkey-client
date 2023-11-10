@@ -13,7 +13,7 @@ interface CreateGameFormProps {
     setPointsToWin: (pointsToWin: string) => void;
     // setSelectedChips: (selectedChips: string[]) => void;
     // selectedChips: string[];
-    setSelectedTopics: (customTopicEntries: string[]) => void;
+    setSelectedTopics: React.Dispatch<React.SetStateAction<string[]>>;
     selectedTopics: string[];
     openModal: () => void;
     closeModal: () => void;
@@ -44,8 +44,8 @@ const CreateGameForm: React.FC<CreateGameFormProps> = ({
     const [customTopicEntriesIds, setCustomTopicEntriesIds] = useState<string[]>([]);
 
     useEffect(() => {
-        console.log('customTopicEntries: ', selectedTopics);
-        console.log('customTopicEntriesIds: ', customTopicEntriesIds);
+        // console.log('customTopicEntries: ', selectedTopics);
+        // console.log('customTopicEntriesIds: ', customTopicEntriesIds);
         // console.log('selectedChips: ', selectedChips);
     } , [customTopicEntriesIds, selectedTopics]);
 

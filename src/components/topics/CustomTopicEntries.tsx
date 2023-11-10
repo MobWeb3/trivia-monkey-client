@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { ComboboxEntry } from './ComboBoxEntry';
 
 interface CustomTopicEntriesProps {
@@ -21,12 +21,12 @@ const CustomTopicEntries: React.FC<CustomTopicEntriesProps> = ({ entrySize, setC
     const [inputValues, setInputValues] = useState<string[]>(new Array(entrySize).fill(''));
     const [inputIds, setInputIds] = useState<string[]>(new Array(entrySize).fill(''));
 
-    useEffect(() => {
-        // inputValuesRef.current = inputValues;
-        console.log(`inputValues `, inputValues);
-        console.log('inputIds', inputIds);
+    // useEffect(() => {
+    //     // inputValuesRef.current = inputValues;
+    //     console.log(`inputValues `, inputValues);
+    //     console.log('inputIds', inputIds);
 
-    }, [entrySize, inputValues, inputIds]); // Empty dependency array means this effect runs once on mount
+    // }, [entrySize, inputValues, inputIds]); // Empty dependency array means this effect runs once on mount
 
     for (let i = 0; i < entrySize; i++) {
         inputs.push(
