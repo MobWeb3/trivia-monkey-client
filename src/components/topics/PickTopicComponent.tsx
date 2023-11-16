@@ -19,8 +19,6 @@ export const PickTopicComponent = ({numberOfPlayers, ...props }: ModalContentPro
 
     // Number of questions the player can choose in total
     const numberQuestions = numberOfQuestionPlayerCanChoose(numberOfPlayers);
-
-    // const [chipsAvailable, setChipsAvailable] = useState<number>(0);
     const [customEntriesAvailable, setCustomEntriesAvailable] = useState<number>(numberQuestions);
     const [chipDisabled, setChipDisabled] = useState(false);
     const { topics } = useContext(TopicContext);

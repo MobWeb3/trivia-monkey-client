@@ -12,31 +12,34 @@ import { SessionDataProvider } from './components/SessionDataContext';
 import AIGame from './screens/AIGame';
 import { MantineProvider } from '@mantine/core';
 import '@mantine/core/styles.css';
+import { TopicProvider } from './components/topics/TopicContext';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
 root.render(
   <React.StrictMode>
-    
-      <SignerProvider>
-        <SessionDataProvider>
+
+    <SignerProvider>
+      <SessionDataProvider>
         <MantineProvider>
-          <Router>
-            <Routes>
-              <Route path="/playlobby" element={<PlayLobby />} />
-              <Route path="*" element={<SignInPage />} />
-              <Route path="/creategame" element={<CreateGame />} />
-              <Route path="/joingame" element={<JoinGame />} />
-              <Route path="/spinwheel" element={<SpinWheel />} />
-              <Route path="/aigame" element={<AIGame />} />
-              {/* other routes... */}
-            </Routes>
-            {/* <Bootstrap /> */}
-          </Router>
-          </MantineProvider>
-        </SessionDataProvider>
-      </SignerProvider>
+          <TopicProvider>
+            <Router>
+              <Routes>
+                <Route path="/playlobby" element={<PlayLobby />} />
+                <Route path="*" element={<SignInPage />} />
+                <Route path="/creategame" element={<CreateGame />} />
+                <Route path="/joingame" element={<JoinGame />} />
+                <Route path="/spinwheel" element={<SpinWheel />} />
+                <Route path="/aigame" element={<AIGame />} />
+                {/* other routes... */}
+              </Routes>
+              {/* <Bootstrap /> */}
+            </Router>
+          </TopicProvider>
+        </MantineProvider>
+      </SessionDataProvider>
+    </SignerProvider>
   </React.StrictMode>
 );
 
