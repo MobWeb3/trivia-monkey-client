@@ -13,7 +13,7 @@
     "@tabler/icons-react": "^2.40.0",
     "@types/node": "^20.8.9",
     "@types/react": "^18.2.37",
-    "@types/react-dom": "^18.2.7",
+    "@types/react-dom": "^18.2.15",
     "@types/uuid": "^9.0.2",
     "@vitejs/plugin-react-swc": "^3.4.0",
     "@walletconnect/sign-client": "^2.9.1",
