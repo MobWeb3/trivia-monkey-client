@@ -2,41 +2,44 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import { SignerProvider } from './components/SignerContext';
-import SignInPage from './sceneReactComponents/SignInPage';
+import SignInPage from './screens/SignInPage';
 import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
-import PlayLobby from './sceneReactComponents/PlayLobby';
-import CreateGame from './sceneReactComponents/CreateGame';
-import JoinGame from './sceneReactComponents/JoinGame';
-import SpinWheel from './sceneReactComponents/SpinWheel';
+import PlayLobby from './screens/PlayLobby';
+import CreateGame from './screens/CreateGame';
+import JoinGame from './screens/JoinGame';
+import SpinWheel from './screens/SpinWheel';
 import { SessionDataProvider } from './components/SessionDataContext';
-import AIGame from './sceneReactComponents/AIGame';
+import AIGame from './screens/AIGame';
 import { MantineProvider } from '@mantine/core';
 import '@mantine/core/styles.css';
+import { TopicProvider } from './components/topics/TopicContext';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
 root.render(
   <React.StrictMode>
-    
-      <SignerProvider>
-        <SessionDataProvider>
+
+    <SignerProvider>
+      <SessionDataProvider>
         <MantineProvider>
-          <Router>
-            <Routes>
-              <Route path="/playlobby" element={<PlayLobby />} />
-              <Route path="*" element={<SignInPage />} />
-              <Route path="/creategame" element={<CreateGame />} />
-              <Route path="/joingame" element={<JoinGame />} />
-              <Route path="/spinwheel" element={<SpinWheel />} />
-              <Route path="/aigame" element={<AIGame />} />
-              {/* other routes... */}
-            </Routes>
-            {/* <Bootstrap /> */}
-          </Router>
-          </MantineProvider>
-        </SessionDataProvider>
-      </SignerProvider>
+          <TopicProvider>
+            <Router>
+              <Routes>
+                <Route path="/playlobby" element={<PlayLobby />} />
+                <Route path="*" element={<SignInPage />} />
+                <Route path="/creategame" element={<CreateGame />} />
+                <Route path="/joingame" element={<JoinGame />} />
+                <Route path="/spinwheel" element={<SpinWheel />} />
+                <Route path="/aigame" element={<AIGame />} />
+                {/* other routes... */}
+              </Routes>
+              {/* <Bootstrap /> */}
+            </Router>
+          </TopicProvider>
+        </MantineProvider>
+      </SessionDataProvider>
+    </SignerProvider>
   </React.StrictMode>
 );
 

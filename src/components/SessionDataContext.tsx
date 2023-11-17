@@ -1,5 +1,5 @@
 import React, { createContext, useState } from 'react';
-import { SessionData } from '../sceneReactComponents/SessionData';
+import { SessionData } from '../screens/SessionData';
 
 interface SessionDataType {
   sessionData: SessionData | null;

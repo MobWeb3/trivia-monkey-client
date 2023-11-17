@@ -31,7 +31,7 @@ export const SignInPage = () => {
     setUserInfo(userInfo);
     localStorage.setItem('userInfo', JSON.stringify(userInfo));
     if (sessionData) {
-      setSessionData({ ...sessionData, clientId: userInfo.email });
+      setSessionData({ ...sessionData, clientId: userInfo.email, name: userInfo.name });
     }
     const evmChain = false;
 

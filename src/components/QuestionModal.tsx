@@ -7,7 +7,7 @@ import { Question } from '../game-domain/Question';
 import { addPointToPlayer } from '../polybase/SessionHandler';
 import { sendMessage } from '../utils/MessageListener';
 import { Messages } from '../utils/Messages';
-import { SessionData } from '../sceneReactComponents/SessionData';
+import { SessionData } from '../screens/SessionData';
 import useLocalStorageState from 'use-local-storage-state'
 
 const placeholderQuestionText = "What is the capital of the United States of America?"

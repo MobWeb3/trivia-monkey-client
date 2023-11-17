@@ -21,10 +21,15 @@ const SelfAvatar = ({ self }: { self: Member | null }) => {
       className={styles.avatar}
       onMouseOver={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
+      style={{
+        backgroundImage: `url(${self?.profileData.avatar})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+      }}
     >
-      <p className={styles.name}>You</p>
+      {/* <p className={styles.name}>You</p> */}
       <div className={styles.statusIndicatorOnline} id="status-indicator" />
-
+      
       {hover && self ? (
         <div className={styles.popup}>
           <UserInfo user={self} isSelf={true} />
@@ -46,18 +51,18 @@ const OtherAvatars = ({
     <>
       {users.map((user, index) => {
         const rightOffset = calculateRightOffset({ usersCount, index });
-        const userInitials = user.profileData.name
-          .split(" ")
-          .map((word: string) => word.charAt(0))
-          .join("");
+        // const userInitials = user.profileData.name
+        //   .split(" ")
+        //   .map((word: string) => word.charAt(0))
+        //   .join("");
 
-        const initialsCSS = classNames(
-          {
-            [styles.textWhite]: user.isConnected,
-            [styles.inactiveColor]: !user.isConnected,
-          },
-          styles.nameOthers,
-        );
+        // const initialsCSS = classNames(
+        //   {
+        //     [styles.textWhite]: user.isConnected,
+        //     [styles.inactiveColor]: !user.isConnected,
+        //   },
+        //   styles.nameOthers,
+        // );
 
         const statusIndicatorCSS = classNames(
           {
@@ -76,18 +81,18 @@ const OtherAvatars = ({
               zIndex: users.length - index,
             }}
           >
-            <div
-              className={styles.avatar}
-              style={{
-                backgroundColor: user.isConnected
-                  ? user.profileData.memberColor
-                  : "#C6CED9",
-              }}
-              onMouseOver={() => setHoveredClientId(user.clientId)}
-              onMouseLeave={() => setHoveredClientId(null)}
-              id="avatar"
-            >
-              <p className={initialsCSS}>{userInitials}</p>
+              <div
+                className={styles.avatar}
+                style={{
+                  backgroundImage: `url(${user.profileData.avatar})`,
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                }}
+                onMouseOver={() => setHoveredClientId(user.clientId)}
+                onMouseLeave={() => setHoveredClientId(null)}
+                id="avatar"
+              >
+              {/* <p className={initialsCSS}>{userInitials}</p> */}
               <div className={statusIndicatorCSS} id="status-indicator" />
             </div>
 

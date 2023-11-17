@@ -38,20 +38,13 @@ export const SignerProvider: React.FC<PropsWithChildren<Props>> = ({ children })
 
 
   const init = async () => {
-    console.log("env variables: ", import.meta.env)
+    // console.log("env variables: ", import.meta.env)
     try {
       const web3auth = web3authSolana;
 
       await web3auth.initModal();
       if (web3auth) {
         setWeb3auth(web3auth);
-        // console.log("web3auth: ", web3auth);
-        // setWeb3AuthConnector(new Web3AuthConnector({
-        //   chains,
-        //   options: {
-        //     web3AuthInstance: web3auth,
-        //   },
-        // }))
       }
       setLoading(false);
     } catch (error) {

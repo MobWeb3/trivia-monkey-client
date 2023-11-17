@@ -5,7 +5,7 @@ import { Messages } from '../utils/Messages';
 import { useLocation, useNavigate } from 'react-router-dom';
 import queryString from 'query-string';
 import { Badge, Button, Group, Modal } from '@mantine/core';
-import ModalContent from '../components/ModalContent';
+import ModalContent from '../components/topics/PickTopicComponent';
 import { useDisclosure } from '@mantine/hooks';
 import { getSession, updateTopics } from '../polybase/SessionHandler';
 import { generateQuestions } from '../game-domain/GenerateQuestionsHandler';
@@ -22,7 +22,7 @@ const JoinGame = () => {
     const [sessionData, setSessionData] = useLocalStorageState<SessionData>('sessionData', {});
     const location = useLocation();
     const [opened, { open, close }] = useDisclosure(false);
-    const [selectedChips, setSelectedChips] = useState<string[]>([]);
+    const [selectedChips] = useState<string[]>([]);
     const [numberPlayers, setNumberPlayers] = useState<number>(0);
     const [joined, setJoined] = useState(false);
 
@@ -153,7 +153,9 @@ const JoinGame = () => {
 
 
                 <Modal opened={opened} onClose={close} title="Pick topic" radius={'lg'} padding={'xl'}>
-                    <ModalContent setSelectedChips={setSelectedChips} numberOfPlayers={numberPlayers}></ModalContent>
+                    <ModalContent 
+                        numberOfPlayers={numberPlayers}>
+                    </ModalContent>
                     {/* Modal content */}
                 </Modal>
                 <Group justify="center">
