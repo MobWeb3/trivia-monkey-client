@@ -35,14 +35,15 @@ export const createChannelListenerWrapper = async (web3auth: Web3Auth, data: any
 
         if (response) {
             // console.log('createSession response:', response);
+            // console.log('createSession args: ', data, channelId);
             const pbSessionId = response?.recordData?.data?.id;
             const channel = ChannelHandler.ablyInstance?.ablyInstance.channels.get(channelId);
             channel?.presence.subscribe('enter', async function (member) {
-                console.log(member.clientId + ' entered realtime-chat');
+                // console.log(member.clientId + ' entered realtime-chat');
                 const presence = await channel?.presence.get();
-                console.log('presence: ', presence);
-                console.log('presence.length: ', presence.length);
-                console.log('data: ', data);
+                // console.log('presence: ', presence);
+                // console.log('presence.length: ', presence.length);
+                // console.log('data: ', data);
                 if (presence.length === Number(data.numberPlayers)) {
 
                     console.log('All players joined, starting game...');
