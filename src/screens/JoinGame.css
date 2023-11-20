@@ -1,12 +1,10 @@
 body,
 html {
-    margin: 20px;
-    padding: 20px;
-    /* height: 50%; */
-    /* overflow: hidden; */
+    margin: 10px;
+    padding: 10px;
 }
 
-.createGamePage {
+.JoinGamePage {
     position: fixed;
     top: 0;
     left: 0;
@@ -33,7 +31,7 @@ html {
     text-align: center;
 } */
 
-.createGameForm {
+.joinGameForm {
     position: absolute;
     top: 10%;
     left: 10%;

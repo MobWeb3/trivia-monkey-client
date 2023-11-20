@@ -4,8 +4,8 @@ import { SignerContext } from '../components/SignerContext';
 import { Messages } from '../utils/Messages';
 import { useLocation, useNavigate } from 'react-router-dom';
 import queryString from 'query-string';
-import { Badge, Button, Group, Modal } from '@mantine/core';
-import ModalContent from '../components/topics/PickTopicComponent';
+import { Container, Flex, Modal } from '@mantine/core';
+import { PickTopicComponent } from '../components/topics/PickTopicComponent';
 import { useDisclosure } from '@mantine/hooks';
 import { getSession, updateTopics } from '../polybase/SessionHandler';
 import { generateQuestions } from '../game-domain/GenerateQuestionsHandler';
@@ -14,6 +14,11 @@ import { SessionPhase } from '../game-domain/SessionPhase';
 import { login } from '../utils/Web3AuthAuthentication';
 import { SessionData } from './SessionData';
 import useLocalStorageState from 'use-local-storage-state';
+import WaitingScreen from '../components/WaitingScreen';
+import './JoinGame.css';
+import CustomButton from '../components/CustomButton';
+import SelectedTopicEntries from '../components/topics/SelectedTopicEntries';
+import { TopicContext } from '../components/topics/TopicContext';
 
 const JoinGame = () => {
     // const [channelId, setChannelId] = useState('');
@@ -23,8 +28,9 @@ const JoinGame = () => {
     const location = useLocation();
     const [opened, { open, close }] = useDisclosure(false);
     const [selectedChips] = useState<string[]>([]);
-    const [numberPlayers, setNumberPlayers] = useState<number>(0);
+    const [numberPlayers, setNumberPlayers] = useState<string>('');
     const [joined, setJoined] = useState(false);
+    const { topics } = useContext(TopicContext);
 
     useEffect(() => {
         const handleAllPlayersJoined = (event: any) => {
@@ -52,7 +58,7 @@ const JoinGame = () => {
         console.log('JoinGame loaded: ', sessionId, channelId);
         if (sessionId && channelId) {
             getSession({ id: sessionId }).then((_sessionData) => {
-                setNumberPlayers(parseInt(_sessionData.numberPlayers));
+                setNumberPlayers(_sessionData.numberPlayers);
                 setSessionData({
                     ...sessionData,
                     sessionId: sessionId as string,
@@ -85,6 +91,7 @@ const JoinGame = () => {
     };
 
     const handleJoinButtonClick = () => {
+        if (!web3auth) retryLogin();
         joinIfAlreadyActiveGame();
         if (sessionData?.channelId !== '') {
             handleJoinGame({ channelId: sessionData?.channelId });
@@ -136,35 +143,82 @@ const JoinGame = () => {
         }
     }
 
-    const WaitingMessage = () => {
-        return (
-            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-                <p>We are waiting for other players to join...</p>
-            </div>
-
-        );
-    };
-
     return (
-        joined ? <WaitingMessage /> :
-            <div>
-                <h1>Select topics and Join</h1>
-                {/* <input type="text" placeholder="Channel id" value={sessionData?.channelId} onChange={e => setChannelId(e.target.value)} /> */}
+        <div className='JoinGamePage'>
+            {
+                joined && <WaitingScreen />
+            }
+            {
+                !joined && <div className='joinGameForm'>
+                    <Flex
+                        gap="sm"
+                        justify="center"
+                        align="center"
+                        direction="column"
+                        w="100%"
+                    >
+                        <Container fluid bg="#FDD673" w="100%" className='container-number-players'>
+                            Select topics and Join
+                        </Container>
+
+                        <CustomButton
+                            fontSize={"32px"}
+                            onClick={open}
+                            background='linear-gradient(to bottom right, orange, red)'
+                            color='#2B2C21'
+                            style={{
+                                marginTop: '5px',
+                                marginBottom: '5px',
+                            }}>Select topics
+                        </CustomButton>
+
+                        <SelectedTopicEntries
+                            entrySize={topics.length}
+                        />
+
+                        {/* show Join if all three topics filled */}
+                        {topics.length >= 3 && <CustomButton
+                            onClick={handleJoinButtonClick}
+                            style={{
+                                marginTop: '5px',
+                                marginBottom: '5px',
+                            }}
+                        >Join
+                        </CustomButton>}
+
+                    </Flex>
+                    <div className='ModalContent'>
+                        {/* # For some reason I need to position to the left around -%13 to center the modal. */}
+                        <Modal
+                            pos={"absolute"}
+                            left={'-5%'}
+                            right={'-5%'}
+                            yOffset={'5dvh'}
+                            opened={opened}
+                            onClose={close}
+                            radius={'xl'}
+                            withCloseButton={false}
+                            styles={{
+                                body: { backgroundColor: '#1AB2C7' },
+                            }}
+                        >
+                            <PickTopicComponent
+                                numberOfPlayers={parseInt(numberPlayers)}
+                                closeModal={close}
+                                style={
+                                    {
+                                        backgroundColor: '#1AB2C7',
+                                    }
+                                }
+                            />
+                        </Modal>
+                    </div>
+
+                </div>
+            }
 
 
-                <Modal opened={opened} onClose={close} title="Pick topic" radius={'lg'} padding={'xl'}>
-                    <ModalContent 
-                        numberOfPlayers={numberPlayers}>
-                    </ModalContent>
-                    {/* Modal content */}
-                </Modal>
-                <Group justify="center">
-                    <Badge size="lg" radius="lg" variant="dot">Selected topics: {selectedChips.join(', ')}</Badge>
-                    <Button onClick={open}>Pick a topic</Button>
-                </Group>
-
-                <Button onClick={handleJoinButtonClick} variant="gradient" gradient={{ from: 'orange', to: 'red' }}>Join</Button>
-            </div>
+        </div>
 
     );
 };
