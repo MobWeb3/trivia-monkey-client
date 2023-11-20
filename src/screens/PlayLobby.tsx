@@ -31,6 +31,7 @@ const PlayLobbyScene = () => {
         }
         localStorage.removeItem('userInfo');
         localStorage.removeItem('web3auth');
+        localStorage.removeItem('sessionData');
         console.log('Disconnected');
     };
 
