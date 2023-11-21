@@ -43,7 +43,7 @@ export default defineConfig(({ command, mode }) => {
                     display: 'standalone',
                     icons: [
                         {
-                            src: 'assets/monkeys_avatars/astronaut-monkey1-200x200.png',
+                            src: 'logo200.png',
                             sizes: '200x200',
                             type: 'image/png',
                             purpose: 'any maskable',
