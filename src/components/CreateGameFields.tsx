@@ -92,8 +92,8 @@ const CreateGameForm: React.FC<CreateGameFormProps> = ({
                         marginBottom: '5px',
                     }}>Pick a topic
                 </CustomButton>
-                <SelectedTopicEntries 
-                    entrySize={topics.length} 
+                <SelectedTopicEntries
+                    entrySize={topics.length}
                 />
                 <CustomButton
                     onClick={handlePlayButtonClick}
@@ -104,31 +104,30 @@ const CreateGameForm: React.FC<CreateGameFormProps> = ({
                 >Create Game
                 </CustomButton>
             </Flex>
-            <div className='ModalContent'>
-                {/* # For some reason I need to position to the left around -%13 to center the modal. */}
-                <Modal
-                    pos={"absolute"}
-                    left={'-13%'}
-                    yOffset={'5dvh'}
-                    opened={opened}
-                    onClose={closeModal}
-                    radius={'xl'}
-                    withCloseButton={false}
-                    styles={{
-                        body: { backgroundColor: '#1AB2C7' },
-                    }}
-                >
-                        <PickTopicComponent
-                            numberOfPlayers={parseInt(numberPlayers)}
-                            closeModal={closeModal}
-                            style={
-                                {
-                                    backgroundColor: '#1AB2C7',
-                                }
-                            }
-                        />
-                </Modal>
-            </div>
+            {/* # For some reason I need to position to the left around -%13 to center the modal. */}
+            <Modal
+                pos={"absolute"}
+                left={'-5%'}
+                right={'-5%'}
+                yOffset={'5dvh'}
+                opened={opened}
+                onClose={closeModal}
+                radius={'xl'}
+                withCloseButton={false}
+                styles={{
+                    body: { backgroundColor: '#1AB2C7' },
+                }}
+            >
+                <PickTopicComponent
+                    numberOfPlayers={parseInt(numberPlayers)}
+                    closeModal={closeModal}
+                    style={
+                        {
+                            backgroundColor: '#1AB2C7',
+                        }
+                    }
+                />
+            </Modal>
         </>
     );
 };
