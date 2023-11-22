@@ -1,6 +1,6 @@
 import './SpinWheel.css';
 import { useEffect, useRef, useState } from 'react';
-import { Button, Loader } from '@mantine/core';
+import { Container, Flex, Image, Loader } from '@mantine/core';
 import { addMessageListener, removeMessageListener, sendMessage } from '../utils/MessageListener';
 import { Messages } from '../utils/Messages';
 import { useNavigate } from 'react-router-dom';
@@ -20,6 +20,7 @@ import { Realtime } from 'ably';
 import { SpaceProvider, SpacesProvider } from "@ably/spaces/react";
 
 import AvatarStack from '../components/avatar_stack/AvatarStack';
+import CustomButton from '../components/CustomButton';
 const VITE_APP_ABLY_API_KEY = import.meta.env.VITE_APP_ABLY_API_KEY ?? "";
 
 function SpinWheel() {
@@ -27,20 +28,14 @@ function SpinWheel() {
     const [sessionData] = useLocalStorageState<SessionData>('sessionData', {});
     const [mayStartGame, setMayStartGame] = useState(false);
     const [isLoading, setIsLoading] = useState(false); // Add this line
-
     const [canSpin, setCanSpin] = useState(true);
     const [selectedSlice, setSelectedSlice] = useState<number | null>(null);
     const [message, setMessage] = useState("Message");
     const [rotationDegrees, setRotationDegrees] = useState(0);
     const channel = useRef<Types.RealtimeChannelPromise | null>(null);
-    // const [space, setSpace] = useLocalStorageState<Space>('spaces', {});
     const [hasSpun, setHasSpun] = useState(false);
-
     const clientRef = useRef<Types.RealtimePromise | null>(null);
     const spacesRef = useRef<Spaces | null>(null);
-
-
-
     const slices = 12;
     const sliceValues = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
 
@@ -64,16 +59,6 @@ function SpinWheel() {
                 spacesRef.current = new Spaces(clientRef.current);
             }
 
-            
-            // const space = await spacesRef.current.get(sessionData?.channelId as string)
-            // setSpace(space);
-            // space.enter({
-            //     username: sessionData?.clientId,
-            //     avatar: avatarImage,
-            // });
-            // space.subscribe('update', (spaceState) => {
-            //     console.log("space members:", spaceState.members);
-            // });
         }
         if (sessionData?.sessionId && sessionData?.clientId) {
             getSpace();
@@ -180,8 +165,6 @@ function SpinWheel() {
         }
     }
 
-
-
     const initializeChannel = async () => {
         console.log('sessionData in initializeChannel', sessionData);
         if (sessionData?.channelId && sessionData?.clientId) {
@@ -225,38 +208,66 @@ function SpinWheel() {
     }
 
     return (
-        <div>
-            <SpacesProvider client={getSpaces()}>
-                <SpaceProvider name="avatar-stack">
-                    <AvatarStack />
-                </SpaceProvider>
-            </SpacesProvider>
-            <div style={{ position: 'relative', display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-                {isLoading ? <Loader /> :
-                    mayStartGame ? (
-                        <Button
-                            style={{ position: 'absolute', bottom: '100px', left: '50%', transform: 'translateX(-50%)' }}
-                            loading={false}
-                            variant="gradient"
-                            gradient={{ from: 'teal', to: 'lime', deg: 105 }}
-                            onClick={handleStartGame}
-                        >
-                            Start Game
-                        </Button>) : null
-                }
-                <p style={{ position: 'absolute', top: '10px', left: '50%', transform: 'translateX(-50%)', color: 'black', fontWeight: 'bold' }}>{message}</p>
-                <motion.div
-                    onClick={spin}
-                    animate={{ rotate: `${rotationDegrees}deg` }}
-                    transition={{ duration: 3, ease: "easeOut" }}
-                    style={{ transformOrigin: "center", display: "flex", justifyContent: "center", alignItems: "center" }}
-                >
-                    <img src={wheelImage} alt="Wheel" style={{ objectFit: "contain" }} />
-                </motion.div>
-                <img src={pinImage} alt="Pin" style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }} />
-            </div>
-        </div>
+        <div className='SpinWheelPage'>
+            <Flex
+                direction='column'
+                align='center'
+                justify='center'
+                gap="sm"
+            >
+                <div className='topAvatarStacks'>
+                    <SpacesProvider client={getSpaces()}>
+                        <SpaceProvider name="avatar-stack">
+                            <AvatarStack />
+                        </SpaceProvider>
+                    </SpacesProvider>
+                </div>
 
+                <Container bg="#FDD673"
+                    className='chooseTurnTitle'
+                >
+                    {message}
+                </Container>
+
+                <Container style={{
+                    position: 'relative',
+                    marginBottom: '10%',
+                    marginTop: '10%',
+
+                }}>
+                    <motion.div
+                        onClick={spin}
+                        animate={{ rotate: `${rotationDegrees}deg` }}
+                        transition={{ duration: 3, ease: "easeOut" }}
+                        style={{
+                            width: '100%',
+                        }}
+                    >
+                        <Image
+                            src={wheelImage}
+                            fit="contain"
+
+                        />
+                    </motion.div>
+                    <img src={pinImage} alt="Pin" style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }} />
+                </Container>
+
+                <Container style={{
+                    position: 'relative'
+                }}>
+                    {isLoading ? <Loader /> :
+                        mayStartGame ? (
+                            <CustomButton
+                                fontSize='1.5rem'
+                                onClick={handleStartGame}
+                            >
+                                Start Game
+                            </CustomButton>) : null
+                    }
+                </Container>
+
+            </Flex>
+        </div>
     );
 }
 

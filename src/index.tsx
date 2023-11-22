@@ -13,6 +13,7 @@ import AIGame from './screens/AIGame';
 import { MantineProvider } from '@mantine/core';
 import '@mantine/core/styles.css';
 import { TopicProvider } from './components/topics/TopicContext';
+import { theme } from './theme';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -22,7 +23,7 @@ root.render(
 
     <SignerProvider>
       <SessionDataProvider>
-        <MantineProvider>
+        <MantineProvider theme={theme}>
           <TopicProvider>
             <Router>
               <Routes>
