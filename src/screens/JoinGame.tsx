@@ -8,7 +8,7 @@ import { Container, Flex, Modal } from '@mantine/core';
 import { PickTopicComponent } from '../components/topics/PickTopicComponent';
 import { useDisclosure } from '@mantine/hooks';
 import { getSession, updateTopics } from '../polybase/SessionHandler';
-import { generateQuestions } from '../game-domain/GenerateQuestionsHandler';
+import { generateAllQuestions } from '../game-domain/GenerateQuestionsHandler';
 import { addQuestions } from '../polybase/QuestionsHandler';
 import { SessionPhase } from '../game-domain/SessionPhase';
 import { login } from '../utils/Web3AuthAuthentication';
@@ -27,7 +27,7 @@ const JoinGame = () => {
     const [sessionData, setSessionData] = useLocalStorageState<SessionData>('sessionData', {});
     const location = useLocation();
     const [opened, { open, close }] = useDisclosure(false);
-    const [selectedChips] = useState<string[]>([]);
+    // const [selectedChips] = useState<string[]>([]);
     const [numberPlayers, setNumberPlayers] = useState<string>('');
     const [joined, setJoined] = useState(false);
     const { topics } = useContext(TopicContext);
@@ -56,6 +56,7 @@ const JoinGame = () => {
         const { sessionId, channelId } = parsed;
 
         console.log('JoinGame loaded: ', sessionId, channelId);
+        console.log("topics: ", topics)
         if (sessionId && channelId) {
             getSession({ id: sessionId }).then((_sessionData) => {
                 setNumberPlayers(_sessionData.numberPlayers);
@@ -78,13 +79,13 @@ const JoinGame = () => {
             await enterChannelListenerWrapper(web3auth, data);
 
             // Generate questions
-            generateQuestions({ topics: selectedChips })
+            generateAllQuestions(topics, true)
                 .then((result) => {
                     // console.log('generateQuestions response: ', result);
                     addQuestions({ id: sessionData?.questionSessionId, column: 1, topics: result });
                 });
             // Update topics to Game session
-            await updateTopics({ id: sessionData?.sessionId, topics: selectedChips })
+            await updateTopics({ id: sessionData?.sessionId, topics: topics.map((topic) => topic[0]) })
             // console.log('updatedTopics response:', addTopicResponse);
             setJoined(true);
         }

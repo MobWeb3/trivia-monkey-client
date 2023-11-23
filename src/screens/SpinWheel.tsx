@@ -30,7 +30,7 @@ function SpinWheel() {
     const [isLoading, setIsLoading] = useState(false); // Add this line
     const [canSpin, setCanSpin] = useState(true);
     const [selectedSlice, setSelectedSlice] = useState<number | null>(null);
-    const [message, setMessage] = useState("Message");
+    const [message, setMessage] = useState("Click to spin!");
     const [rotationDegrees, setRotationDegrees] = useState(0);
     const channel = useRef<Types.RealtimeChannelPromise | null>(null);
     const [hasSpun, setHasSpun] = useState(false);
@@ -141,7 +141,7 @@ function SpinWheel() {
 
     const spin = async () => {
         if (canSpin) {
-            setMessage("");
+            setMessage("Spinning...");
             const minRounds = 2;
             const maxRounds = 4;
             const rounds = Math.floor(Math.random() * (maxRounds - minRounds + 1)) + minRounds;
@@ -236,7 +236,6 @@ function SpinWheel() {
 
                 }}>
                     <motion.div
-                        onClick={spin}
                         animate={{ rotate: `${rotationDegrees}deg` }}
                         transition={{ duration: 3, ease: "easeOut" }}
                         style={{
@@ -249,7 +248,10 @@ function SpinWheel() {
 
                         />
                     </motion.div>
-                    <img src={pinImage} alt="Pin" style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }} />
+                    <img src={pinImage} 
+                        alt="Pin"
+                        onClick={spin}
+                        style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }} />
                 </Container>
 
                 <Container style={{

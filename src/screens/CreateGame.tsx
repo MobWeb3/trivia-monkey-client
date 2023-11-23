@@ -112,11 +112,11 @@ const CreateGame = () => {
                     // Deploy generation of AI questions
                     generateAllQuestions(topics, true)
                         .then((result) => {
-                            // console.log('generateQuestions response: ', result);
+                            console.log('generateQuestions response: ', result);
                             addQuestions({ id: questionSessionId, column: 1, topics: result });
                         });
                     // Update topics to Game session
-                    await updateTopics({ id: sessionData?.sessionId, topics: topics })
+                    await updateTopics({ id: sessionData?.sessionId, topics: topics.map((topic) => topic[0]) });
                     // console.log('updatedTopics response:', addTopicResponse);
 
                     // Set questionSessionId in the Game session records
