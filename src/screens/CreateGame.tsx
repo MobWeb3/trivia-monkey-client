@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { Flex, Loader } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import QRCodeStyling from "qr-code-styling";
-import { addQuestions, createQuestionSession } from '../polybase/QuestionsHandler';
+import { createQuestionSession } from '../polybase/QuestionsHandler';
 import { generateAllQuestions } from '../game-domain/GenerateQuestionsHandler';
 import { updateQuestionSessionId, updateTopics } from '../polybase/SessionHandler';
 import { SessionData } from './SessionData';
@@ -110,11 +110,7 @@ const CreateGame = () => {
                 if (response) {
                     const questionSessionId = response.recordData.data.id;
                     // Deploy generation of AI questions
-                    generateAllQuestions(topics, true)
-                        .then((result) => {
-                            console.log('generateQuestions response: ', result);
-                            addQuestions({ id: questionSessionId, column: 1, topics: result });
-                        });
+                    await generateAllQuestions(topics, questionSessionId, true);
                     // Update topics to Game session
                     await updateTopics({ id: sessionData?.sessionId, topics: topics.map((topic) => topic[0]) });
                     // console.log('updatedTopics response:', addTopicResponse);

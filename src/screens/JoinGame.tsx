@@ -9,7 +9,6 @@ import { PickTopicComponent } from '../components/topics/PickTopicComponent';
 import { useDisclosure } from '@mantine/hooks';
 import { getSession, updateTopics } from '../polybase/SessionHandler';
 import { generateAllQuestions } from '../game-domain/GenerateQuestionsHandler';
-import { addQuestions } from '../polybase/QuestionsHandler';
 import { SessionPhase } from '../game-domain/SessionPhase';
 import { login } from '../utils/Web3AuthAuthentication';
 import { SessionData } from './SessionData';
@@ -79,10 +78,10 @@ const JoinGame = () => {
             await enterChannelListenerWrapper(web3auth, data);
 
             // Generate questions
-            generateAllQuestions(topics, true)
+            generateAllQuestions(topics, sessionData?.questionSessionId as string)
                 .then((result) => {
                     // console.log('generateQuestions response: ', result);
-                    addQuestions({ id: sessionData?.questionSessionId, column: 1, topics: result });
+                    // addQuestions({ id: sessionData?.questionSessionId, column: 1, topics: result });
                 });
             // Update topics to Game session
             await updateTopics({ id: sessionData?.sessionId, topics: topics.map((topic) => topic[0]) })
