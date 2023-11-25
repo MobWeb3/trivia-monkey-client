@@ -23,13 +23,9 @@ export const generateAllQuestions = async (topics: Topic[], questionSessionId: s
             console.log("GENERATING CUSTOM QUESTIONS FOR TOPICS: ", customTopics);
             axios.post(getUrl, customTopics).then((response) => {
                 console.log("RESPONSE: ", response);
-                const json = JSON.stringify(response.data);
-                const cleanedJsonString: string = json.replace(/\\"/g, '"');
-                const jsonObject = JSON.parse(cleanedJsonString);
-                const result: any = {};
-                result['customTopics'] = jsonObject;
+                const result = response.data;
                 addQuestions(questionSessionId, result); // TODO: should be done on the server
-                console.log("added questions: ", { customTopics: result });
+                console.log("added questions: ", { result });
             });
 
         } catch (error) {
