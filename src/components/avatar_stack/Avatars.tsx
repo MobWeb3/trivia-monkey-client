@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import classNames from "classnames";
 
 import {
@@ -12,10 +12,45 @@ import UserInfo from "./UserInfo";
 import type { Member } from "../utils/helpers";
 
 import styles from "./Avatars.module.css";
+import { useSpace } from "@ably/spaces/dist/mjs/react";
+import useGameBoardState from "../../polybase/useGameBoardState";
+import useLocalStorageState from "use-local-storage-state";
+import { SessionData } from "../../screens/SessionData";
+import { GameBoardState } from "../../game-domain/Session";
 
-const SelfAvatar = ({ self }: { self: Member | null }) => {
+const SelfAvatar = ({ self, gameBoardState }: 
+{ self: Member | null;
+  gameBoardState: GameBoardState;
+}) => {
   const [hover, setHover] = useState(false);
+  const { space } = useSpace();
+  
+  // sessionData
+  const [sessionData] = useLocalStorageState<SessionData>('sessionData', {});
 
+  // Get the game board state
+  // const gameBoardState: GameBoardState = useGameBoardState();
+  
+  /**
+   * 💡 Get the latest scores for the the given avatar 💡
+   */
+  useEffect(() => {
+    if (!space) return;
+    // console.log('gameBoardState:', gameBoardState);
+    if (sessionData && sessionData.clientId) {
+      // console.log(`gameBoardState-${sessionData.clientId}`, gameBoardState[sessionData.clientId]);
+    }
+
+  }, [gameBoardState, sessionData, space]);
+
+
+  function getSelfScore() {
+    if (sessionData && sessionData.clientId) {
+      // console.log(`gameBoardState-${sessionData.clientId}`, gameBoardState[sessionData.clientId]);
+      return gameBoardState[sessionData.clientId];
+    }
+    return 0;
+  }
   return (
     <div
       className={styles.avatar}
@@ -27,6 +62,9 @@ const SelfAvatar = ({ self }: { self: Member | null }) => {
         backgroundPosition: 'center',
       }}
     >
+      <div className={styles.scoreBox}>
+        <p className={styles.scoreText}>{getSelfScore()}</p>
+      </div>
       {/* <p className={styles.name}>You</p> */}
       <div className={styles.statusIndicatorOnline} id="status-indicator" />
       
@@ -42,27 +80,26 @@ const SelfAvatar = ({ self }: { self: Member | null }) => {
 const OtherAvatars = ({
   users,
   usersCount,
+  gameBoardState,
 }: {
   users: Member[];
   usersCount: number;
+  gameBoardState: GameBoardState;
 }) => {
   const [hoveredClientId, setHoveredClientId] = useState<string | null>(null);
   return (
     <>
       {users.map((user, index) => {
         const rightOffset = calculateRightOffset({ usersCount, index });
-        // const userInitials = user.profileData.name
-        //   .split(" ")
-        //   .map((word: string) => word.charAt(0))
-        //   .join("");
 
-        // const initialsCSS = classNames(
-        //   {
-        //     [styles.textWhite]: user.isConnected,
-        //     [styles.inactiveColor]: !user.isConnected,
-        //   },
-        //   styles.nameOthers,
-        // );
+        // get score from gameBoardState for this user
+        function getScore() {
+          if (user.clientId) {
+            // console.log(`gameBoardState-${user.clientId}`, gameBoardState[user.clientId]);
+            return gameBoardState[user.clientId];
+          }
+          return 0;
+        }
 
         const statusIndicatorCSS = classNames(
           {
@@ -92,7 +129,12 @@ const OtherAvatars = ({
                 onMouseLeave={() => setHoveredClientId(null)}
                 id="avatar"
               >
-              {/* <p className={initialsCSS}>{userInitials}</p> */}
+              {/* Add a small score box on the bottom of the avatar */}
+              <div className={styles.scoreBox}>
+                <p className={styles.scoreText}>{
+                  getScore()
+                }</p>
+              </div>
               <div className={statusIndicatorCSS} id="status-indicator" />
             </div>
 
@@ -116,13 +158,21 @@ const Avatars = ({
   self: Member | null;
 }) => {
   const totalWidth = calculateTotalWidth({ users: otherUsers });
+  // Get the game board state
+  const gameBoardState: GameBoardState = useGameBoardState();
+
+  useEffect(() => {
+    // console.log('gameBoardState:', gameBoardState);
+  }, [gameBoardState]);
+    
 
   return (
     <div className={styles.container} style={{ width: `${totalWidth}px` }}>
-      <SelfAvatar self={self} />
+      <SelfAvatar self={self} gameBoardState= {gameBoardState} />
       <OtherAvatars
         usersCount={otherUsers.length}
         users={otherUsers.slice(0, MAX_USERS_BEFORE_LIST).reverse()}
+        gameBoardState= {gameBoardState}
       />
       {/** 💡 Dropdown list of surplus users 💡 */}
       <Surplus otherUsers={otherUsers} />

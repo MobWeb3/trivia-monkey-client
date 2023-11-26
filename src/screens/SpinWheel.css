@@ -37,6 +37,8 @@ html {
     letter-spacing: 0px;
     color: #1A1A17;
     opacity: 1;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
 }
 
 .wheelContainer {

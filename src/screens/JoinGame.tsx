@@ -78,11 +78,8 @@ const JoinGame = () => {
             await enterChannelListenerWrapper(web3auth, data);
 
             // Generate questions
-            generateAllQuestions(topics, sessionData?.questionSessionId as string)
-                .then((result) => {
-                    // console.log('generateQuestions response: ', result);
-                    // addQuestions({ id: sessionData?.questionSessionId, column: 1, topics: result });
-                });
+            await generateAllQuestions(topics, sessionData?.questionSessionId as string, true);
+            
             // Update topics to Game session
             await updateTopics({ id: sessionData?.sessionId, topics: topics.map((topic) => topic[0]) })
             // console.log('updatedTopics response:', addTopicResponse);

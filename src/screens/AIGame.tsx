@@ -1,5 +1,5 @@
-import './SpinWheel.css';
-import { useEffect, useState } from 'react';
+import './AIGame.css';
+import { useEffect, useRef, useState } from 'react';
 import QuestionModal from '../components/QuestionModal';
 import { getQuestion } from '../polybase/QuestionsHandler';
 import { Question } from '../game-domain/Question';
@@ -13,6 +13,11 @@ import { GameSession } from '../game-domain/GameSession';
 import { Wheel } from 'react-custom-roulette'
 import { WheelData } from 'react-custom-roulette/dist/components/Wheel/types';
 import { pollForCurrentPlayerId, pollUntilSessionChanges } from '../polybase/PollHelpers';
+import { Container, Flex } from '@mantine/core';
+import { SpaceProvider, SpacesProvider } from '@ably/spaces/dist/mjs/react';
+import AvatarStack from '../components/avatar_stack/AvatarStack';
+import Spaces from '@ably/spaces';
+import { Realtime } from 'ably';
 
 function AIGame() {
 
@@ -25,6 +30,7 @@ function AIGame() {
     const [selectedSlice, setSelectedSlice] = useState<string | null>(null);
     const [sliceValues, setSliceValues] = useState<string[]>([]);
     const [session, setSession] = useState<GameSession | null>(null);
+    const spacesRef = useRef<Spaces | null>(null);
 
     const handleShowQuestion = async (topic: string) => {
 
@@ -160,12 +166,43 @@ function AIGame() {
         }
     }
 
+    function getSpaces() {
+        if (spacesRef.current !== null) {
+            const spaces: Spaces = spacesRef.current;
+            return spaces;
+        }
+        return new Spaces(new Realtime.Promise({
+            key: import.meta.env.VITE_APP_ABLY_API_KEY ?? "",
+            clientId: sessionData?.clientId
+        }))
+    }
+
     return (
-        <div style={{ position: 'relative' }}>
+        <div className='AIGamePage'>
+            <Flex
+                direction='column'
+                align='center'
+                justify='center'
+                gap="md"
+            >
+                <div className='topAvatarStacks'>
+                    <SpacesProvider client={getSpaces()}>
+                        <SpaceProvider name="avatar-stack">
+                            <AvatarStack />
+                        </SpaceProvider>
+                    </SpacesProvider>
+                </div>
+
+                <Container bg="#FDD673"
+                    className='messageBox'
+                >
+                    {message}
+                </Container>
+            </Flex>
             {/* <Button onClick={() => handleShowQuestion("Music")}>
                 Show Question
             </Button> */}
-            <QuestionModal
+            {/* <QuestionModal
                 open={showQuestionModal}
                 onClose={() => finishTurnAndSaveState()}
                 question={currentQuestion}
@@ -194,7 +231,7 @@ function AIGame() {
                         {canSpin && <button onClick={handleSpinClick}>SPIN</button>}
                     </div>
                 </div>
-            )}
+            )} */}
 
         </div>
 
