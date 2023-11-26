@@ -27,6 +27,11 @@ html {
     align-items: center;
 }
 
+.flex-container {
+    margin-left: 10%;
+    margin-right: 10%;
+  }
+
 .topAvatarStacks {
     background-color: rgba(143, 25, 25, 0);
 }

@@ -1,0 +1,38 @@
+.card {
+  display: flex;
+  align-items: center;
+}
+
+.card img {
+  width: 5rem;
+  height: 5rem;
+  border-radius: 50%;
+}
+
+.message-bubble {
+  background-color: #e5e5ea; /* Light grey background */
+  color: black; /* Text color */
+  padding: 10px 15px; /* Padding inside the bubble */
+  border-radius: 20px; /* Rounded corners */
+  max-width: 75%; /* Maximum width of the bubble */
+  margin-bottom: 10px; /* Space below each bubble */
+  position: relative; /* Needed for absolute positioning of the tail */
+  word-wrap: break-word; /* Wrap long words */
+  font: bold;
+  font-family: 'umbrage2';
+  font-size: 1rem;
+
+}
+
+.message-bubble::after {
+  content: '';
+  position: absolute;
+  bottom: -10px; /* Position the tail at the bottom */
+  left: 20px; /* Position the tail slightly from the left */
+  width: 20px;
+  height: 20px;
+  background-color: #e5e5ea;
+  border-radius: 50%;
+  transform: translateX(-50%) rotate(45deg); /* Rotate the tail to point downwards */
+  clip-path: polygon(0 0, 100% 0, 0 190%); /* Clip the circle to form a tail */
+}

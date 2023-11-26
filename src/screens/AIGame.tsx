@@ -18,6 +18,7 @@ import { SpaceProvider, SpacesProvider } from '@ably/spaces/dist/mjs/react';
 import AvatarStack from '../components/avatar_stack/AvatarStack';
 import Spaces from '@ably/spaces';
 import { Realtime } from 'ably';
+import IgnoranceMonkeyCard from '../components/game/IgnorantMonkeyCard';
 
 function AIGame() {
 
@@ -180,6 +181,7 @@ function AIGame() {
     return (
         <div className='AIGamePage'>
             <Flex
+                className="flex-container"
                 direction='column'
                 align='center'
                 justify='center'
@@ -198,11 +200,32 @@ function AIGame() {
                 >
                     {message}
                 </Container>
+
+                <IgnoranceMonkeyCard message={'heyooo.... fdssfd fd fsdfdsf sfsdf sdfdsfdsfds\nsdfdsf'} />
+
+                {data && data.length > 0 && (
+
+                    <Wheel
+                        mustStartSpinning={mustSpin}
+                        prizeNumber={prizeNumber}
+                        data={data}
+                        onStopSpinning={async () => {
+                            setMustSpin(false);
+                            const topicSelected = sliceValues[prizeNumber];
+                            setSelectedSlice(topicSelected)
+                            await handleShowQuestion(topicSelected)
+                        }}
+                    // other props and methods
+                    />
+                
+
+                )}
+                {canSpin && <button onClick={handleSpinClick}>SPIN</button>}
             </Flex>
             {/* <Button onClick={() => handleShowQuestion("Music")}>
                 Show Question
             </Button> */}
-            {/* <QuestionModal
+            <QuestionModal
                 open={showQuestionModal}
                 onClose={() => finishTurnAndSaveState()}
                 question={currentQuestion}
@@ -211,27 +234,9 @@ function AIGame() {
             />
 
 
-            <p style={{ position: 'absolute', top: '10px', left: '50%', transform: 'translateX(-50%)', color: 'black', fontWeight: 'bold' }}>{message}</p>
-            <p style={{ position: 'absolute', top: '30px', left: '50%', transform: 'translateX(-50%)', color: 'black', fontWeight: 'bold' }}>{selectedSlice}</p>
-            {data && data.length > 0 && (
-                <div style={{ position: 'relative', display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-                    <div style={{ position: 'absolute', top: '40%', left: '50%', transform: 'translate(-50%, -50%)' }}>
-                        <Wheel
-                            mustStartSpinning={mustSpin}
-                            prizeNumber={prizeNumber}
-                            data={data}
-                            onStopSpinning={async () => {
-                                setMustSpin(false);
-                                const topicSelected = sliceValues[prizeNumber];
-                                setSelectedSlice(topicSelected)
-                                await handleShowQuestion(topicSelected)
-                            }}
-                        // other props and methods
-                        />
-                        {canSpin && <button onClick={handleSpinClick}>SPIN</button>}
-                    </div>
-                </div>
-            )} */}
+            {/* <p style={{ position: 'absolute', top: '10px', left: '50%', transform: 'translateX(-50%)', color: 'black', fontWeight: 'bold' }}>{message}</p>
+            <p style={{ position: 'absolute', top: '30px', left: '50%', transform: 'translateX(-50%)', color: 'black', fontWeight: 'bold' }}>{selectedSlice}</p> */}
+
 
         </div>
 
