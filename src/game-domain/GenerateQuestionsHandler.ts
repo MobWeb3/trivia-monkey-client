@@ -1,9 +1,9 @@
 import axios from 'axios';
-import { BASE_AI_URL, BASE_URL } from '../ApiServiceConfig';
+import { BASE_URL } from '../ApiServiceConfig';
 import { Topic } from '../components/topics/TopicContext';
 import { addQuestions } from '../polybase/QuestionsHandler';
 
-const BASE_PAPERSPACE_HOST = `${BASE_AI_URL}/api`;
+const BASE_PAPERSPACE_HOST = `${BASE_URL}/api`;
 const GENERATE_QUESTIONS_URL = `${BASE_PAPERSPACE_HOST}/generateQuestions`;
 const GENERATE_QUESTIONS_33_URL = `${BASE_PAPERSPACE_HOST}/generateQuestions33`;
 
