@@ -19,6 +19,7 @@ import AvatarStack from '../components/avatar_stack/AvatarStack';
 import Spaces from '@ably/spaces';
 import { Realtime } from 'ably';
 import IgnoranceMonkeyCard from '../components/game/IgnorantMonkeyCard';
+import CustomButton from '../components/CustomButton';
 
 function AIGame() {
 
@@ -89,7 +90,6 @@ function AIGame() {
                 if (!session) return;
                 setSession(session);
                 const { topics } = session;
-                // Get topics
                 setSliceValues(topics as unknown as string[]);
 
             } catch (error) {
@@ -138,7 +138,12 @@ function AIGame() {
                 setMessage("Your turn!");
             } else {
                 setCanSpin(false);
-                setMessage(`Waiting for ${session.currentTurnPlayerId} to finish turn...`);
+
+                //message to show
+                const _message = `Waiting for ${session?.currentTurnPlayerId ?? ""} to finish turn..`;
+                setMessage(_message);
+
+                console.log("message: ", _message);                
             }
         }
     }, [session, sessionData?.clientId]);
@@ -147,14 +152,29 @@ function AIGame() {
     const [mustSpin, setMustSpin] = useState(false);
     const [prizeNumber, setPrizeNumber] = useState(0);
 
-    const data: WheelData[] = (session?.topics ?? [])?.map((topic, index) => {
-        // console.log(`topic: ${topic} index:${index}`) 
+    const topicsLength = 6;
+    const data: WheelData[] = (session?.topics ?? [])?.map((topic: string, index) => {
+
+        // get sequential number from 0 to topicsLength
+        let sequentialNumber = index % topicsLength;
+
+        // get random color from array
+        const colors = ['#FF591D', '#547DFF', '#05D900', '#F1FF38', '#F67AFF', '#A2EFFF'];
+        const sequentialColor = colors[sequentialNumber];
+
+        // lets trim '- Wikipedia' from topic and empty spaces
+        topic = topic.replace('- Wikipedia', '').trim();
+
+        // truncate topic to 20 characters
+        topic = topic.length > 10 ? topic.substring(0, 10) + "..." : topic;
+
         return {
             option: topic,
             style: {
-                backgroundColor: index % 2 ? 'green' : 'white',
+                backgroundColor: sequentialColor,
                 textColor: 'black',
-            },
+                fontFamily: 'umbrage2',
+            }
         };
     });
 
@@ -195,7 +215,7 @@ function AIGame() {
                     </SpacesProvider>
                 </div>
 
-                <Container bg="#FDD673"
+                <Container bg="linear-gradient(to bottom right, #FDD673, #D5B45B)"
                     className='messageBox'
                 >
                     {message}
@@ -208,23 +228,20 @@ function AIGame() {
                     <Wheel
                         mustStartSpinning={mustSpin}
                         prizeNumber={prizeNumber}
+                        fontSize={25}
                         data={data}
+                        radiusLineColor={'#fff'}
+                        radiusLineWidth={1}
                         onStopSpinning={async () => {
                             setMustSpin(false);
                             const topicSelected = sliceValues[prizeNumber];
                             setSelectedSlice(topicSelected)
                             await handleShowQuestion(topicSelected)
                         }}
-                    // other props and methods
                     />
-                
-
                 )}
-                {canSpin && <button onClick={handleSpinClick}>SPIN</button>}
+                {canSpin && <CustomButton onClick={handleSpinClick}>SPIN</CustomButton>}
             </Flex>
-            {/* <Button onClick={() => handleShowQuestion("Music")}>
-                Show Question
-            </Button> */}
             <QuestionModal
                 open={showQuestionModal}
                 onClose={() => finishTurnAndSaveState()}
@@ -232,12 +249,6 @@ function AIGame() {
                 topic={chosenTopic}
                 onExpire={() => finishTurnAndSaveState()}
             />
-
-
-            {/* <p style={{ position: 'absolute', top: '10px', left: '50%', transform: 'translateX(-50%)', color: 'black', fontWeight: 'bold' }}>{message}</p>
-            <p style={{ position: 'absolute', top: '30px', left: '50%', transform: 'translateX(-50%)', color: 'black', fontWeight: 'bold' }}>{selectedSlice}</p> */}
-
-
         </div>
 
     );

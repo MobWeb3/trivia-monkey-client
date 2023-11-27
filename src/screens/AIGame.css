@@ -30,6 +30,8 @@ html {
 .flex-container {
     margin-left: 10%;
     margin-right: 10%;
+    width: 80%;
+    
   }
 
 .topAvatarStacks {
@@ -38,12 +40,22 @@ html {
 
 .messageBox {
     text-align: center;
-    font: normal normal normal 32px/37px umbrage2;
+    /* font: normal normal normal calc(min(32px, 4vw)) / calc(min(37px, 4vh)) umbrage2, Arial, sans-serif; */
+    font-size: medium;
+    font-family: 'umbrage2', Arial, sans-serif;
     letter-spacing: 0px;
     color: #1A1A17;
     opacity: 1;
     margin-top: 1rem;
     margin-bottom: 1rem;
+    
+    /* Wrap text */
+    white-space: pre-wrap;
+
+    /* border radius */
+    border-radius: 15px;
+    /* border: rgb(241, 237, 237) solid 2px; */
+
 }
 
 .wheel {
