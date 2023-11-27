@@ -15,13 +15,10 @@ import { motion } from 'framer-motion';
 import pinImage from './../assets/sprites/pin.png'; // replace with your actual image path
 import { Types } from 'ably';
 import { ChannelHandler } from '../ably/ChannelHandler';
-import Spaces from '@ably/spaces';
-import { Realtime } from 'ably';
 import { SpaceProvider, SpacesProvider } from "@ably/spaces/react";
-
 import AvatarStack from '../components/avatar_stack/AvatarStack';
 import CustomButton from '../components/CustomButton';
-const VITE_APP_ABLY_API_KEY = import.meta.env.VITE_APP_ABLY_API_KEY ?? "";
+import { getSpacesInstance } from '../ably/SpacesSingleton';
 
 function SpinWheel() {
 
@@ -34,8 +31,6 @@ function SpinWheel() {
     const [rotationDegrees, setRotationDegrees] = useState(0);
     const channel = useRef<Types.RealtimeChannelPromise | null>(null);
     const [hasSpun, setHasSpun] = useState(false);
-    const clientRef = useRef<Types.RealtimePromise | null>(null);
-    const spacesRef = useRef<Spaces | null>(null);
     const slices = 12;
     const sliceValues = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
 
@@ -46,25 +41,11 @@ function SpinWheel() {
         // Cleanup function
         return () => {
             // Code to clean up the channel
+            console.log('cleaning up channel');
+            channel.current?.unsubscribe();
+            channel.current?.detach();
         };
     });
-
-    useEffect(() => {
-        const getSpace = async () => {
-            if (!clientRef.current) {
-                clientRef.current = new Realtime.Promise({ key: VITE_APP_ABLY_API_KEY, clientId: sessionData?.clientId });
-            }
-
-            if (!spacesRef.current) {
-                spacesRef.current = new Spaces(clientRef.current);
-            }
-
-        }
-        if (sessionData?.sessionId && sessionData?.clientId) {
-            getSpace();
-        }
-
-    }, [sessionData?.sessionId, sessionData?.clientId, sessionData?.channelId]);
 
     useEffect(() => {
         const handleSelectedSlice = async () => {
@@ -200,11 +181,7 @@ function SpinWheel() {
     }
 
     function getSpaces() {
-        if (spacesRef.current !== null) {
-            const spaces: Spaces = spacesRef.current;
-            return spaces;
-        }
-        return new Spaces(new Realtime.Promise({ key: VITE_APP_ABLY_API_KEY, clientId: sessionData?.clientId }))
+        return getSpacesInstance(sessionData?.clientId ?? "");
     }
 
     return (

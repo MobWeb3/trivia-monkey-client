@@ -16,10 +16,10 @@ import { pollForCurrentPlayerId, pollUntilSessionChanges } from '../polybase/Pol
 import { Container, Flex } from '@mantine/core';
 import { SpaceProvider, SpacesProvider } from '@ably/spaces/dist/mjs/react';
 import AvatarStack from '../components/avatar_stack/AvatarStack';
-import Spaces from '@ably/spaces';
-import { Realtime } from 'ably';
 import IgnoranceMonkeyCard from '../components/game/IgnorantMonkeyCard';
 import CustomButton from '../components/CustomButton';
+import Spaces from '@ably/spaces';
+import { getSpacesInstance } from '../ably/SpacesSingleton';
 
 function AIGame() {
 
@@ -29,10 +29,15 @@ function AIGame() {
     const [chosenTopic, setChosenTopic] = useState<string | null>(null);
     const [canSpin, setCanSpin] = useState(false);
     const [message, setMessage] = useState("Loading...");
-    const [selectedSlice, setSelectedSlice] = useState<string | null>(null);
     const [sliceValues, setSliceValues] = useState<string[]>([]);
     const [session, setSession] = useState<GameSession | null>(null);
     const spacesRef = useRef<Spaces | null>(null);
+
+    useEffect(() => {
+        if (!spacesRef.current && sessionData?.clientId){
+            spacesRef.current = getSpacesInstance(sessionData?.clientId);
+        }
+    }, [sessionData?.clientId]);
 
     const handleShowQuestion = async (topic: string) => {
 
@@ -187,17 +192,6 @@ function AIGame() {
         }
     }
 
-    function getSpaces() {
-        if (spacesRef.current !== null) {
-            const spaces: Spaces = spacesRef.current;
-            return spaces;
-        }
-        return new Spaces(new Realtime.Promise({
-            key: import.meta.env.VITE_APP_ABLY_API_KEY ?? "",
-            clientId: sessionData?.clientId
-        }))
-    }
-
     return (
         <div className='AIGamePage'>
             <Flex
@@ -207,13 +201,13 @@ function AIGame() {
                 justify='center'
                 gap="md"
             >
-                <div className='topAvatarStacks'>
-                    <SpacesProvider client={getSpaces()}>
-                        <SpaceProvider name="avatar-stack">
-                            <AvatarStack />
-                        </SpaceProvider>
-                    </SpacesProvider>
-                </div>
+                {spacesRef.current && (
+                <SpacesProvider client={spacesRef.current}>
+                    <SpaceProvider name="avatar-stack">
+                    <AvatarStack />
+                    </SpaceProvider>
+                </SpacesProvider>
+                )}
 
                 <Container bg="linear-gradient(to bottom right, #FDD673, #D5B45B)"
                     className='messageBox'
@@ -235,7 +229,6 @@ function AIGame() {
                         onStopSpinning={async () => {
                             setMustSpin(false);
                             const topicSelected = sliceValues[prizeNumber];
-                            setSelectedSlice(topicSelected)
                             await handleShowQuestion(topicSelected)
                         }}
                     />
