@@ -6,7 +6,7 @@
   "dependencies": {
     "@ably/spaces": "^0.2.0",
     "@babel/runtime": "^7.23.1",
-    "@mantine/core": "^7.1.2",
+    "@mantine/core": "^7.2.2",
     "@mantine/hooks": "^7.0.0",
     "@metaplex-foundation/js": "^0.20.0",
     "@polybase/client": "^0.6.6",
