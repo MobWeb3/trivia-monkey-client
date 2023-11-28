@@ -43,27 +43,29 @@ const CreateGameForm: React.FC<CreateGameFormProps> = ({
                 align="center"
                 direction="column"
                 w="100%"
+                h="auto" // Fixed height
             >
-                <div style={{ width: '100%', margin: '0 auto' }}>  {/* This div will constrain the width and center the Input component */}
-                    <Input
-                        leftSection={<IconPacman />}
-                        placeholder="Your Name"
-                        radius="md"
-                        styles={{
-                            input: {
-                                textAlign: 'center',
-                                width: '100%',  // Ensure the input field takes up the full width of the div
-                                background: '#DAD5D5',
-                                opacity: 1,
-                                fontFamily: 'umbrage2',
-                                fontSize: '32px',
-                            },
-                        }}
-                        onChange={(e) => setNickname(e.currentTarget.value)}
-                    />
-                </div>
+                <Input
+                    leftSection={<IconPacman />}
+                    placeholder="Your Name"
+                    radius="md"
+                    styles={{
+                        input: {
+                            textAlign: 'center',
+                            width: '100%',  // Ensure the input field takes up the full width of the div
+                            background: '#DAD5D5',
+                            opacity: 1,
+                            fontFamily: 'umbrage2',
+                            fontSize: '32px',
+                        },
+                    }}
+                    onChange={(e) => setNickname(e.currentTarget.value)}
+                />
 
-                <div style={{ width: '100%', margin: '0 auto' }}>  {/* This div will constrain the width and center the Input component */}
+                <div style={{
+                    width: '100%',
+                    margin: '0 auto'
+                }}>  {/* This div will constrain the width and center the Input component */}
                     <NumberInputComponent setNumberSelected={setNumberPlayers} />
                 </div>
 
@@ -98,8 +100,8 @@ const CreateGameForm: React.FC<CreateGameFormProps> = ({
                 <CustomButton
                     onClick={handlePlayButtonClick}
                     style={{
-                        marginTop: '5px',
-                        marginBottom: '5px',
+                        marginTop: '5%',
+                        marginBottom: '5%',
                     }}
                 >Create Game
                 </CustomButton>

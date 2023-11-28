@@ -27,6 +27,8 @@ html {
     justify-content: center;
     /* Added for centering button */
     align-items: center;
+
+    overflow-y: auto;
 }
 
 /* .centerPlaceholder::placeholder {

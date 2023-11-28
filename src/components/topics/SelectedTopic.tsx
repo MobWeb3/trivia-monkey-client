@@ -7,6 +7,7 @@ interface SelectedTopicProps {
   color?: string;
   style?: React.CSSProperties;
 }
+type TextAlign = "left" | "right" | "center" | "justify";
 
 const SelectedTopic: React.FC<SelectedTopicProps> = ({ background, fontSize, text, color, ...props }) => {
     const customStyle = {
@@ -17,9 +18,7 @@ const SelectedTopic: React.FC<SelectedTopicProps> = ({ background, fontSize, tex
         fontSize: fontSize || '30px',
         padding: '10px',
         color: color || '#FED11B',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
+        textAlign: 'center' as TextAlign ,
         fontFamily: 'umbrage2',
         // margin: '10px', // Add margin of 10px to all sides
         
@@ -27,7 +26,7 @@ const SelectedTopic: React.FC<SelectedTopicProps> = ({ background, fontSize, tex
 
     };
 
-    return <div style={customStyle}>{text}</div>;
+    return <div style={customStyle} >{text}</div>;
 };
 
 export default SelectedTopic;

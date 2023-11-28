@@ -1,6 +1,7 @@
 import React, { useContext } from 'react';
 import SelectedTopic from './SelectedTopic';
 import { TopicContext } from './TopicContext';
+import { removeSuffixes } from '../../game-domain/metaphor/TopicLabelFilter';
 
 interface SelectedTopicEntriesProps {
     entrySize: number;
@@ -16,14 +17,14 @@ const SelectedTopicEntries: React.FC<SelectedTopicEntriesProps> = ({ entrySize }
         inputs.push(
             <SelectedTopic
                 key={i}
-                text={topics[i][0]}
+                text={removeSuffixes(topics[i][0])}
             /> 
         );
     }
 
     return <div style={{
         width: '100%',
-        height: '100%',
+        height: 'auto',
     }}>{inputs}</div>;
 };
 

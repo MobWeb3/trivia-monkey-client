@@ -6,4 +6,4 @@ export interface MetaphorEntry {
     score: number | null;
     title: string;
     url: string;
-  }
+}

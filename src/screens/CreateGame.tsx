@@ -16,7 +16,7 @@ import './CreateGame.css'
 import DisplayTitle from '../components/DisplayTitle';
 import ShareModal from '../components/share/ShareModal';
 import CustomButton from '../components/CustomButton';
-import { TopicContext } from '../components/topics/TopicContext';
+import { Topic, TopicContext } from '../components/topics/TopicContext';
 
 const CreateGame = () => {
     const [nickname, setNickname] = useState('');
@@ -51,8 +51,6 @@ const CreateGame = () => {
     }), []);
 
     useEffect(() => {
-        // console.log("topics: ", topics)
-        // console.log('sessionData: ', sessionData);
         const handleAllPlayersJoined = (event: any) => {
             console.log('All players have joined', event.detail);
             setSessionData({ ...sessionData, ...event.detail });
@@ -70,8 +68,8 @@ const CreateGame = () => {
 
     useEffect(() => {
         const url = `${window.location.origin}/joingame?sessionId=${sessionData?.sessionId}&channelId=${sessionData?.channelId}`;
-        urlRef.current =url;        qrCode.update({
-          data: url,
+        urlRef.current = url; qrCode.update({
+            data: url,
         });
         console.log('qrCode URL to share: ', url);
         if (ref.current) {
@@ -82,7 +80,6 @@ const CreateGame = () => {
     const handleCreateChannel = async (data: any) => {
         if (web3auth) {
             const { sessionId, channelId, clientId } = await createChannelListenerWrapper(web3auth, data);
-            // console.log('handleCreateChannel: ', sessionId, channelId);
             setSessionData({ sessionId, channelId, clientId });
             return { sessionId, channelId, clientId };
         }
@@ -112,7 +109,7 @@ const CreateGame = () => {
                     // Deploy generation of AI questions
                     await generateAllQuestions(topics, questionSessionId, true);
                     // Update topics to Game session
-                    await updateTopics({ id: sessionData?.sessionId, topics: topics.map((topic) => topic[0]) });
+                    await updateTopics({ id: sessionData?.sessionId, topics: topics.map((topic: Topic) => topic[0]) });
                     // console.log('updatedTopics response:', addTopicResponse);
 
                     // Set questionSessionId in the Game session records
@@ -141,14 +138,14 @@ const CreateGame = () => {
                 align="center"
                 direction="column"
                 wrap="wrap"
-            >                
-                <DisplayTitle text={'Waiting for others to join'} fontSize='25px' background='#FDD673'/>
-                <div ref={ref} onClick={openShareModal}/>
+            >
+                <DisplayTitle text={'Waiting for others to join'} fontSize='25px' background='#FDD673' />
+                <div ref={ref} onClick={openShareModal} />
                 {/* add a label to press the QR code to share link*/}
                 <CustomButton fontSize='15px' background='#6562DF' color='#FDD673' onClick={openShareModal}> share link </CustomButton>
-                <ShareModal url={urlRef.current} isOpen={isShareModalOpen} onClose={closeShareModal}/>
+                <ShareModal url={urlRef.current} isOpen={isShareModalOpen} onClose={closeShareModal} />
             </Flex>
-            
+
         );
     };
 
@@ -177,8 +174,6 @@ const CreateGame = () => {
                         </div>
                     )
             }
-
-
         </div>
     );
 };
