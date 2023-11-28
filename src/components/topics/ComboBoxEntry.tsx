@@ -1,8 +1,9 @@
 import { useContext, useState } from 'react';
 import { Combobox, ComboboxProps, TextInput, useCombobox } from '@mantine/core';
-import { IconSearch, IconCircleLetterX } from '@tabler/icons-react';
+import { IconSearch, IconCircleLetterX, IconLoader } from '@tabler/icons-react';
 import { getTopicEntries } from '../../metaphor/metaphor';
 import { Topic, TopicContext } from './TopicContext';
+import './ComboBoxEntry.css';
 
 interface MyComboboxProps extends ComboboxProps {
     // other props...
@@ -51,6 +52,7 @@ export function ComboboxEntry({ savedValue }: MyComboboxProps) {
                     style={{
                         marginTop: '10px',
                         marginBottom: '10px',
+                        fontFamily: 'umbrage2',
                     }}
                     onChange={(event) => {
                         const value = event.currentTarget.value;
@@ -63,8 +65,8 @@ export function ComboboxEntry({ savedValue }: MyComboboxProps) {
                     leftSection={
                         <div
                             onClick={async () => {
-  
-                                if (currentValue.length > 2) {
+
+                                if (currentValue.length > 2 && !searching) {
                                     console.log("searching for: ", currentValue);
                                     setSearching(true);
                                     const response = (await getTopicEntries(currentValue));
@@ -75,7 +77,11 @@ export function ComboboxEntry({ savedValue }: MyComboboxProps) {
                                 }
                             }}
                         >
-                            {<IconSearch />}
+                            {
+                                searching ? <div className="icon-loader">
+                                    <IconLoader/>
+                              </div> : <IconSearch />
+                            }
                         </div>
                     }
                     rightSection={
