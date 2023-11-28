@@ -8,4 +8,4 @@ export const BASE_URL = isDev ? DEV_BASE_URL : PROD_BASE_URL;
 
 // export const BASE_AI_URL = 'https://74.82.30.101:5000'
 
-// export const BASE_AI_URL = 'http://65.19.132.88:5000'
+export const BASE_AI_URL = 'https://mobweb3.com'
