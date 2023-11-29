@@ -15,9 +15,10 @@ import useLocalStorageState from "use-local-storage-state";
 import { SessionData } from "../../screens/SessionData";
 import { GameBoardState } from "../../game-domain/Session";
 
-const SelfAvatar = ({ self, gameBoardState }: 
+const SelfAvatar = ({ self, gameBoardState, showScoreBadge=false }: 
 { self: Member | null;
   gameBoardState: GameBoardState;
+  showScoreBadge?:boolean;
 }) => {
   const [hover, setHover] = useState(false);
 
@@ -42,9 +43,9 @@ const SelfAvatar = ({ self, gameBoardState }:
         backgroundPosition: 'center',
       }}
     >
-      <div className={styles.scoreBox}>
+      {showScoreBadge && <div className={styles.scoreBox}>
         <p className={styles.scoreText}>{getSelfScore()}</p>
-      </div>
+      </div>}
       {/* <p className={styles.name}>You</p> */}
       <div className={styles.statusIndicatorOnline} id="status-indicator" />
       
@@ -61,10 +62,12 @@ const OtherAvatars = ({
   users,
   usersCount,
   gameBoardState,
+  showScoreBadge=false,
 }: {
   users: Member[];
   usersCount: number;
   gameBoardState: GameBoardState;
+  showScoreBadge?:boolean;
 }) => {
   const [hoveredClientId, setHoveredClientId] = useState<string | null>(null);
   return (
@@ -111,11 +114,11 @@ const OtherAvatars = ({
                 id="avatar"
               >
               {/* Add a small score box on the bottom of the avatar */}
-              <div className={styles.scoreBox}>
+              {showScoreBadge && <div className={styles.scoreBox}>
                 <p className={styles.scoreText}>{
                   getScore()
                 }</p>
-              </div>
+              </div>}
               <div className={statusIndicatorCSS} id="status-indicator" />
             </div>
 
@@ -134,9 +137,11 @@ const OtherAvatars = ({
 const Avatars = ({
   otherUsers,
   self,
+  showScoreBadge=false,
 }: {
   otherUsers: Member[];
   self: Member | null;
+  showScoreBadge?:boolean;
 }) => {
   const totalWidth = calculateTotalWidth({ users: otherUsers });
   // Get the game board state
@@ -144,11 +149,12 @@ const Avatars = ({
 
   return (
     <div className={styles.container} style={{ width: `${totalWidth}px` }}>
-      <SelfAvatar self={self} gameBoardState= {gameBoardState} />
+      <SelfAvatar self={self} gameBoardState= {gameBoardState} showScoreBadge={showScoreBadge}/>
       <OtherAvatars
         usersCount={otherUsers.length}
         users={otherUsers.slice(0, MAX_USERS_BEFORE_LIST).reverse()}
         gameBoardState= {gameBoardState}
+        showScoreBadge={showScoreBadge}
       />
       {/** 💡 Dropdown list of surplus users 💡 */}
       <Surplus otherUsers={otherUsers} />

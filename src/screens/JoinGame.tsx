@@ -84,16 +84,16 @@ const JoinGame = () => {
             await updateTopics({ id: sessionData?.sessionId, topics: topics.map((topic) => topic[0]) })
 
             // add player to game session
-            await addPlayer({ id: sessionData?.sessionId,playerId: sessionData?.clientId })
+            await addPlayer({ id: sessionData?.sessionId, playerId: sessionData?.clientId })
 
             setJoined(true);
         }
     };
 
-    const handleJoinButtonClick = () => {
+    const handleJoinButtonClick = async () => {
         if (!web3auth) retryLogin();
         if (sessionData?.channelId !== '') {
-            handleJoinGame({ channelId: sessionData?.channelId });
+            await handleJoinGame({ channelId: sessionData?.channelId });
         }
 
         joinIfAlreadyActiveGame();

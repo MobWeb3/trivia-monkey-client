@@ -192,7 +192,7 @@ function AIGame() {
                 {spacesRef.current && (
                 <SpacesProvider client={spacesRef.current}>
                     <SpaceProvider name="avatar-stack">
-                    <AvatarStack />
+                    <AvatarStack showScoreBadge={true}/>
                     </SpaceProvider>
                 </SpacesProvider>
                 )}
