@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import classNames from "classnames";
 
 import {
@@ -8,11 +8,8 @@ import {
 } from "../utils/helpers";
 import Surplus from "./Surplus";
 import UserInfo from "./UserInfo";
-
 import type { Member } from "../utils/helpers";
-
 import styles from "./Avatars.module.css";
-import { useSpace } from "@ably/spaces/dist/mjs/react";
 import useGameBoardState from "../../polybase/useGameBoardState";
 import useLocalStorageState from "use-local-storage-state";
 import { SessionData } from "../../screens/SessionData";
@@ -23,29 +20,12 @@ const SelfAvatar = ({ self, gameBoardState }:
   gameBoardState: GameBoardState;
 }) => {
   const [hover, setHover] = useState(false);
-  const { space } = useSpace();
   
   // sessionData
   const [sessionData] = useLocalStorageState<SessionData>('sessionData', {});
 
-  // Get the game board state
-  // const gameBoardState: GameBoardState = useGameBoardState();
-  
-  /**
-   * 💡 Get the latest scores for the the given avatar 💡
-   */
-  useEffect(() => {
-    if (!space) return;
-    // console.log('gameBoardState:', gameBoardState);
-    if (sessionData && sessionData.clientId) {
-      // console.log(`gameBoardState-${sessionData.clientId}`, gameBoardState[sessionData.clientId]);
-    }
-
-  }, [gameBoardState, sessionData, space]);
-
-
   function getSelfScore() {
-    if (sessionData && sessionData.clientId) {
+    if (Object.keys(gameBoardState).length > 0 && sessionData && sessionData.clientId) {
       // console.log(`gameBoardState-${sessionData.clientId}`, gameBoardState[sessionData.clientId]);
       return gameBoardState[sessionData.clientId];
     }
@@ -94,7 +74,7 @@ const OtherAvatars = ({
 
         // get score from gameBoardState for this user
         function getScore() {
-          if (user.clientId) {
+          if (Object.keys(gameBoardState).length > 0 && user.clientId) {
             // console.log(`gameBoardState-${user.clientId}`, gameBoardState[user.clientId]);
             return gameBoardState[user.clientId];
           }
@@ -160,11 +140,6 @@ const Avatars = ({
   const totalWidth = calculateTotalWidth({ users: otherUsers });
   // Get the game board state
   const gameBoardState: GameBoardState = useGameBoardState();
-
-  useEffect(() => {
-    // console.log('gameBoardState:', gameBoardState);
-  }, [gameBoardState]);
-    
 
   return (
     <div className={styles.container} style={{ width: `${totalWidth}px` }}>

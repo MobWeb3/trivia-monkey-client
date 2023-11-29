@@ -1,14 +1,13 @@
 import { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { createChannelListenerWrapper } from '../ably/ChannelListener';
 import { SignerContext } from '../components/SignerContext';
-import { Messages } from '../utils/Messages';
 import { useNavigate } from 'react-router-dom';
 import { Flex, Loader } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import QRCodeStyling from "qr-code-styling";
 import { createQuestionSession } from '../polybase/QuestionsHandler';
 import { generateAllQuestions } from '../game-domain/GenerateQuestionsHandler';
-import { updateQuestionSessionId, updateTopics } from '../polybase/SessionHandler';
+import { addPlayer, updateQuestionSessionId, updateSessionPhase, updateTopics } from '../polybase/SessionHandler';
 import { SessionData } from './SessionData';
 import useLocalStorageState from 'use-local-storage-state';
 import CreateGameForm from '../components/CreateGameFields';
@@ -17,6 +16,8 @@ import DisplayTitle from '../components/DisplayTitle';
 import ShareModal from '../components/share/ShareModal';
 import CustomButton from '../components/CustomButton';
 import { Topic, TopicContext } from '../components/topics/TopicContext';
+import useGameSession from '../polybase/useGameSession';
+import { SessionPhase } from '../game-domain/SessionPhase';
 
 const CreateGame = () => {
     const [nickname, setNickname] = useState('');
@@ -31,6 +32,8 @@ const CreateGame = () => {
     const [sessionCreated, setSessionCreated] = useState(false);
     const urlRef = useRef('');
     const ref = useRef(null); //qr code ref
+    const useGameSessionHook = useGameSession();
+
     const qrCode = useMemo(() => new QRCodeStyling({
         width: 300,
         height: 300,
@@ -51,20 +54,24 @@ const CreateGame = () => {
     }), []);
 
     useEffect(() => {
-        const handleAllPlayersJoined = (event: any) => {
-            console.log('All players have joined', event.detail);
-            setSessionData({ ...sessionData, ...event.detail });
-            // Handle the event here
+        if (!useGameSessionHook) return;
+
+    //  Check if all players have joined
+    //  If all players have joined, navigate to SpinWheel
+        const { playerList, numberPlayers, gamePhase } = useGameSessionHook;
+
+        if (playerList === undefined || playerList === null ||
+             numberPlayers === undefined) return;
+
+        console.log('playerList', playerList);
+        // console.log('numberPlayers', numberPlayers);
+        // const initialTurnPositionLength = Object.keys(initialTurnPosition).length;
+        const canGoToSpin = playerList.length >= numberPlayers && gamePhase === SessionPhase.TURN_ORDER;
+        console.log('canGoToSpin', canGoToSpin);
+        if (canGoToSpin) {
             navigate('/spinwheel');
-        };
-
-        window.addEventListener(Messages.ALL_PLAYERS_JOINED, handleAllPlayersJoined);
-
-        // Cleanup listener when component unmounts
-        return () => {
-            window.removeEventListener(Messages.ALL_PLAYERS_JOINED, handleAllPlayersJoined);
-        };
-    });
+        }
+    },[navigate, useGameSessionHook]);
 
     useEffect(() => {
         const url = `${window.location.origin}/joingame?sessionId=${sessionData?.sessionId}&channelId=${sessionData?.channelId}`;
@@ -75,7 +82,7 @@ const CreateGame = () => {
         if (ref.current) {
             qrCode.append(ref.current);
         }
-    }, [sessionCreated, qrCode, sessionData?.channelId, sessionData?.sessionId]);
+    }, [sessionCreated, qrCode, sessionData?.sessionId, sessionData?.channelId]);
 
     const handleCreateChannel = async (data: any) => {
         if (web3auth) {
@@ -89,31 +96,43 @@ const CreateGame = () => {
     const handleCreateGameButton = async () => {
         setLoading(true);
 
-        // console.log('handlePlayButtonClick A');
         if (nickname !== '' && numberPlayers !== '' && pointsToWin !== '') {
-            // console.log('handlePlayButtonClick B');
-            const sessionData = await handleCreateChannel({ nickname, numberPlayers, pointsToWin, topics });
-            // console.log('handlePlayButtonClick sessionData', sessionData);
+            
             // Create AI session question database record in Polybase
-            if (sessionData) {
-                // console.log('entered createQuestionSession', sessionData);
+            const gameSessionData = await handleCreateChannel({ nickname, numberPlayers, pointsToWin, topics });
+            
+            if (gameSessionData) {
+                // Create question session
                 const response = await createQuestionSession({
-                    sessionId: sessionData.sessionId,
-                    clientId: sessionData.clientId
+                    sessionId: gameSessionData.sessionId,
+                    clientId: sessionData?.clientId
                 });
 
-                // console.log('createQuestionSession response: ', response);
-                // console.log('topics', topics)
                 if (response) {
                     const questionSessionId = response.recordData.data.id;
                     // Deploy generation of AI questions
                     await generateAllQuestions(topics, questionSessionId, true);
                     // Update topics to Game session
-                    await updateTopics({ id: sessionData?.sessionId, topics: topics.map((topic: Topic) => topic[0]) });
+                    await updateTopics({ id: gameSessionData?.sessionId, topics: topics.map((topic: Topic) => topic[0]) });
                     // console.log('updatedTopics response:', addTopicResponse);
 
                     // Set questionSessionId in the Game session records
-                    updateQuestionSessionId({ id: sessionData?.sessionId, questionSessionId });
+                    await updateQuestionSessionId({ id: gameSessionData?.sessionId, questionSessionId });
+
+                    // add player to game session
+                    await addPlayer({ id: gameSessionData?.sessionId, playerId: sessionData?.clientId });
+
+                    // Change game state to TURN_ORDER
+                    await updateSessionPhase({id: gameSessionData?.sessionId, newPhase: SessionPhase.TURN_ORDER});
+
+                    // save to sessionData
+                    setSessionData({
+                        ...sessionData,
+                        sessionId: gameSessionData?.sessionId,
+                        channelId: gameSessionData?.channelId,
+                        clientId: sessionData?.clientId,
+                        questionSessionId
+                    });
                 }
 
             }
