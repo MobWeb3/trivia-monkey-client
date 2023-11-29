@@ -73,6 +73,17 @@ export const updateTopics = async (data: any) => {
     return false;
 }
 
+// add player to player list
+export const addPlayer = async (data: any) => {
+    try {
+        const response = await axios.post(`${BASE_URL}/api/polybase/session/addPlayer`, data);
+        return response.data;
+    } catch (error) {
+        console.error(error);
+    }
+    return false;
+}
+
 export const updatePlayerListOrder = async (data: any) => {
     try {
         const response = await axios.post(`${BASE_URL}/api/polybase/session/sortPlayerOrders`, data);

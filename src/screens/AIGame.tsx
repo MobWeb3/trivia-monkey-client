@@ -6,13 +6,10 @@ import { Question } from '../game-domain/Question';
 import { addMessageListener, removeMessageListener } from '../utils/MessageListener';
 import { Messages } from '../utils/Messages';
 import { getNextTurnPlayerId, getSession } from '../polybase/SessionHandler';
-import { publishTurnCompleted, subscribeToTurnCompleted, unsubscribeToTurnCompleted } from '../ably/AblyMessages';
 import { SessionData } from './SessionData';
 import useLocalStorageState from 'use-local-storage-state';
-import { GameSession } from '../game-domain/GameSession';
 import { Wheel } from 'react-custom-roulette'
 import { WheelData } from 'react-custom-roulette/dist/components/Wheel/types';
-import { pollForCurrentPlayerId, pollUntilSessionChanges } from '../polybase/PollHelpers';
 import { Container, Flex } from '@mantine/core';
 import { SpaceProvider, SpacesProvider } from '@ably/spaces/dist/mjs/react';
 import AvatarStack from '../components/avatar_stack/AvatarStack';
@@ -20,6 +17,7 @@ import IgnoranceMonkeyCard from '../components/game/IgnorantMonkeyCard';
 import CustomButton from '../components/CustomButton';
 import Spaces from '@ably/spaces';
 import { getSpacesInstance } from '../ably/SpacesSingleton';
+import useGameSession from '../polybase/useGameSession';
 
 function AIGame() {
 
@@ -30,8 +28,8 @@ function AIGame() {
     const [canSpin, setCanSpin] = useState(false);
     const [message, setMessage] = useState("Loading...");
     const [sliceValues, setSliceValues] = useState<string[]>([]);
-    const [session, setSession] = useState<GameSession | null>(null);
     const spacesRef = useRef<Spaces | null>(null);
+    const useGameSessionHook = useGameSession();
 
     useEffect(() => {
         if (!spacesRef.current && sessionData?.clientId){
@@ -58,23 +56,14 @@ function AIGame() {
     const finishTurnAndSaveState = async () => {
         setShowQuestionModal(false);
         // Update turn on polybase
-        const { nextTurnPlayerId } = await getNextTurnPlayerId({ id: sessionData?.sessionId });
-        // Publish turn completed // we know clientId is not null because we checked isPlayerTurn
-        if (sessionData?.clientId && sessionData.channelId) {
-            console.log("publish completed turn");
-            await publishTurnCompleted(sessionData?.clientId, sessionData.channelId, { nextTurnPlayerId });
-        }
+        await getNextTurnPlayerId({ id: sessionData?.sessionId });
     }
 
     useEffect(() => {
         const setupSessionData = async () => {
 
-            if (!sessionData?.sessionId) return;
-            const session = await pollForCurrentPlayerId(sessionData?.sessionId);
-            if (!session) return;
-            setSession(session);
-            // Get session data
-            const { topics } = session;
+            if (!useGameSessionHook) return;
+            const { topics } = useGameSessionHook;
 
             console.log('topics: ', topics)
 
@@ -83,61 +72,60 @@ function AIGame() {
         }
 
         setupSessionData();
-    }, [sessionData?.sessionId]);
+    }, [useGameSessionHook]);
 
-    useEffect(() => {
+    // useEffect(() => {
 
-        if (!sessionData?.clientId || !sessionData?.channelId) return;
+    //     if (!sessionData?.clientId || !sessionData?.channelId) return;
 
-        async function updateTurn(expectedCurrentPlayerId: string) {
-            try {
-                const session: GameSession = await pollUntilSessionChanges(expectedCurrentPlayerId, sessionData?.sessionId ?? '');
-                if (!session) return;
-                setSession(session);
-                const { topics } = session;
-                setSliceValues(topics as unknown as string[]);
+    //     async function updateTurn(expectedCurrentPlayerId: string) {
+    //         try {
+    //             const session: GameSession = await pollUntilSessionChanges(expectedCurrentPlayerId, sessionData?.sessionId ?? '');
+    //             if (!session) return;
+    //             setSession(session);
+    //             const { topics } = session;
+    //             setSliceValues(topics as unknown as string[]);
 
-            } catch (error) {
-                console.log("error updating session data: ", error);
-            }
-        }
-        if (sessionData?.clientId && sessionData?.channelId) {
-            console.log("subscribed to turn completed");
-            subscribeToTurnCompleted(sessionData?.clientId, sessionData?.channelId);
-        }
+    //         } catch (error) {
+    //             console.log("error updating session data: ", error);
+    //         }
+    //     }
+    //     if (sessionData?.clientId && sessionData?.channelId) {
+    //         console.log("subscribed to turn completed");
+    //         subscribeToTurnCompleted(sessionData?.clientId, sessionData?.channelId);
+    //     }
 
-        const handleTurnCompleted = async (event: any) => {
-            console.log("event detail: ", event.detail)
-            const { nextTurnPlayerId } = event.detail;
-            await updateTurn(nextTurnPlayerId);
-        };
+    //     const handleTurnCompleted = async (event: any) => {
+    //         console.log("event detail: ", event.detail)
+    //         const { nextTurnPlayerId } = event.detail;
+    //         await updateTurn(nextTurnPlayerId);
+    //     };
 
-        window.addEventListener(Messages.TURN_COMPLETED, handleTurnCompleted);
-        // Return cleanup function
-        return () => {
-            window.removeEventListener(Messages.TURN_COMPLETED, handleTurnCompleted);
-            if (!sessionData?.clientId || !sessionData?.channelId) return;
-            unsubscribeToTurnCompleted(sessionData?.clientId, sessionData?.channelId)
-        };
-    }, []);// eslint-disable-line react-hooks/exhaustive-deps
+    //     window.addEventListener(Messages.TURN_COMPLETED, handleTurnCompleted);
+    //     // Return cleanup function
+    //     return () => {
+    //         window.removeEventListener(Messages.TURN_COMPLETED, handleTurnCompleted);
+    //         if (!sessionData?.clientId || !sessionData?.channelId) return;
+    //         unsubscribeToTurnCompleted(sessionData?.clientId, sessionData?.channelId)
+    //     };
+    // }, []);// eslint-disable-line react-hooks/exhaustive-deps
 
     useEffect(() => {
         addMessageListener(Messages.HIDE_QUESTION, finishTurnAndSaveState);
         return () => {
-            // removeMessageListener(Messages.SHOW_QUESTION, showQuestion);
             removeMessageListener(Messages.HIDE_QUESTION, finishTurnAndSaveState)
         };
     });
 
     useEffect(() => {
         function isPlayerTurn(): boolean {
-            console.log('isPlayerTurn: ', sessionData?.clientId, session?.currentTurnPlayerId);
-            if (!sessionData?.clientId || !session?.currentTurnPlayerId)
+            console.log('isPlayerTurn: ', sessionData?.clientId, useGameSessionHook?.currentTurnPlayerId);
+            if (!sessionData?.clientId || !useGameSessionHook?.currentTurnPlayerId)
                 return false;
-            return sessionData.clientId === session.currentTurnPlayerId;
+            return sessionData.clientId === useGameSessionHook.currentTurnPlayerId;
         }
 
-        if (session) {
+        if (useGameSessionHook) {
             if (isPlayerTurn()) {
                 setCanSpin(true);
                 setMessage("Your turn!");
@@ -145,20 +133,20 @@ function AIGame() {
                 setCanSpin(false);
 
                 //message to show
-                const _message = `Waiting for ${session?.currentTurnPlayerId ?? ""} to finish turn..`;
+                const _message = `Waiting for ${useGameSessionHook?.currentTurnPlayerId ?? ""} to finish turn..`;
                 setMessage(_message);
 
                 console.log("message: ", _message);                
             }
         }
-    }, [session, sessionData?.clientId]);
+    }, [sessionData?.clientId, useGameSessionHook]);
 
 
     const [mustSpin, setMustSpin] = useState(false);
     const [prizeNumber, setPrizeNumber] = useState(0);
 
     const topicsLength = 6;
-    const data: WheelData[] = (session?.topics ?? [])?.map((topic: string, index) => {
+    const data: WheelData[] = (useGameSessionHook?.topics ?? [])?.map((topic: string, index) => {
 
         // get sequential number from 0 to topicsLength
         let sequentialNumber = index % topicsLength;
@@ -204,7 +192,7 @@ function AIGame() {
                 {spacesRef.current && (
                 <SpacesProvider client={spacesRef.current}>
                     <SpaceProvider name="avatar-stack">
-                    <AvatarStack />
+                    <AvatarStack showScoreBadge={true}/>
                     </SpaceProvider>
                 </SpacesProvider>
                 )}

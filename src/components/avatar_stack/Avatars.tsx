@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import classNames from "classnames";
 
 import {
@@ -8,46 +8,27 @@ import {
 } from "../utils/helpers";
 import Surplus from "./Surplus";
 import UserInfo from "./UserInfo";
-
 import type { Member } from "../utils/helpers";
-
 import styles from "./Avatars.module.css";
-import { useSpace } from "@ably/spaces/dist/mjs/react";
 import useGameBoardState from "../../polybase/useGameBoardState";
 import useLocalStorageState from "use-local-storage-state";
 import { SessionData } from "../../screens/SessionData";
 import { GameBoardState } from "../../game-domain/Session";
 
-const SelfAvatar = ({ self, gameBoardState }: 
+const SelfAvatar = ({ self, gameBoardState, showScoreBadge=false }: 
 { self: Member | null;
   gameBoardState: GameBoardState;
+  showScoreBadge?:boolean;
 }) => {
   const [hover, setHover] = useState(false);
-  const { space } = useSpace();
-  
+
   // sessionData
   const [sessionData] = useLocalStorageState<SessionData>('sessionData', {});
 
-  // Get the game board state
-  // const gameBoardState: GameBoardState = useGameBoardState();
-  
-  /**
-   * 💡 Get the latest scores for the the given avatar 💡
-   */
-  useEffect(() => {
-    if (!space) return;
-    // console.log('gameBoardState:', gameBoardState);
-    if (sessionData && sessionData.clientId) {
-      // console.log(`gameBoardState-${sessionData.clientId}`, gameBoardState[sessionData.clientId]);
-    }
-
-  }, [gameBoardState, sessionData, space]);
-
-
   function getSelfScore() {
-    if (sessionData && sessionData.clientId) {
-      // console.log(`gameBoardState-${sessionData.clientId}`, gameBoardState[sessionData.clientId]);
-      return gameBoardState[sessionData.clientId];
+    if (Object.keys(gameBoardState).length > 0 && sessionData && sessionData.clientId) {
+      const selfScore = gameBoardState[sessionData.clientId];
+      return selfScore !== undefined && selfScore !== null ? selfScore : 0;
     }
     return 0;
   }
@@ -62,9 +43,9 @@ const SelfAvatar = ({ self, gameBoardState }:
         backgroundPosition: 'center',
       }}
     >
-      <div className={styles.scoreBox}>
+      {showScoreBadge && <div className={styles.scoreBox}>
         <p className={styles.scoreText}>{getSelfScore()}</p>
-      </div>
+      </div>}
       {/* <p className={styles.name}>You</p> */}
       <div className={styles.statusIndicatorOnline} id="status-indicator" />
       
@@ -81,10 +62,12 @@ const OtherAvatars = ({
   users,
   usersCount,
   gameBoardState,
+  showScoreBadge=false,
 }: {
   users: Member[];
   usersCount: number;
   gameBoardState: GameBoardState;
+  showScoreBadge?:boolean;
 }) => {
   const [hoveredClientId, setHoveredClientId] = useState<string | null>(null);
   return (
@@ -94,9 +77,10 @@ const OtherAvatars = ({
 
         // get score from gameBoardState for this user
         function getScore() {
-          if (user.clientId) {
+          if (Object.keys(gameBoardState).length > 0 && user.clientId) {
             // console.log(`gameBoardState-${user.clientId}`, gameBoardState[user.clientId]);
-            return gameBoardState[user.clientId];
+            const selfScore = gameBoardState[user.clientId];
+            return selfScore !== undefined && selfScore !== null ? selfScore : 0;
           }
           return 0;
         }
@@ -130,11 +114,11 @@ const OtherAvatars = ({
                 id="avatar"
               >
               {/* Add a small score box on the bottom of the avatar */}
-              <div className={styles.scoreBox}>
+              {showScoreBadge && <div className={styles.scoreBox}>
                 <p className={styles.scoreText}>{
                   getScore()
                 }</p>
-              </div>
+              </div>}
               <div className={statusIndicatorCSS} id="status-indicator" />
             </div>
 
@@ -153,26 +137,24 @@ const OtherAvatars = ({
 const Avatars = ({
   otherUsers,
   self,
+  showScoreBadge=false,
 }: {
   otherUsers: Member[];
   self: Member | null;
+  showScoreBadge?:boolean;
 }) => {
   const totalWidth = calculateTotalWidth({ users: otherUsers });
   // Get the game board state
   const gameBoardState: GameBoardState = useGameBoardState();
 
-  useEffect(() => {
-    // console.log('gameBoardState:', gameBoardState);
-  }, [gameBoardState]);
-    
-
   return (
     <div className={styles.container} style={{ width: `${totalWidth}px` }}>
-      <SelfAvatar self={self} gameBoardState= {gameBoardState} />
+      <SelfAvatar self={self} gameBoardState= {gameBoardState} showScoreBadge={showScoreBadge}/>
       <OtherAvatars
         usersCount={otherUsers.length}
         users={otherUsers.slice(0, MAX_USERS_BEFORE_LIST).reverse()}
         gameBoardState= {gameBoardState}
+        showScoreBadge={showScoreBadge}
       />
       {/** 💡 Dropdown list of surplus users 💡 */}
       <Surplus otherUsers={otherUsers} />

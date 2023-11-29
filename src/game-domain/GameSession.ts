@@ -5,9 +5,11 @@ export interface GameSession {
     readonly channelId?: string;
     readonly currentPhase?: string;
     readonly channel?: Types.RealtimeChannelPromise;
-    readonly initialTurnPositions?: any;
+    readonly initialTurnPosition?: any;
     readonly numberPlayers?: number;
     readonly gamePhase?: string;
     readonly topics?: readonly [];
     readonly currentTurnPlayerId?: string;
+    readonly hostPlayerId?: string;
+    readonly playerList?: readonly [];
 }

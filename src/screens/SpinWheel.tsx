@@ -1,11 +1,8 @@
 import './SpinWheel.css';
 import { useEffect, useRef, useState } from 'react';
 import { Container, Flex, Image, Loader } from '@mantine/core';
-import { addMessageListener, removeMessageListener, sendMessage } from '../utils/MessageListener';
-import { Messages } from '../utils/Messages';
 import { useNavigate } from 'react-router-dom';
-import { publishStartGameAI, subscribeToStartGameAI } from '../ably/AblyMessages';
-import { getSession, setCurrentTurnPlayerId, updateInitialTurnPosition, updatePlayerListOrder, updateSessionPhase } from '../polybase/SessionHandler';
+import { setCurrentTurnPlayerId, updateInitialTurnPosition, updatePlayerListOrder, updateSessionPhase } from '../polybase/SessionHandler';
 import { SessionData } from './SessionData';
 import { SessionPhase } from '../game-domain/SessionPhase';
 import useLocalStorageState from 'use-local-storage-state';
@@ -14,11 +11,11 @@ import './SpinWheel.css';
 import { motion } from 'framer-motion';
 import pinImage from './../assets/sprites/pin.png'; // replace with your actual image path
 import { Types } from 'ably';
-import { ChannelHandler } from '../ably/ChannelHandler';
 import { SpaceProvider, SpacesProvider } from "@ably/spaces/react";
 import AvatarStack from '../components/avatar_stack/AvatarStack';
 import CustomButton from '../components/CustomButton';
 import { getSpacesInstance } from '../ably/SpacesSingleton';
+import useGameSession from '../polybase/useGameSession';
 
 function SpinWheel() {
 
@@ -33,19 +30,31 @@ function SpinWheel() {
     const [hasSpun, setHasSpun] = useState(false);
     const slices = 12;
     const sliceValues = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
-
     const navigate = useNavigate();
-    useEffect(() => {
-        initializeChannel();
+    const useGameSessionHook = useGameSession();
 
-        // Cleanup function
-        return () => {
-            // Code to clean up the channel
-            console.log('cleaning up channel');
-            channel.current?.unsubscribe();
-            channel.current?.detach();
-        };
-    });
+    useEffect(() => {
+        console.log('useEffect sessionData', sessionData);
+
+        // check if we can start the game
+        if (sessionData?.sessionId) {
+            const { initialTurnPosition, numberPlayers } = useGameSessionHook;
+
+            if (initialTurnPosition === undefined || numberPlayers === undefined) return;
+
+            console.log('initialTurnPosition', initialTurnPosition);
+            console.log('numberPlayers', numberPlayers);
+            const initialTurnPositionLength = Object.keys(initialTurnPosition).length;
+            const canStartGame = initialTurnPositionLength >= numberPlayers;
+            console.log('canStartGame', canStartGame);
+            if (canStartGame) {
+                // console.log('GAME_ACTIVE!');
+                setMayStartGame(true);
+            }
+        }
+
+        console.log('useGameSessionHook', useGameSessionHook);
+    },[sessionData, sessionData?.sessionId, useGameSessionHook]);
 
     useEffect(() => {
         const handleSelectedSlice = async () => {
@@ -65,60 +74,43 @@ function SpinWheel() {
             handleSelectedSlice();
         }
     }, [hasSpun, selectedSlice, sessionData?.clientId, sessionData?.sessionId]);
+    
 
     useEffect(() => {
-        console.log('sessionData', sessionData);
 
-        const enableStartGameButton = () => {
-            console.log('enableStartGameButton');
-            setMayStartGame(true);
-        };
+        // automatically take to AI game if game phase is GAME_ACTIVE
+        if (sessionData?.sessionId) {
+            const { gamePhase } = useGameSessionHook;
 
-        addMessageListener(Messages.MAY_START_GAME, enableStartGameButton);
-
-        console.log('SpinWheel useEffect');
-
-        if (sessionData && sessionData.clientId && sessionData.channelId) {
-            const { clientId, channelId } = sessionData;
-            subscribeToStartGameAI(clientId, channelId);
+            if (gamePhase === SessionPhase.GAME_ACTIVE) {
+                navigate('/aigame');
+            }
         }
 
-        const handleOpenAIGame = async (event: any) => {
-            // update order list        
-            //make call to polybase to set the first in turn
-            setIsLoading(true);
-            if (sessionData) {
-                const playerList = (await updatePlayerListOrder({ id: sessionData.sessionId })).playerList;
-                console.log('playerList', playerList);
-                // set the first player in the list as the current turn player
-                await setCurrentTurnPlayerId({ id: sessionData.sessionId, playerId: playerList[0] })
-                // if all players have selected their turn, then we can proceed to the next phase.
-                await updateSessionPhase({ id: sessionData.sessionId, newPhase: SessionPhase.GAME_ACTIVE });
-            }
-            setIsLoading(false);
-            console.log('Naviagting to Game', event.detail);
-            navigate('/aigame');
-        };
+    }, [sessionData, navigate, useGameSessionHook]);
 
-        window.addEventListener(Messages.START_GAME_AI, handleOpenAIGame);
-
-        // Cleanup listener when component unmounts
-        return () => {
-            window.removeEventListener(Messages.START_GAME_AI, handleOpenAIGame);
-            removeMessageListener(Messages.MAY_START_GAME, enableStartGameButton);
-        };
-    }, [sessionData, navigate]);
-
-    const handleStartGame = () => {
+    const handleStartGame = async () => {
         console.log('handleStartGame');
         console.log('handleStartGame SpinWheel sesionData: ', sessionData);
         if (sessionData === null) return;
         const { clientId, channelId } = sessionData as SessionData;
         if (clientId && channelId) {
+            setIsLoading(true);
+            await updatePlayerAndTurn()
+
+            // Upldate polybase session phase to GAME_ACTIVE
+            await updateSessionPhase({ id: sessionData?.sessionId, newPhase: SessionPhase.GAME_ACTIVE });
+            setIsLoading(false);
             navigate('/aigame');
-            publishStartGameAI(clientId, channelId)
         }
     };
+
+    // setup player list order and current turn player(which is the first player in the list)
+    async function updatePlayerAndTurn() {
+        const playerList = (await updatePlayerListOrder({ id: sessionData?.sessionId })).playerList;
+        // set the first player in the list as the current turn player
+        await setCurrentTurnPlayerId({ id: sessionData?.sessionId, playerId: playerList[0] })
+    }
 
     const spin = async () => {
         if (canSpin) {
@@ -143,40 +135,6 @@ function SpinWheel() {
 
             // Call handleSelectedSlice after spinning is complete
             setHasSpun(true);
-        }
-    }
-
-    const initializeChannel = async () => {
-        console.log('sessionData in initializeChannel', sessionData);
-        if (sessionData?.channelId && sessionData?.clientId) {
-            const session = await getSession({ id: sessionData?.sessionId });
-            const channelHandler = await ChannelHandler.getInstance().initChannelHandler(sessionData?.clientId);
-            await channelHandler?.enterChannel({ channelId: sessionData?.channelId, clientId: sessionData?.clientId, nickname: "" });
-            channel.current = ChannelHandler.ablyInstance?.ablyInstance.channels.get(sessionData?.channelId) as Types.RealtimeChannelPromise;
-            // console.log('HERE channelId: ', this.channelId);
-            // console.log('HERE channel: ', this.channel);
-            if (session.hostPlayerId === sessionData?.clientId) {
-                console.log("subscribing to turn-selected");
-                channel.current?.subscribe('turn-selected', async (message) => {
-                    console.log('turn selected by: ', message.clientId);
-                    const { initialTurnPosition, numberPlayers } = await getSession({ id: sessionData.sessionId });
-
-                    console.log('initialTurnPositions: ', initialTurnPosition);
-                    console.log('numberPlayers: ', numberPlayers);
-
-                    const initialTurnPositionLength = Object.keys(initialTurnPosition).length;
-                    const canStartGame = initialTurnPositionLength >= numberPlayers;
-
-                    // console.log('canStartGame: ', canStartGame);
-                    // check if all other players have already selected their turn. To do this we must check the length of 
-                    // initialTurnPosition in the Polybase server
-                    if (canStartGame) {
-                        // console.log('GAME_ACTIVE!');
-                        sendMessage(Messages.MAY_START_GAME, { sessionId: sessionData.sessionId });
-                    }
-                });
-            }
-
         }
     }
 
@@ -235,7 +193,8 @@ function SpinWheel() {
                     position: 'relative'
                 }}>
                     {isLoading ? <Loader /> :
-                        mayStartGame ? (
+                        // check if we can start the game annd if we are the host to display the start game button
+                        (mayStartGame && useGameSessionHook.hostPlayerId === sessionData?.clientId ) ? (
                             <CustomButton
                                 fontSize='1.5rem'
                                 onClick={handleStartGame}

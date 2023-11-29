@@ -1,13 +1,11 @@
 import { useContext, useEffect, useState } from 'react';
-import { enterChannelListenerWrapper } from '../ably/ChannelListener';
 import { SignerContext } from '../components/SignerContext';
-import { Messages } from '../utils/Messages';
 import { useLocation, useNavigate } from 'react-router-dom';
 import queryString from 'query-string';
 import { Container, Flex, Modal } from '@mantine/core';
 import { PickTopicComponent } from '../components/topics/PickTopicComponent';
 import { useDisclosure } from '@mantine/hooks';
-import { getSession, updateTopics } from '../polybase/SessionHandler';
+import { addPlayer, getSession, updateTopics } from '../polybase/SessionHandler';
 import { generateAllQuestions } from '../game-domain/GenerateQuestionsHandler';
 import { SessionPhase } from '../game-domain/SessionPhase';
 import { login } from '../utils/Web3AuthAuthentication';
@@ -18,6 +16,7 @@ import './JoinGame.css';
 import CustomButton from '../components/CustomButton';
 import SelectedTopicEntries from '../components/topics/SelectedTopicEntries';
 import { TopicContext } from '../components/topics/TopicContext';
+import useGameSession from '../polybase/useGameSession';
 
 const JoinGame = () => {
     // const [channelId, setChannelId] = useState('');
@@ -30,25 +29,26 @@ const JoinGame = () => {
     const [numberPlayers, setNumberPlayers] = useState<string>('');
     const [joined, setJoined] = useState(false);
     const { topics } = useContext(TopicContext);
+    const useGameSessionHook = useGameSession();
 
     useEffect(() => {
-        const handleAllPlayersJoined = (event: any) => {
-            console.log('All players have joined', event.detail);
-            console.log('sessionData', sessionData);
-            setSessionData(event.detail);
-            // Handle the event here
 
-            // If all players have joined and current player joined, navigate to SpinWheel
-            navigate('/spinwheel');
-        };
+        // If all players have joined, navigate to SpinWheel and joined the game
+        // automatically navigate to SpinWheel
+        if (sessionData?.sessionId && sessionData?.channelId) {
+            const { playerList, numberPlayers, gamePhase } = useGameSessionHook;
 
-        window.addEventListener(Messages.ALL_PLAYERS_JOINED, handleAllPlayersJoined);
+            if (playerList === undefined || numberPlayers === undefined || gamePhase === undefined) return;
 
-        // Cleanup listener when component unmounts
-        return () => {
-            window.removeEventListener(Messages.ALL_PLAYERS_JOINED, handleAllPlayersJoined);
-        };
-    });
+            const canGoToSpin = playerList.length >= numberPlayers && gamePhase === SessionPhase.TURN_ORDER;
+            console.log('canGoToSpin', canGoToSpin);
+            if (canGoToSpin) {
+                navigate('/spinwheel');
+            }
+        }
+
+    }, [navigate, sessionData?.channelId, sessionData?.sessionId, topics, useGameSessionHook]);
+
 
     useEffect(() => {
         const parsed = queryString.parse(location.search);
@@ -75,24 +75,28 @@ const JoinGame = () => {
 
     const handleJoinGame = async (data: any) => {
         if (web3auth) {
-            await enterChannelListenerWrapper(web3auth, data);
+            // await enterChannelListenerWrapper(web3auth, data);
 
             // Generate questions
-            await generateAllQuestions(topics, sessionData?.questionSessionId as string, true);
+            generateAllQuestions(topics, sessionData?.questionSessionId as string, true);
             
             // Update topics to Game session
             await updateTopics({ id: sessionData?.sessionId, topics: topics.map((topic) => topic[0]) })
-            // console.log('updatedTopics response:', addTopicResponse);
+
+            // add player to game session
+            await addPlayer({ id: sessionData?.sessionId, playerId: sessionData?.clientId })
+
             setJoined(true);
         }
     };
 
-    const handleJoinButtonClick = () => {
+    const handleJoinButtonClick = async () => {
         if (!web3auth) retryLogin();
-        joinIfAlreadyActiveGame();
         if (sessionData?.channelId !== '') {
-            handleJoinGame({ channelId: sessionData?.channelId });
+            await handleJoinGame({ channelId: sessionData?.channelId });
         }
+
+        joinIfAlreadyActiveGame();
     };
 
     const joinIfAlreadyActiveGame = async () => {

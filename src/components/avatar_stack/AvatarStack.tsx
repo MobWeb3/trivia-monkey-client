@@ -5,7 +5,7 @@ import type { Member } from "../utils/helpers";
 import styles from "./AvatarStack.module.css";
 import avatarImage from '../../assets/monkeys_avatars/astronaut-monkey1-200x200.png';
 
-const AvatarStack = () => {
+const AvatarStack = ({showScoreBadge=false}: {showScoreBadge?:boolean}) => {
 
   /** 💡 Get a handle on a space instance 💡 */
   const { space } = useSpace();
@@ -39,7 +39,7 @@ const AvatarStack = () => {
   return (
     <div id="avatar-stack" className={`example-container ${styles.container}`}>
       {/** 💡 Stack of first 5 user avatars including yourself.💡 */}
-      <Avatars self={self as Member | null} otherUsers={uniqueOthers as Member[]} />
+      <Avatars self={self as Member | null} otherUsers={uniqueOthers as Member[]} showScoreBadge={showScoreBadge} />
     </div>
   );
 };

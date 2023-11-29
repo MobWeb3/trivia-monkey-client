@@ -11,10 +11,6 @@ export enum Messages {
     CHANNEL_CREATED = 'ChannelCreated',
     ENTER_CHANNEL = 'EnterChannel',
     CHANNEL_JOINED = 'ChannelJoined',
-    ALL_PLAYERS_JOINED = 'AllPlayersJoined',
-    MAY_START_GAME = 'MayStartGame',
-    START_GAME_AI = 'start-game-ai',
-    TURN_COMPLETED = 'turn-completed',
     SHOW_QUESTION = 'show-question',
     HIDE_QUESTION = 'hide-question',
   }
