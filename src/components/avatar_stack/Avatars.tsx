@@ -20,14 +20,14 @@ const SelfAvatar = ({ self, gameBoardState }:
   gameBoardState: GameBoardState;
 }) => {
   const [hover, setHover] = useState(false);
-  
+
   // sessionData
   const [sessionData] = useLocalStorageState<SessionData>('sessionData', {});
 
   function getSelfScore() {
     if (Object.keys(gameBoardState).length > 0 && sessionData && sessionData.clientId) {
-      // console.log(`gameBoardState-${sessionData.clientId}`, gameBoardState[sessionData.clientId]);
-      return gameBoardState[sessionData.clientId];
+      const selfScore = gameBoardState[sessionData.clientId];
+      return selfScore !== undefined && selfScore !== null ? selfScore : 0;
     }
     return 0;
   }
@@ -76,7 +76,8 @@ const OtherAvatars = ({
         function getScore() {
           if (Object.keys(gameBoardState).length > 0 && user.clientId) {
             // console.log(`gameBoardState-${user.clientId}`, gameBoardState[user.clientId]);
-            return gameBoardState[user.clientId];
+            const selfScore = gameBoardState[user.clientId];
+            return selfScore !== undefined && selfScore !== null ? selfScore : 0;
           }
           return 0;
         }

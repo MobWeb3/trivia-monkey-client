@@ -20,7 +20,7 @@ function useGameBoardState() {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const collectionReference = db.collection(COLLECTION_NAME).onSnapshot(
+  const collectionReference = db.collection(COLLECTION_NAME).record(sessionData?.sessionId ?? '').onSnapshot(
     (newDoc) => {
 
       async function fetchGameBoardState() {
@@ -29,7 +29,7 @@ function useGameBoardState() {
       }
 
       // console.log('newDoc: ', newDoc);
-      const { gameBoardState: newGameBoardState } = newDoc.data[0].data;
+      const { gameBoardState: newGameBoardState } = newDoc.data;
       // console.log('newUpdate!!: ', newGameBoardState);
       if (hasChanged(gameBoardState, newGameBoardState)) {
         fetchGameBoardState();

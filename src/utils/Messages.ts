@@ -11,7 +11,6 @@ export enum Messages {
     CHANNEL_CREATED = 'ChannelCreated',
     ENTER_CHANNEL = 'EnterChannel',
     CHANNEL_JOINED = 'ChannelJoined',
-    TURN_COMPLETED = 'turn-completed',
     SHOW_QUESTION = 'show-question',
     HIDE_QUESTION = 'hide-question',
   }
