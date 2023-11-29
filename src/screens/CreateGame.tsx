@@ -64,8 +64,6 @@ const CreateGame = () => {
              numberPlayers === undefined) return;
 
         console.log('playerList', playerList);
-        // console.log('numberPlayers', numberPlayers);
-        // const initialTurnPositionLength = Object.keys(initialTurnPosition).length;
         const canGoToSpin = playerList.length >= numberPlayers && gamePhase === SessionPhase.TURN_ORDER;
         console.log('canGoToSpin', canGoToSpin);
         if (canGoToSpin) {
@@ -74,7 +72,7 @@ const CreateGame = () => {
     },[navigate, useGameSessionHook]);
 
     useEffect(() => {
-        const url = `${window.location.origin}/joingame?sessionId=${sessionData?.sessionId}&channelId=${sessionData?.channelId}`;
+        const url = `${window.location.origin}/joingame?sessionId=${useGameSessionHook?.id}&channelId=${useGameSessionHook?.channelId}`;
         urlRef.current = url; qrCode.update({
             data: url,
         });
@@ -82,7 +80,7 @@ const CreateGame = () => {
         if (ref.current) {
             qrCode.append(ref.current);
         }
-    }, [sessionCreated, qrCode, sessionData?.sessionId, sessionData?.channelId]);
+    }, [sessionCreated, qrCode, useGameSessionHook]);
 
     const handleCreateChannel = async (data: any) => {
         if (web3auth) {

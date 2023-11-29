@@ -92,10 +92,11 @@ const JoinGame = () => {
 
     const handleJoinButtonClick = () => {
         if (!web3auth) retryLogin();
-        joinIfAlreadyActiveGame();
         if (sessionData?.channelId !== '') {
             handleJoinGame({ channelId: sessionData?.channelId });
         }
+
+        joinIfAlreadyActiveGame();
     };
 
     const joinIfAlreadyActiveGame = async () => {

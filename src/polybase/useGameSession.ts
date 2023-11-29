@@ -7,8 +7,9 @@ import { POLYBASE_NAMESPACE } from './PolybaseNamespace';
 import { GameSession } from '../game-domain/GameSession'; // Import the Session type
 import { isEqual } from 'lodash';
 
-const db = new Polybase({ defaultNamespace: POLYBASE_NAMESPACE });
+
 const COLLECTION_NAME = "GameSession";
+const db = new Polybase({ defaultNamespace: POLYBASE_NAMESPACE });
 
 function useGameSession() {
   const [session, setSession] = useState<GameSession>({});
@@ -19,7 +20,12 @@ function useGameSession() {
   }
 
   useEffect(() => {
-    const collectionReference = db.collection(COLLECTION_NAME).onSnapshot(
+
+    if (!sessionData?.sessionId) {
+      return;
+    }
+
+    const collectionReference = db.collection(COLLECTION_NAME).record(sessionData?.sessionId).onSnapshot(
       (newDoc) => {
         async function fetchSession() {
           const newSession = await getSession({ id: sessionData?.sessionId });
@@ -27,7 +33,7 @@ function useGameSession() {
         }
   
         console.log('newDoc', newDoc);
-        const new_session = newDoc.data[0].data;
+        const new_session = newDoc.data;
         // console.log('newSession', new_session);
         if (hasChanged(session, new_session)) {
           console.log('session changed: session data', sessionData);
