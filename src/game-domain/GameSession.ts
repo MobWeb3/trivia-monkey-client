@@ -12,4 +12,7 @@ export interface GameSession {
     readonly currentTurnPlayerId?: string;
     readonly hostPlayerId?: string;
     readonly playerList?: readonly [];
+    readonly pointsToWinTheGame?: number;
+    readonly gameBoardState?: Readonly<{ [key: string]: number }>;
+    readonly winner?: string;
 }

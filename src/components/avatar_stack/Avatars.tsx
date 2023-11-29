@@ -10,10 +10,10 @@ import Surplus from "./Surplus";
 import UserInfo from "./UserInfo";
 import type { Member } from "../utils/helpers";
 import styles from "./Avatars.module.css";
-import useGameBoardState from "../../polybase/useGameBoardState";
 import useLocalStorageState from "use-local-storage-state";
 import { SessionData } from "../../screens/SessionData";
 import { GameBoardState } from "../../game-domain/Session";
+import useGameSession from "../../polybase/useGameSession";
 
 const SelfAvatar = ({ self, gameBoardState, showScoreBadge=false }: 
 { self: Member | null;
@@ -25,7 +25,7 @@ const SelfAvatar = ({ self, gameBoardState, showScoreBadge=false }:
   // sessionData
   const [sessionData] = useLocalStorageState<SessionData>('sessionData', {});
 
-  function getSelfScore() {
+  function getSelfScore() { 
     if (Object.keys(gameBoardState).length > 0 && sessionData && sessionData.clientId) {
       const selfScore = gameBoardState[sessionData.clientId];
       return selfScore !== undefined && selfScore !== null ? selfScore : 0;
@@ -145,7 +145,7 @@ const Avatars = ({
 }) => {
   const totalWidth = calculateTotalWidth({ users: otherUsers });
   // Get the game board state
-  const gameBoardState: GameBoardState = useGameBoardState();
+  const gameBoardState = useGameSession()?.gameBoardState || {};
 
   return (
     <div className={styles.container} style={{ width: `${totalWidth}px` }}>

@@ -133,3 +133,14 @@ export const addPointToPlayer = async (data: any) => {
     }
     return false;
 }
+
+// setWinner 
+export const setWinner = async (data: any) => {
+    try {
+        const response = await axios.post(`${BASE_URL}/api/polybase/session/setWinner`, data);
+        return response.data;
+    } catch (error) {
+        console.error(error);
+    }
+    return false;
+}

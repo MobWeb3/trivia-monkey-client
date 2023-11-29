@@ -1,0 +1,41 @@
+body {
+
+  /* height: 100vh; */
+  /* margin-top: 10%; */
+  background: linear-gradient(to bottom, #9995DB 40%, #000000 90%);
+  /* center content */
+  /* display: flex; */
+}
+
+.avatar {
+  position: absolute;
+  transform: translate(-50%, -50%); /* This centers the avatar on the position */
+  /* Add additional styling as necessary */
+
+  width: 3rem;
+  height: 3rem;
+}
+
+.game-container {
+  position: absolute;
+  left: 2%;
+  right: 2%;
+  
+  
+
+  overflow-y: auto;
+  
+  /* set background to something blurry and dark */
+  /* background-image: url('../assets/Screens/create-game/game-background-screen-peppermint-jungle-430x932.png'); */
+}
+
+.messageBox {
+  text-align: center;
+  /* font: normal normal normal calc(min(32px, 4vw)) / calc(min(37px, 4vh)) umbrage2, Arial, sans-serif; */
+  font-family: 'umbrage2', Arial, sans-serif;
+  letter-spacing: 0px;
+  color: #1A1A17;
+  opacity: 1;
+  white-space: pre-wrap;
+
+}

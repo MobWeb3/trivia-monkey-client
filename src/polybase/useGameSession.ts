@@ -32,11 +32,11 @@ function useGameSession() {
           setSession(newSession);
         }
   
-        console.log('newDoc', newDoc);
         const new_session = newDoc.data;
+        // console.log('old session', session);
         // console.log('newSession', new_session);
         if (hasChanged(session, new_session)) {
-          console.log('session changed: session data', sessionData);
+          // console.log('session changed: session data', sessionData);
           fetchSession();
         }
       },

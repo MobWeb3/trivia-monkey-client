@@ -14,6 +14,7 @@ import { MantineProvider } from '@mantine/core';
 import '@mantine/core/styles.css';
 import { TopicProvider } from './components/topics/TopicContext';
 import { theme } from './theme';
+import ScoreScreen from './screens/ScoreScreen';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -33,6 +34,7 @@ root.render(
                 <Route path="/joingame" element={<JoinGame />} />
                 <Route path="/spinwheel" element={<SpinWheel />} />
                 <Route path="/aigame" element={<AIGame />} />
+                <Route path="/scoretree" element={<ScoreScreen />} />
                 {/* other routes... */}
               </Routes>
               {/* <Bootstrap /> */}

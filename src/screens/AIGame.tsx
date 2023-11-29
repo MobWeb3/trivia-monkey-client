@@ -5,7 +5,7 @@ import { getQuestion } from '../polybase/QuestionsHandler';
 import { Question } from '../game-domain/Question';
 import { addMessageListener, removeMessageListener } from '../utils/MessageListener';
 import { Messages } from '../utils/Messages';
-import { getNextTurnPlayerId, getSession } from '../polybase/SessionHandler';
+import { getNextTurnPlayerId, getSession, setWinner, updateSessionPhase } from '../polybase/SessionHandler';
 import { SessionData } from './SessionData';
 import useLocalStorageState from 'use-local-storage-state';
 import { Wheel } from 'react-custom-roulette'
@@ -18,6 +18,9 @@ import CustomButton from '../components/CustomButton';
 import Spaces from '@ably/spaces';
 import { getSpacesInstance } from '../ably/SpacesSingleton';
 import useGameSession from '../polybase/useGameSession';
+import { SessionPhase } from '../game-domain/SessionPhase';
+import { useNavigate } from 'react-router-dom';
+
 
 function AIGame() {
 
@@ -30,6 +33,7 @@ function AIGame() {
     const [sliceValues, setSliceValues] = useState<string[]>([]);
     const spacesRef = useRef<Spaces | null>(null);
     const useGameSessionHook = useGameSession();
+    const navigate = useNavigate();
 
     useEffect(() => {
         if (!spacesRef.current && sessionData?.clientId){
@@ -74,42 +78,6 @@ function AIGame() {
         setupSessionData();
     }, [useGameSessionHook]);
 
-    // useEffect(() => {
-
-    //     if (!sessionData?.clientId || !sessionData?.channelId) return;
-
-    //     async function updateTurn(expectedCurrentPlayerId: string) {
-    //         try {
-    //             const session: GameSession = await pollUntilSessionChanges(expectedCurrentPlayerId, sessionData?.sessionId ?? '');
-    //             if (!session) return;
-    //             setSession(session);
-    //             const { topics } = session;
-    //             setSliceValues(topics as unknown as string[]);
-
-    //         } catch (error) {
-    //             console.log("error updating session data: ", error);
-    //         }
-    //     }
-    //     if (sessionData?.clientId && sessionData?.channelId) {
-    //         console.log("subscribed to turn completed");
-    //         subscribeToTurnCompleted(sessionData?.clientId, sessionData?.channelId);
-    //     }
-
-    //     const handleTurnCompleted = async (event: any) => {
-    //         console.log("event detail: ", event.detail)
-    //         const { nextTurnPlayerId } = event.detail;
-    //         await updateTurn(nextTurnPlayerId);
-    //     };
-
-    //     window.addEventListener(Messages.TURN_COMPLETED, handleTurnCompleted);
-    //     // Return cleanup function
-    //     return () => {
-    //         window.removeEventListener(Messages.TURN_COMPLETED, handleTurnCompleted);
-    //         if (!sessionData?.clientId || !sessionData?.channelId) return;
-    //         unsubscribeToTurnCompleted(sessionData?.clientId, sessionData?.channelId)
-    //     };
-    // }, []);// eslint-disable-line react-hooks/exhaustive-deps
-
     useEffect(() => {
         addMessageListener(Messages.HIDE_QUESTION, finishTurnAndSaveState);
         return () => {
@@ -140,6 +108,40 @@ function AIGame() {
             }
         }
     }, [sessionData?.clientId, useGameSessionHook]);
+
+    // Lets detect the winner that reaches the points to win.
+    /**
+     * gameBoardState: {"mobweb3.technology@gmail.com":1,"norman.lopez.krypto@gmail.com":2}
+     */
+    useEffect(() => {
+        if (useGameSessionHook) {
+            const { gamePhase, pointsToWinTheGame, gameBoardState } = useGameSessionHook;
+            if (gamePhase === 'GAME_ACTIVE' && pointsToWinTheGame && gameBoardState) {
+
+
+                const winner = Object.keys(gameBoardState).find((key) => gameBoardState[key] >= pointsToWinTheGame);
+                if (winner) {
+                    setMessage(`${winner} wins!`);
+                    setCanSpin(false);
+                    // Update game phase to GAME_OVER
+                    updateSessionPhase({ id: useGameSessionHook?.id, newPhase: SessionPhase.GAME_OVER });
+
+                    // update winner on polybase
+                    setWinner({ id: useGameSessionHook?.id, winner });
+                }
+            }
+            else if (gamePhase === 'GAME_OVER') {
+                setMessage(`Game over!`);
+                setCanSpin(false);
+
+                // navigate to Scores screen - winner announced
+
+                navigate('/scoretree')
+
+            }
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [useGameSessionHook]);
 
 
     const [mustSpin, setMustSpin] = useState(false);
