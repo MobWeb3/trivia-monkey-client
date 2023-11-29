@@ -91,12 +91,11 @@ const JoinGame = () => {
     };
 
     const handleJoinButtonClick = async () => {
-        if (!web3auth) retryLogin();
+        await retryLogin();
+        await joinIfAlreadyActiveGame();
         if (sessionData?.channelId !== '') {
             await handleJoinGame({ channelId: sessionData?.channelId });
         }
-
-        joinIfAlreadyActiveGame();
     };
 
     const joinIfAlreadyActiveGame = async () => {
@@ -120,10 +119,6 @@ const JoinGame = () => {
                     }
 
                     navigate('/aigame');
-                }
-                else if (gamePhase === SessionPhase.TURN_ORDER) {
-                    await retryLogin();
-                    navigate('/spinwheel');
                 }
             } catch (error) {
                 console.log("joinIfAlreadyActiveGame - Error getting session: ", error);
