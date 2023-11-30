@@ -48,10 +48,10 @@ function AIGame() {
             setSessionData({ ...sessionData, questionSessionId });
         }
 
-        console.log(`topic ${topic}, questionSessionId ${sessionData?.questionSessionId}`);
+        // console.log(`topic ${topic}, questionSessionId ${sessionData?.questionSessionId}`);
         const question: Question = await getQuestion({ id: sessionData?.questionSessionId, topic });
 
-        console.log('question', question);
+        // console.log('question', question);
         setCurrentQuestion(question);
         setChosenTopic(topic);
         setShowQuestionModal(true);

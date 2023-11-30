@@ -48,15 +48,15 @@ export function ConnectionStatus({ image, name, email, icon, ...others }: UserBu
 
       setSigner(_signer);
       // console.log("signer created: ", signer);
-      console.log("signer address", await _signer.getAddress());
+      // console.log("signer address", await _signer.getAddress());
     } else {
       const publicKey = await getConnectedPublicKey(web3auth);
       console.log(`publick key: ${publicKey?.toString()}`);
-      console.log(`userInfo: ${JSON.stringify(userInfo)}`);
+      // console.log(`userInfo: ${JSON.stringify(userInfo)}`);
 
       const userExist = await userExists(userInfo?.email ?? "");
       if (!userExist) {
-        console.log('user does not exist, creating user');
+        // console.log('user does not exist, creating user');
         // create user
         await createUser({
           clientId: userInfo.email ?? "",

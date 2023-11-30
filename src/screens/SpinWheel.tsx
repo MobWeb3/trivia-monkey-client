@@ -1,5 +1,5 @@
 import './SpinWheel.css';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Container, Flex, Image, Loader } from '@mantine/core';
 import { useNavigate } from 'react-router-dom';
 import { setCurrentTurnPlayerId, updateInitialTurnPosition, updatePlayerListOrder, updateSessionPhase } from '../polybase/SessionHandler';
@@ -10,7 +10,6 @@ import wheelImage from './../assets/sprites/wheel2.png'; // replace with your ac
 import './SpinWheel.css';
 import { motion } from 'framer-motion';
 import pinImage from './../assets/sprites/pin.png'; // replace with your actual image path
-import { Types } from 'ably';
 import { SpaceProvider, SpacesProvider } from "@ably/spaces/react";
 import AvatarStack from '../components/avatar_stack/AvatarStack';
 import CustomButton from '../components/CustomButton';
@@ -26,7 +25,6 @@ function SpinWheel() {
     const [selectedSlice, setSelectedSlice] = useState<number | null>(null);
     const [message, setMessage] = useState("Click to spin!");
     const [rotationDegrees, setRotationDegrees] = useState(0);
-    const channel = useRef<Types.RealtimeChannelPromise | null>(null);
     const [hasSpun, setHasSpun] = useState(false);
     const slices = 12;
     const sliceValues = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
@@ -34,7 +32,7 @@ function SpinWheel() {
     const useGameSessionHook = useGameSession();
 
     useEffect(() => {
-        console.log('useEffect sessionData', sessionData);
+        // console.log('useEffect sessionData', sessionData);
 
         // check if we can start the game
         if (sessionData?.sessionId) {
@@ -42,32 +40,29 @@ function SpinWheel() {
 
             if (initialTurnPosition === undefined || numberPlayers === undefined) return;
 
-            console.log('initialTurnPosition', initialTurnPosition);
-            console.log('numberPlayers', numberPlayers);
+            // console.log('initialTurnPosition', initialTurnPosition);
+            // console.log('numberPlayers', numberPlayers);
             const initialTurnPositionLength = Object.keys(initialTurnPosition).length;
             const canStartGame = initialTurnPositionLength >= numberPlayers;
-            console.log('canStartGame', canStartGame);
+            // console.log('canStartGame', canStartGame);
             if (canStartGame) {
                 // console.log('GAME_ACTIVE!');
                 setMayStartGame(true);
             }
         }
 
-        console.log('useGameSessionHook', useGameSessionHook);
+        // console.log('useGameSessionHook', useGameSessionHook);
     },[sessionData, sessionData?.sessionId, useGameSessionHook]);
 
     useEffect(() => {
         const handleSelectedSlice = async () => {
-            console.log('handleSelectedSlice has run');
+            // console.log('handleSelectedSlice has run');
             setCanSpin(false);
             setMessage(selectedSlice?.toString() ?? "");
             // Here you can add your logic to update the turn position and publish the 'turn-selected' event
 
             // report to our polybase server our turn position.
             await updateInitialTurnPosition({ initialTurnPosition: selectedSlice, id: sessionData?.sessionId, clientId: sessionData?.clientId });
-
-            // report through ably that we are done choosing our turn.
-            await channel.current?.publish('turn-selected', { turn: selectedSlice });
         }
 
         if (hasSpun) {
@@ -90,8 +85,8 @@ function SpinWheel() {
     }, [sessionData, navigate, useGameSessionHook]);
 
     const handleStartGame = async () => {
-        console.log('handleStartGame');
-        console.log('handleStartGame SpinWheel sesionData: ', sessionData);
+        // console.log('handleStartGame');
+        // console.log('handleStartGame SpinWheel sesionData: ', sessionData);
         if (sessionData === null) return;
         const { clientId, channelId } = sessionData as SessionData;
         if (clientId && channelId) {

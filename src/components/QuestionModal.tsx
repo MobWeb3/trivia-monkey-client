@@ -193,7 +193,7 @@ const QuestionModal: React.FC<QuestionModalProps> = ({ open, onClose, question, 
                                         {question?.options[2] ?? placeholderOptionA}
                                     </Button>
                                 </Grid.Col>
-                                <Grid.Col span={12}>
+                                {question?.options[3] && <Grid.Col span={12}>
                                     <Button size='sm'
                                             justify="left"
                                             fullWidth
@@ -201,9 +201,9 @@ const QuestionModal: React.FC<QuestionModalProps> = ({ open, onClose, question, 
                                             color={getButtonColor(OptionButton.D)}
                                             variant={getButtonVariant(OptionButton.D)}
                                             onClick={() => handleButtonClick(OptionButton.D)}>
-                                        {question?.options[3] ?? placeholderOptionA}
+                                        {question?.options[3]}
                                     </Button>
-                                </Grid.Col>
+                                </Grid.Col>}
                             </Grid>
                         </Container>
                     </Card.Section>
