@@ -9,6 +9,7 @@ import { sendMessage } from '../utils/MessageListener';
 import { Messages } from '../utils/Messages';
 import { SessionData } from '../screens/SessionData';
 import useLocalStorageState from 'use-local-storage-state'
+import { IGNORANCE_MONKEY_NAME } from '../game-domain/Session';
 
 const placeholderQuestionText = "What is the capital of the United States of America?"
 const placeholderOptionA = "Lorem Ipsum long anser that is very long, and more text";
@@ -84,6 +85,10 @@ const QuestionModal: React.FC<QuestionModalProps> = ({ open, onClose, question, 
             // Add point to player
             console.log('adding point to player', sessionData?.clientId);
             addPointToPlayer({ playerId: sessionData?.clientId, id: sessionData?.sessionId });
+        } else {
+            // add point to ignorant monkey
+            console.log('adding point to ignorant monkey');
+            addPointToPlayer({ playerId: IGNORANCE_MONKEY_NAME, id: sessionData?.sessionId });
         }
 
     }

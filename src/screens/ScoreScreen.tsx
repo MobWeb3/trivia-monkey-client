@@ -1,16 +1,27 @@
-// import { useState } from 'react';
 import './ScoreScreen.css'; // This is where you'd import your CSS
 import scoreTreeSrc from '../assets/Screens/scoreTree/final-10level-tree-phone-1080x1920.png';
 import avatarImgSrc from '../assets/monkeys_avatars/astronaut-monkey1-200x200.png';
-import { Container } from '@mantine/core';
+import ignoranceImgSrc from '../assets/monkeys_avatars/ignorance-buchon-monkey3-200x200.png';
+import { ActionIcon, Container, Flex } from '@mantine/core';
 import useGameSession from '../polybase/useGameSession';
+import { IGNORANCE_MONKEY_NAME } from '../game-domain/Session';
+import { IconHome2 } from '@tabler/icons-react';
+import { useNavigate } from 'react-router-dom';
 
 type AvatarPosition = {
     top: number;
     left: number;
 }
 
+type AvatarPositionData = {
+    position: AvatarPosition;
+    level: number;
+    src: string;
+    id: string;
+}
+
 const ScoreScreen = () => {
+    const navigate = useNavigate();
     // const [, setWindowSize] = useState({
     //     width: window.innerWidth,
     //     height: window.innerHeight,
@@ -31,7 +42,7 @@ const ScoreScreen = () => {
     // }, []);
 
     const calculatePositions = () => {
-        let result: AvatarPosition[] = [];
+        let result: AvatarPositionData[] = [];
 
 
         if (!useGameSessionHook || !useGameSessionHook.gameBoardState) return [];
@@ -63,40 +74,86 @@ const ScoreScreen = () => {
                 3: { top: 72, left: 70 },
                 2: { top: 75, left: 33 },
                 1: { top: 82, left: 48 },
-              };
-              
-              if (positions.hasOwnProperty(gameBoardState[key])) {
-                result.push(positions[gameBoardState[key]]);
-              }
+                0: { top: 82, left: 48 }
+            };
+
+            if (positions.hasOwnProperty(gameBoardState[key])) {
+                // result.push(positions[gameBoardState[key]]);
+                result.push(
+                    { position: positions[gameBoardState[key]], src: avatarImgSrc, id: key, level: gameBoardState[key] }
+                );
+
+
+            }
         });
-    
-        
-    
+
+
+
         // This function would calculate the positions of your avatars based on the screen size
         // For example, it might return something like:
         return result;
     };
 
-    const avatarPositions = calculatePositions();
+    const avatarPositionsData = calculatePositions();
 
     return (
         <div className="game-container">
-            <Container bg="linear-gradient(to bottom right, #FDD673, #D5B45B)"
-                className='messageBox'
-            >
-                {`${useGameSessionHook.winner} WINS!`}
-            </Container>
-            <img src={scoreTreeSrc} alt="Game background" style={{ width: '100%' }} />
-            {avatarPositions?.map((pos, index) => (
-                <img
-                    key={index}
-                    src={avatarImgSrc}
-                    className="avatar"
-                    style={{ top: `${pos.top}%`, left: `${pos.left}%` }}
-                    alt="Avatar"
+            <Flex>
+                <Container bg="linear-gradient(to bottom right, #FDD673, #D5B45B)"
+                    className='messageBox'
+                >
+                    {`${useGameSessionHook.winner} WINS!`}
+                </Container>
+                <ActionIcon
+                    variant="gradient"
+                    size="xl"
+                    aria-label="Gradient action icon"
+                    gradient={{ from: 'purple', to: 'cyan', deg: 90 }}
+                    onClick={() => { 
+                        navigate('/playlobby');
+                        localStorage.removeItem('sessionData');
+                     }}
+                >
+                    <IconHome2 />
+                </ActionIcon>
+            </Flex>
 
-                />
-            ))}
+            {/* <div style={{ display: 'grid'}}> */}
+            <img src={scoreTreeSrc} alt="Game background" style={{ width: '100%' }} />
+            {
+                avatarPositionsData?.map((avatarPositionData) => {
+                    const { position, src, id } = avatarPositionData;
+
+                    console.log('avatarPositionData: ', avatarPositionData);
+                    return (
+                        <img
+                            key={id}
+                            src={id === IGNORANCE_MONKEY_NAME ? ignoranceImgSrc : src}
+                            className="avatar"
+                            style={{ top: `${position.top}%`, left: `${position.left}%` }}
+                            alt="Avatar"
+
+                        />
+                    );
+                })
+            }
+            {/* <Flex
+                    direction='column'
+                    align='center'
+                    justify='center'
+                    gap="md">
+
+                    <CustomButton fontSize='2rem' style={{
+
+                        // padding: '10px',
+                    }}> EXIT WITHOUT MINTING</CustomButton>
+                    <CustomButton fontSize='2rem' style={{
+
+                    }}> Mint Session</CustomButton>
+
+
+                </Flex> */}
+            {/* </div> */}
         </div>
     );
 };

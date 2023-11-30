@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import { SignerContext } from '../components/SignerContext';
 import { useLocation, useNavigate } from 'react-router-dom';
 import queryString from 'query-string';
@@ -17,6 +17,7 @@ import CustomButton from '../components/CustomButton';
 import SelectedTopicEntries from '../components/topics/SelectedTopicEntries';
 import { TopicContext } from '../components/topics/TopicContext';
 import useGameSession from '../polybase/useGameSession';
+import { UserInfo } from '@web3auth/base';
 
 const JoinGame = () => {
     // const [channelId, setChannelId] = useState('');
@@ -30,6 +31,7 @@ const JoinGame = () => {
     const [joined, setJoined] = useState(false);
     const { topics } = useContext(TopicContext);
     const useGameSessionHook = useGameSession();
+    const userInfoRef = useRef<Partial<UserInfo> | null>(null);
 
     useEffect(() => {
 
@@ -73,28 +75,26 @@ const JoinGame = () => {
         }
     });
 
-    const handleJoinGame = async (data: any) => {
-        if (web3auth) {
-            // await enterChannelListenerWrapper(web3auth, data);
-
-            // Generate questions
-            generateAllQuestions(topics, sessionData?.questionSessionId as string, true);
-            
-            // Update topics to Game session
-            await updateTopics({ id: sessionData?.sessionId, topics: topics.map((topic) => topic[0]) })
-
-            // add player to game session
-            await addPlayer({ id: sessionData?.sessionId, playerId: sessionData?.clientId })
-
-            setJoined(true);
-        }
-    };
-
     const handleJoinButtonClick = async () => {
         await retryLogin();
         await joinIfAlreadyActiveGame();
         if (sessionData?.channelId !== '') {
-            await handleJoinGame({ channelId: sessionData?.channelId });
+            if (web3auth) {
+                // await enterChannelListenerWrapper(web3auth, data);
+    
+                // Generate questions
+                await generateAllQuestions(topics, sessionData?.questionSessionId as string, true);
+                
+                // Update topics to Game session
+                await updateTopics({ id: sessionData?.sessionId, topics: topics.map((topic) => topic[0]) })
+    
+                console.log('JoinGame handleJoinGame: ', sessionData);
+    
+                // add player to game session
+                await addPlayer({ id: sessionData?.sessionId, playerId: userInfoRef.current?.email as string })
+    
+                setJoined(true);
+            }
         }
     };
 
@@ -133,8 +133,9 @@ const JoinGame = () => {
         if (web3auth) {
             const userInfo = await login(web3auth);
             localStorage.setItem('userInfo', JSON.stringify(userInfo));
-            if (sessionData) {
+            if (sessionData && userInfo) {
                 setSessionData({ ...sessionData, clientId: userInfo.email });
+                userInfoRef.current = userInfo;
             }
         }
     }

@@ -20,6 +20,7 @@ import { getSpacesInstance } from '../ably/SpacesSingleton';
 import useGameSession from '../polybase/useGameSession';
 import { SessionPhase } from '../game-domain/SessionPhase';
 import { useNavigate } from 'react-router-dom';
+import { IGNORANCE_MONKEY_NAME } from '../game-domain/Session';
 
 
 function AIGame() {
@@ -205,7 +206,10 @@ function AIGame() {
                     {message}
                 </Container>
 
-                <IgnoranceMonkeyCard message={'heyooo.... fdssfd fd fsdfdsf sfsdf sdfdsfdsfds\nsdfdsf'} />
+                <IgnoranceMonkeyCard 
+                    message={'heyooo.... fdssfd fd fsdfdsf sfsdf sdfdsfdsfds\nsdfdsf'}
+                    score={useGameSessionHook?.gameBoardState?.[IGNORANCE_MONKEY_NAME] ?? 0}
+                />
 
                 {data && data.length > 0 && (
 
