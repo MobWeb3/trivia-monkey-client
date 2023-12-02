@@ -1,8 +1,16 @@
-body, html {
-    margin: 0;
-    padding: 0;
-    height: 100%;
-}
+/* This media query will apply when the viewport width is 768px or more */
+@media (min-width: 768px) {
+    .signInPage {
+        background-image: url('../assets/Screens/in-game-bg-peppermint-1920x1080.png');
+    }
+  }
+  
+  /* This media query will apply when the viewport width is 430px or more */
+  @media (max-width: 767px) {
+    .signInPage {
+        background-image: url('../assets/Screens/signin/sign-in-screen-430x932.png');
+    }
+  }
 
 .signInPage {
     position: absolute;
@@ -10,15 +18,6 @@ body, html {
     left: 0;
     height: 100%;
     width: 100%;
-    background-image: url('../assets/Screens/signin/sign-in-screen-430x932.png');
-    background-image: -webkit-image-set(
-        url('../assets/Screens/signin/sign-in-screen-430x932.png') 1x,
-        url('../assets/Screens/signin/sign-in-screen-430x932@2x.png') 2x
-    );
-    background-image: image-set(
-        url('../assets/Screens/signin/sign-in-screen-430x932.png') 1x,
-        url('../assets/Screens/signin/sign-in-screen-430x932@2x.png') 2x
-    );
     background-size: cover;
     background-position: center;
     display: flex;
@@ -33,13 +32,15 @@ body, html {
     align-items: center;
 }
 
-
-/* In your SignInPage.css file */
 .topImage {
     position: absolute;
-    top: 10%;
-    left: 0; /* Optional: This will align the image to the left edge of the container */
+    top: 20%;
+    height: 20%;
 }
 
-
-
+@media (min-width: 768px) {
+    .topImage {
+        top: 10%;
+        height: 30%;
+    }
+}

@@ -108,9 +108,6 @@ const CreateGameForm: React.FC<CreateGameFormProps> = ({
             </Flex>
             {/* # For some reason I need to position to the left around -%13 to center the modal. */}
             <Modal
-                pos={"absolute"}
-                left={'-5%'}
-                right={'-5%'}
                 yOffset={'5dvh'}
                 opened={opened}
                 onClose={closeModal}

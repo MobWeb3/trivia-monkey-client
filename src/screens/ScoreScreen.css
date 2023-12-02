@@ -1,11 +1,3 @@
-body {
-
-  /* height: 100vh; */
-  /* margin-top: 10%; */
-  background: linear-gradient(to top, #9995DB 40%, #c8c7e3 90%);
-  /* center content */
-  /* display: flex; */
-}
 
 .avatar {
   position: absolute;
@@ -20,13 +12,7 @@ body {
   position: absolute;
   left: 2%;
   right: 2%;
-  
-  
-
   overflow-y: auto;
-  
-  /* set background to something blurry and dark */
-  /* background-image: url('../assets/Screens/create-game/game-background-screen-peppermint-jungle-430x932.png'); */
 }
 
 .messageBox {

@@ -1,9 +1,16 @@
-body,
-html {
-    margin: 20px;
-    padding: 20px;
-    /* height: 50%; */
-    /* overflow: hidden; */
+
+/* This media query will apply when the viewport width is 768px or more */
+@media (min-width: 768px) {
+    .createGamePage {
+        background-image: url('../assets/Screens/in-game-bg-peppermint-1920x1080.png');
+    }
+}
+
+/* This media query will apply when the viewport width is 430px or more */
+@media (max-width: 767px) {
+    .createGamePage {
+        background-image: url('../assets/Screens/create-game/game-background-screen-peppermint-jungle-430x932@2x.png');
+    }
 }
 
 .createGamePage {
@@ -12,11 +19,11 @@ html {
     left: 0;
     height: 100%;
     width: 100%;
-    background-image: url('../assets/Screens/create-game/game-background-screen-peppermint-jungle-430x932.png');
-    background-image: -webkit-image-set(url('../assets/Screens/create-game/game-background-screen-peppermint-jungle-430x932.png') 1x,
+    /* background-image: url('../assets/Screens/create-game/game-background-screen-peppermint-jungle-430x932.png'); */
+    /* background-image: -webkit-image-set(url('../assets/Screens/create-game/game-background-screen-peppermint-jungle-430x932.png') 1x,
             url('../assets/Screens/create-game/game-background-screen-peppermint-jungle-430x932@2x.png') 2x);
     background-image: image-set(url('../assets/Screens/create-game/game-background-screen-peppermint-jungle-430x932.png') 1x,
-            url('../assets/Screens/create-game/game-background-screen-peppermint-jungle-430x932@2x.png') 2x);
+            url('../assets/Screens/create-game/game-background-screen-peppermint-jungle-430x932@2x.png') 2x); */
 
 
     background-size: cover;
