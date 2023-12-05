@@ -38,13 +38,17 @@ export const SignerProvider: React.FC<PropsWithChildren<Props>> = ({ children })
 
 
   const init = async () => {
-    // console.log("env variables: ", import.meta.env)
     try {
-      const web3auth = web3authSolana;
-
-      await web3auth.initModal();
-      if (web3auth) {
-        setWeb3auth(web3auth);
+      const isEvmChain = import.meta.env.VITE_APP_EVM_CHAIN === 'true';
+      let web3auth;
+      if (isEvmChain){
+        console.log("isEvmChain- SignerContext");
+      } else {
+        web3auth = web3authSolana;
+        await web3auth.initModal();
+        if (web3auth) {
+          setWeb3auth(web3auth);
+        }
       }
       setLoading(false);
     } catch (error) {
