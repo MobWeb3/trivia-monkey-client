@@ -16,6 +16,12 @@ const PlayLobbyScene = () => {
         navigate('/creategame');
     };
 
+    const handleProfileClick = () => {
+        console.log('Go to profile page');
+        // Navigate to CreateGame
+        navigate('/profile');
+    };
+
 
     const logout = async () => {
         if (!web3auth) {
@@ -24,6 +30,7 @@ const PlayLobbyScene = () => {
         }
         try {
             await web3auth.logout();
+            web3auth.clearCache();
         } catch (error) {
             console.error(error);
         }
@@ -48,9 +55,9 @@ const PlayLobbyScene = () => {
                     src={monkeyTriviaLogo}
                 />
                 <CustomButton onClick={handleCreateGameClick}>Create Game</CustomButton>
-
-                <CustomButton onClick={handleCreateGameClick}>Settings</CustomButton>
-                <CustomButton onClick={() => { logout(); navigate('/'); }}>Disconnect</CustomButton>
+                <CustomButton onClick={handleProfileClick}>Profile</CustomButton>
+                <CustomButton onClick={()=> {}}>Settings</CustomButton>
+                <CustomButton onClick={async () => { await logout(); navigate('/'); }}>Disconnect</CustomButton>
             </Flex>
         </div>
     );

@@ -8,7 +8,7 @@ import { getConnectedPublicKey } from '../utils/Web3AuthAuthentication';
 import { createUser, userExists } from '../polybase/UserHandler';
 import useLocalStorageState from 'use-local-storage-state';
 import { SessionData } from './SessionData';
-import { createWeb3AuthSigner, getProvider } from '../alchemy/Web3AuthSigner';
+import { getWeb3AuthSigner } from '../evm/Login';
 
 export const SignInPage = () => {
   const { web3auth, setWeb3auth, setLoggedIn, setUserInfo } = useContext(SignerContext);
@@ -20,11 +20,8 @@ export const SignInPage = () => {
     const isEvmChain = import.meta.env.VITE_APP_EVM_CHAIN === 'true';
 
     if (isEvmChain) {
-      const web3auth = await createWeb3AuthSigner();
-      setWeb3auth(web3auth.inner);
-
-      const publicKey = await getProvider(web3auth).getAddress();
-      console.log("Smart Account Address: ", publicKey); // Log the smart account address
+      const web3authSigner = await getWeb3AuthSigner();
+      setWeb3auth(web3authSigner.inner);
     } else {
       if (!web3auth) {
         console.log("web3auth not initialized yet");

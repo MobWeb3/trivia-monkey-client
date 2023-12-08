@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
-import { SignerProvider } from './components/SignerContext';
+import { SignerContext, SignerProvider } from './components/SignerContext';
 import SignInPage from './screens/SignInPage';
 import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 import PlayLobby from './screens/PlayLobby';
@@ -15,43 +15,47 @@ import '@mantine/core/styles.css';
 import { TopicProvider } from './components/topics/TopicContext';
 import { theme } from './theme';
 import ScoreScreen from './screens/ScoreScreen';
+import { WagmiConfig } from 'wagmi';
+import { getWagmiConfig } from './evm/WagmiConnector';
+import { Profile } from './screens/Profile';
 
-const root = ReactDOM.createRoot(
-  document.getElementById('root') as HTMLElement
-);
+const container = document.getElementById('root') as HTMLElement;
+const root = ReactDOM.createRoot(container);
+
 root.render(
-  <React.StrictMode>
-
-    <SignerProvider>
-      <SessionDataProvider>
-        <MantineProvider theme={theme}>
-          <TopicProvider>
-            <Router>
-              <Routes>
-                <Route path="/playlobby" element={<PlayLobby />} />
-                <Route path="*" element={<SignInPage />} />
-                <Route path="/creategame" element={<CreateGame />} />
-                <Route path="/joingame" element={<JoinGame />} />
-                <Route path="/spinwheel" element={<SpinWheel />} />
-                <Route path="/aigame" element={<AIGame />} />
-                <Route path="/scoretree" element={<ScoreScreen />} />
-                {/* other routes... */}
-              </Routes>
-              {/* <Bootstrap /> */}
-            </Router>
-          </TopicProvider>
-        </MantineProvider>
-      </SessionDataProvider>
-    </SignerProvider>
-  </React.StrictMode>
+  <SignerProvider>
+    <AppComponent />
+  </SignerProvider>
 );
 
-// If you want your app to work offline and load faster, you can change
-// unregister() to register() below. Note this comes with some pitfalls.
-// Learn more about service workers: https://cra.link/PWA
-// serviceWorkerRegistration.unregister();
+function AppComponent() {
 
-// // If you want to start measuring performance in your app, pass a function
-// // to log results (for example: reportWebVitals(console.log))
-// // or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-// reportWebVitals();
+  const { web3auth} = useContext(SignerContext);
+
+  return (
+    <React.StrictMode>
+        <SessionDataProvider>
+          <MantineProvider theme={theme}>
+            <TopicProvider>
+              <WagmiConfig config={getWagmiConfig(web3auth)}>
+                <Router>
+                  <Routes>
+                    <Route path="/playlobby" element={<PlayLobby />} />
+                    <Route path="*" element={<SignInPage />} />
+                    <Route path="/creategame" element={<CreateGame />} />
+                    <Route path="/joingame" element={<JoinGame />} />
+                    <Route path="/spinwheel" element={<SpinWheel />} />
+                    <Route path="/aigame" element={<AIGame />} />
+                    <Route path="/scoretree" element={<ScoreScreen />} />
+                    <Route path="/profile" element={<Profile />} />
+                    {/* other routes... */}
+                  </Routes>
+                  {/* <Bootstrap /> */}
+                </Router>
+              </WagmiConfig>
+            </TopicProvider>
+          </MantineProvider>
+        </SessionDataProvider>
+    </React.StrictMode>
+  )
+}
