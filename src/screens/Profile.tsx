@@ -1,28 +1,37 @@
-import { Web3AuthConnector } from '@web3auth/web3auth-wagmi-connector'
-import { useAccount, useConnect, useEnsName } from 'wagmi'
-import { chains } from '../evm/WagmiConnector'
-import { useContext } from 'react'
+import { useAccount, useEnsName } from 'wagmi'
+import { useContext, useEffect } from 'react'
 import { SignerContext } from '../components/SignerContext'
 import { getWeb3AuthSigner } from '../evm/Login'
-// import { InjectedConnector } from 'wagmi/connectors/injected'
 
 export function Profile() {
-    const { address, isConnected } = useAccount()
+    const { address, isConnected, connector: activeConnector, } = useAccount()
     const { data: ensName } = useEnsName({ address })
     const { web3auth, setWeb3auth } = useContext(SignerContext);
-    const { connect } = useConnect({
-        connector: new Web3AuthConnector({
-            chains,
-            options: {
-                web3AuthInstance: web3auth!,
-            },
-        }),
-    })
+    // const { connect, connectors, error, isLoading, pendingConnector, status } = useConnect();
+
+    useEffect(() => {
+        console.log('useEffect: ');
+
+        const fetchWeb3auth = async () => {
+            const web3authSigner = await getWeb3AuthSigner();
+            setWeb3auth(web3authSigner.inner);
+        };
+
+        if(!activeConnector && !web3auth) {
+            fetchWeb3auth();
+        }
+    }, [activeConnector, setWeb3auth, web3auth]);
+
+
+    if (!isConnected) {
+        // Show a loading spinner or a placeholder
+        return <div>Loading...</div>;
+    }
 
     if (isConnected) return <div>Connected to {ensName ?? address}</div>
     return <button onClick={async () => {
         const web3authSigner = await getWeb3AuthSigner();
         setWeb3auth(web3authSigner.inner);
-        connect()
+        // connect()
     }}>Connect Wallet</button>
 }
