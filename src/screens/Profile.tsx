@@ -10,16 +10,23 @@ export function Profile() {
     // const { connect, connectors, error, isLoading, pendingConnector, status } = useConnect();
 
     useEffect(() => {
-        console.log('useEffect: ');
+        
 
         const fetchWeb3auth = async () => {
             const web3authSigner = await getWeb3AuthSigner();
             setWeb3auth(web3authSigner.inner);
         };
 
+        const getActiveConnectorData = async () => {
+            if(!activeConnector) return;
+            console.log('activeConnector data: ', activeConnector);
+        }
+
         if(!activeConnector && !web3auth) {
             fetchWeb3auth();
         }
+
+        getActiveConnectorData();
     }, [activeConnector, setWeb3auth, web3auth]);
 
 
