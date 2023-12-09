@@ -2,16 +2,15 @@ import { useAccount, useEnsName } from 'wagmi'
 import { useContext, useEffect } from 'react'
 import { SignerContext } from '../components/SignerContext'
 import { getWeb3AuthSigner } from '../evm/Login'
+import { mintNftActive } from '../evm/user-operation/mint'
+import { getProvider } from '../evm/alchemy/Web3AuthSigner'
 
 export function Profile() {
     const { address, isConnected, connector: activeConnector, } = useAccount()
     const { data: ensName } = useEnsName({ address })
     const { web3auth, setWeb3auth } = useContext(SignerContext);
-    // const { connect, connectors, error, isLoading, pendingConnector, status } = useConnect();
 
     useEffect(() => {
-        
-
         const fetchWeb3auth = async () => {
             const web3authSigner = await getWeb3AuthSigner();
             setWeb3auth(web3authSigner.inner);
@@ -35,7 +34,20 @@ export function Profile() {
         return <div>Loading...</div>;
     }
 
-    if (isConnected) return <div>Connected to {ensName ?? address}</div>
+    if (isConnected) {
+        return (
+            <div>
+                Connected to {ensName ?? address}
+                <button onClick={async () => {
+                    if (web3auth) {
+                        const web3authSigner = await getWeb3AuthSigner();
+                        const provider = getProvider(web3authSigner);
+                        await mintNftActive(provider);
+                    }
+
+                } }>MintNft</button>
+            </div>)
+    }
     return <button onClick={async () => {
         const web3authSigner = await getWeb3AuthSigner();
         setWeb3auth(web3authSigner.inner);

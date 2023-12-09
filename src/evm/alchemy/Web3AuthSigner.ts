@@ -48,7 +48,7 @@ export const createWeb3AuthSigner = async () => {
 };
 
 export function getProvider(signer: Web3AuthSigner) {
-  const API_KEY = import.meta.env.VITE_ALCHEMY_API_KEY_MUMBAI ?? "";
+  const API_KEY = import.meta.env.VITE_ALCHEMY_API_KEY_SEPOLIA ?? "";
 
   // Create a provider to send user operations from your smart account
   return new AlchemyProvider({
