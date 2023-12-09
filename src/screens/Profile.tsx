@@ -4,12 +4,14 @@ import { SignerContext } from '../components/SignerContext'
 import { getWeb3AuthSigner } from '../evm/Login'
 import { mintNftActive } from '../evm/user-operation/mint'
 import { getProvider } from '../evm/alchemy/Web3AuthSigner'
-import {getNftsFromSmartAccount, providerWithAlchemyEnhancedApis } from '../evm/alchemy/EnhancedApis'
+import { getNftsFromSmartAccount, providerWithAlchemyEnhancedApis } from '../evm/alchemy/EnhancedApis'
+import { useNavigate } from 'react-router-dom'
 
 export function Profile() {
     const { address, isConnected, connector: activeConnector, } = useAccount()
     const { data: ensName } = useEnsName({ address })
     const { web3auth, setWeb3auth } = useContext(SignerContext);
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchWeb3auth = async () => {
@@ -18,11 +20,11 @@ export function Profile() {
         };
 
         const getActiveConnectorData = async () => {
-            if(!activeConnector) return;
+            if (!activeConnector) return;
             // console.log('activeConnector data: ', activeConnector);
         }
 
-        if(!activeConnector && !web3auth) {
+        if (!activeConnector && !web3auth) {
             fetchWeb3auth();
         }
 
@@ -46,8 +48,8 @@ export function Profile() {
                         await mintNftActive(provider);
                     }
 
-                } }>MintNft</button>
-                 <button onClick={async () => {
+                }}>MintNft</button>
+                <button onClick={async () => {
                     const web3authSigner = await getWeb3AuthSigner();
                     // console.log('providerWithAlchemyEnhancedApis: ', providerWithAlchemyEnhancedApis);
                     if (web3authSigner) {
@@ -55,9 +57,11 @@ export function Profile() {
                         const provider = getProvider(web3authSigner);
                         await getNftsFromSmartAccount(providerWithAlchemyEnhancedApis(provider));
                     }
+                }}>GetNfts</button>
+                <button onClick={async () => {
+                   navigate('/wallet')
 
-                    
-                } }>GetNfts</button>
+                }}>Wallet</button>
             </div>
         )
     }

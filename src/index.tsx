@@ -18,6 +18,7 @@ import ScoreScreen from './screens/ScoreScreen';
 import { WagmiConfig } from 'wagmi';
 import { getWagmiConfig } from './evm/WagmiConnector';
 import { Profile } from './screens/Profile';
+import NftWalletScreen from './screens/NftWalletScreen';
 
 const container = document.getElementById('root') as HTMLElement;
 const root = ReactDOM.createRoot(container);
@@ -48,6 +49,7 @@ function AppComponent() {
                     <Route path="/aigame" element={<AIGame />} />
                     <Route path="/scoretree" element={<ScoreScreen />} />
                     <Route path="/profile" element={<Profile />} />
+                    <Route path="/wallet" element={<NftWalletScreen />} />
                     {/* other routes... */}
                   </Routes>
                   {/* <Bootstrap /> */}
