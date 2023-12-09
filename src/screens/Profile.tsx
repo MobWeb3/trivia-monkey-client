@@ -4,6 +4,7 @@ import { SignerContext } from '../components/SignerContext'
 import { getWeb3AuthSigner } from '../evm/Login'
 import { mintNftActive } from '../evm/user-operation/mint'
 import { getProvider } from '../evm/alchemy/Web3AuthSigner'
+import {getNftsFromSmartAccount, providerWithAlchemyEnhancedApis } from '../evm/alchemy/EnhancedApis'
 
 export function Profile() {
     const { address, isConnected, connector: activeConnector, } = useAccount()
@@ -18,7 +19,7 @@ export function Profile() {
 
         const getActiveConnectorData = async () => {
             if(!activeConnector) return;
-            console.log('activeConnector data: ', activeConnector);
+            // console.log('activeConnector data: ', activeConnector);
         }
 
         if(!activeConnector && !web3auth) {
@@ -46,8 +47,21 @@ export function Profile() {
                     }
 
                 } }>MintNft</button>
-            </div>)
+                 <button onClick={async () => {
+                    const web3authSigner = await getWeb3AuthSigner();
+                    // console.log('providerWithAlchemyEnhancedApis: ', providerWithAlchemyEnhancedApis);
+                    if (web3authSigner) {
+                        console.log('Heree!!');
+                        const provider = getProvider(web3authSigner);
+                        await getNftsFromSmartAccount(providerWithAlchemyEnhancedApis(provider));
+                    }
+
+                    
+                } }>GetNfts</button>
+            </div>
+        )
     }
+
     return <button onClick={async () => {
         const web3authSigner = await getWeb3AuthSigner();
         setWeb3auth(web3authSigner.inner);
