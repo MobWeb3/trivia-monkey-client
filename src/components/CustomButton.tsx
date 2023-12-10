@@ -16,7 +16,7 @@ export const CustomButton: React.FC<CustomButtonProps> = ({ children, background
     useEffect(() => {
         const updateDimensions = () => {
             const viewportHeight = window.innerHeight;
-            const newHeight = Math.min(100, viewportHeight / 10) + 10;  // Adjust divisor to get desired scaling
+            const newHeight = Math.min(100, viewportHeight / 10);  // Adjust divisor to get desired scaling
             const newPadding = `${newHeight / 5}px ${newHeight / 2.5}px`;  // Adjust ratios to get desired padding
             setButtonDimensions({ height: `${newHeight}px`, padding: newPadding });
         };

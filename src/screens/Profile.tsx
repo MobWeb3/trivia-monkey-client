@@ -53,14 +53,13 @@ export function Profile() {
                     const web3authSigner = await getWeb3AuthSigner();
                     // console.log('providerWithAlchemyEnhancedApis: ', providerWithAlchemyEnhancedApis);
                     if (web3authSigner) {
-                        console.log('Heree!!');
                         const provider = getProvider(web3authSigner);
-                        await getNftsFromSmartAccount(providerWithAlchemyEnhancedApis(provider));
+                        const providerWithAlchemy = providerWithAlchemyEnhancedApis(provider);
+                        await getNftsFromSmartAccount(providerWithAlchemy);
                     }
                 }}>GetNfts</button>
                 <button onClick={async () => {
                    navigate('/wallet')
-
                 }}>Wallet</button>
             </div>
         )

@@ -2,11 +2,12 @@ import './ScoreScreen.css'; // This is where you'd import your CSS
 import scoreTreeSrc from '../assets/Screens/scoreTree/final-10level-tree-phone-1080x1920.png';
 import avatarImgSrc from '../assets/monkeys_avatars/astronaut-monkey1-200x200.png';
 import ignoranceImgSrc from '../assets/monkeys_avatars/ignorance-buchon-monkey3-200x200.png';
-import { ActionIcon, Container, Flex } from '@mantine/core';
+import { ActionIcon, Container, Grid, SimpleGrid } from '@mantine/core';
 import useGameSession from '../polybase/useGameSession';
 import { IGNORANCE_MONKEY_NAME } from '../game-domain/Session';
 import { IconHome2 } from '@tabler/icons-react';
 import { useNavigate } from 'react-router-dom';
+import { ActionButton } from '../components/nft_wallet/ActionButton';
 
 type AvatarPosition = {
     top: number;
@@ -22,24 +23,7 @@ type AvatarPositionData = {
 
 const ScoreScreen = () => {
     const navigate = useNavigate();
-    // const [, setWindowSize] = useState({
-    //     width: window.innerWidth,
-    //     height: window.innerHeight,
-    // });
     const useGameSessionHook = useGameSession();
-
-    // useEffect(() => {
-    //     const handleResize = () => {
-    //         setWindowSize({
-    //             width: window.innerWidth,
-    //             height: window.innerHeight,
-    //         });
-    //     };
-
-    //     window.addEventListener('resize', handleResize);
-
-    //     return () => window.removeEventListener('resize', handleResize);
-    // }, []);
 
     const calculatePositions = () => {
         let result: AvatarPositionData[] = [];
@@ -82,12 +66,8 @@ const ScoreScreen = () => {
                 result.push(
                     { position: positions[gameBoardState[key]], src: avatarImgSrc, id: key, level: gameBoardState[key] }
                 );
-
-
             }
         });
-
-
 
         // This function would calculate the positions of your avatars based on the screen size
         // For example, it might return something like:
@@ -98,28 +78,40 @@ const ScoreScreen = () => {
 
     return (
         <div className="game-container">
-            <Flex>
-                <Container bg="linear-gradient(to bottom right, #FDD673, #D5B45B)"
-                    className='messageBox'
-                >
-                    {`${useGameSessionHook.winner} WINS!`}
-                </Container>
-                <ActionIcon
-                    variant="gradient"
-                    size="xl"
-                    aria-label="Gradient action icon"
-                    gradient={{ from: 'purple', to: 'cyan', deg: 90 }}
-                    onClick={() => { 
-                        navigate('/playlobby');
-                        localStorage.removeItem('sessionData');
-                     }}
-                >
-                    <IconHome2 />
-                </ActionIcon>
-            </Flex>
+            <Grid m={'xs'}>
+                <Grid.Col span={10}>
+                    <Container fluid bg="#FDD673" className='messageBox'>
+                        {`${useGameSessionHook.winner} WINS!`}
+                    </Container>
+                </Grid.Col>
+                <Grid.Col span={2} >
+                    <div style={{
+                        display: 'flex',
+                        flexDirection: 'row',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        height: '100%',
+                    }}>
+                        <ActionIcon
+                            variant="gradient"
+                            size="xl"
+                            aria-label="Gradient action icon"
+                            gradient={{ from: 'purple', to: 'cyan', deg: 90 }}
+                            onClick={() => {
+                                navigate('/playlobby');
+                                localStorage.removeItem('sessionData');
+                            }}
+                        >
+                            <IconHome2 />
+                        </ActionIcon>
+                    </div>
+                </Grid.Col>
+            </Grid>
 
-            {/* <div style={{ display: 'grid'}}> */}
-            <img src={scoreTreeSrc} alt="Game background" style={{ width: '100%' }} />
+            <img src={scoreTreeSrc} alt="Game background" style={{
+                width: '100%',
+                borderRadius: '30px',
+            }} />
             {
                 avatarPositionsData?.map((avatarPositionData) => {
                     const { position, src, id } = avatarPositionData;
@@ -137,23 +129,11 @@ const ScoreScreen = () => {
                     );
                 })
             }
-            {/* <Flex
-                    direction='column'
-                    align='center'
-                    justify='center'
-                    gap="md">
+            <SimpleGrid cols={1} verticalSpacing="xs">
+                <ActionButton text={"Mint Session"} />
+                {/* <ActionButton text={"Exit"}/> */}
+            </SimpleGrid>
 
-                    <CustomButton fontSize='2rem' style={{
-
-                        // padding: '10px',
-                    }}> EXIT WITHOUT MINTING</CustomButton>
-                    <CustomButton fontSize='2rem' style={{
-
-                    }}> Mint Session</CustomButton>
-
-
-                </Flex> */}
-            {/* </div> */}
         </div>
     );
 };
