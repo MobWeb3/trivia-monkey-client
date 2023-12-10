@@ -7,7 +7,7 @@ import {
 import { IconChevronRight } from '@tabler/icons-react';
 import { SignerContext } from './SignerContext';
 import { useContext } from 'react';
-import { getRPCProviderOwner, getZeroDevSigner } from '@zerodevapp/sdk';
+// import { getRPCProviderOwner, getZeroDevSigner } from '@zerodevapp/sdk';
 import { SessionDataContext } from './SessionDataContext';
 import { getConnectedPublicKey } from '../utils/Web3AuthAuthentication';
 import { createUser, userExists } from '../polybase/UserHandler';
@@ -20,7 +20,7 @@ interface UserButtonProps extends UnstyledButtonProps {
 }
 
 export function ConnectionStatus({ image, name, email, icon, ...others }: UserButtonProps) {
-  const { web3auth, setSigner, loggedIn, setLoggedIn, setUserInfo, userInfo } = useContext(SignerContext);
+  const { web3auth, loggedIn, setLoggedIn, setUserInfo, userInfo } = useContext(SignerContext);
   const { sessionData, setSessionData } = useContext(SessionDataContext);
 
   const login = async () => {
@@ -41,12 +41,11 @@ export function ConnectionStatus({ image, name, email, icon, ...others }: UserBu
     const evmChain = false;
 
     if (evmChain) {
-      const _signer = await getZeroDevSigner({
-        projectId: "5682ee04-d8d3-436a-ae63-479e063a23c4",
-        owner: getRPCProviderOwner(web3auth.provider),
-      })
+      // const _signer = await getZeroDevSigner({
+      //   projectId: "5682ee04-d8d3-436a-ae63-479e063a23c4",
+      //   owner: getRPCProviderOwner(web3auth.provider),
+      // })
 
-      setSigner(_signer);
       // console.log("signer created: ", signer);
       // console.log("signer address", await _signer.getAddress());
     } else {

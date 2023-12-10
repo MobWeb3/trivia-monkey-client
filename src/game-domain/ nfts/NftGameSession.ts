@@ -1,18 +1,16 @@
+import { NftRawMetadata } from "alchemy-sdk";
+
 export interface NftGameSession {
     readonly name?: string;
     readonly tokenUri?: string;
     readonly description?: string;
     readonly image?: string;
     readonly contract?: string;
-    readonly tokenId?: number;
+    readonly tokenId?: string;
     readonly owner?: string;
     readonly timestampMint?: string;
-    readonly attributes?: readonly Trait[];
+    readonly attributes?: readonly Record<string, any>[];
+    readonly raw?: NftRawMetadata;
 }
 
-// Define the interface
-interface Trait {
-    value: string;
-    trait_type: string;
-}
 

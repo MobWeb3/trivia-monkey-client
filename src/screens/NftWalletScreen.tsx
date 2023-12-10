@@ -2,26 +2,45 @@ import { Flex, Title } from '@mantine/core';
 import './NftWalletScreen.css'
 import { NftGameSession } from '../game-domain/ nfts/NftGameSession';
 import { NftGrid } from '../components/nft_wallet/NftGrid';
+import { getNftsFromSmartAccount, providerWithAlchemyEnhancedApis } from '../evm/alchemy/EnhancedApis';
+import { getProvider } from '../evm/alchemy/Web3AuthSigner';
+import { OwnedNftsResponse } from 'alchemy-sdk';
+import { useEffect, useState } from 'react';
+import { getWeb3AuthSigner } from '../evm/Login';
 
 const NftWalletScreen = () => {
+    const [nfts, setNfts] = useState<NftGameSession[]>([]);
 
-    const getSomeNfts = () => {
-        const nfts: NftGameSession[] = [
-            {
-                tokenId: 1,
-            },
-            {
-                tokenId: 2,
-            },
-            {
-                tokenId: 3,
-            },
-            {
-                tokenId: 4,
+    useEffect(() => {
+        const getNfts = async () => {
+            const signer = await getWeb3AuthSigner();
+            if (signer === undefined) {
+                console.log('signer is undefined');
+                return [];
             }
-        ];
-        return nfts as NftGameSession[];
-    };
+            const provider = getProvider(signer);
+            const providerWithAlchemy = providerWithAlchemyEnhancedApis(provider);
+            const nfts: OwnedNftsResponse = await getNftsFromSmartAccount(providerWithAlchemy);
+    
+            // Lets create an array of NftGameSession from nfts which is OwnedNftsResponse
+            const nftGameSessions: NftGameSession[] = nfts.ownedNfts.map((nft) => {
+                return {
+                    name: nft.name,
+                    description: nft.description,
+                    image: nft.image?.cachedUrl,
+                    tokenId: nft.tokenId,
+                    timestampMint: nft.mint?.timestamp,
+                    attributes: nft.raw.metadata,
+                    raw: nft.raw,
+                } as NftGameSession;
+            });
+
+            setNfts(nftGameSessions);
+        };
+
+        getNfts();
+
+    }, []);
 
     return (
         <div className="nftWalletScreen">
@@ -52,7 +71,7 @@ const NftWalletScreen = () => {
                         opacity: 0.9,
                     }}
                 >NFT Game Sessions</Title>
-                <NftGrid nfts={getSomeNfts()}></NftGrid>
+                <NftGrid nfts={nfts}></NftGrid>
             </Flex>
         </div>
     );

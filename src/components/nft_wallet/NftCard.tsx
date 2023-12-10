@@ -1,4 +1,4 @@
-import { Card, Image, Text, Badge, Button, Group } from '@mantine/core';
+import { Card, Image, Text, Group } from '@mantine/core';
 import { NftGameSession } from '../../game-domain/ nfts/NftGameSession';
 
 type NftCardProps = {
@@ -6,29 +6,41 @@ type NftCardProps = {
   };
 
 export function NftCard({nft}: NftCardProps) {
-  return (
-    <Card shadow="sm" padding="lg" radius="md" withBorder>
+  
+  function getIpfsHashFromUrl(url?: string) {
+    if (url === undefined) return "";
+    const parts = url.split('/');
+    const ipfsHash = parts[2].split('.')[0];
+    return ipfsHash;
+  }
+
+  function getCloudflareIpfsUrl(url?: string) {
+    const ipfsHash = getIpfsHashFromUrl(url);
+    return `https://cloudflare-ipfs.com/ipfs/${ipfsHash}`;
+  }
+  
+  return ( 
+     <Card shadow="sm" padding="lg" radius="md" withBorder>
       <Card.Section component="a" href="https://mantine.dev/">
         <Image
-          src="https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/images/bg-8.png"
+          src={nft.image ? getCloudflareIpfsUrl(nft.image) : "https://bafybeiahlgcpkogk3rynat27ol4mdi7my3t7ykrrlel5wxnmpcy2fgmxqi.ipfs.nftstorage.link/"}
           height={160}
           alt="Norway"
         />
       </Card.Section>
 
       <Group justify="space-between" mt="md" mb="xs">
-        <Text fw={500}>Norway Fjord Adventures</Text>
-        <Badge color="pink">On Sale</Badge>
+        <Text fw={500}>{nft.name ?? "name"}</Text>
+        {/* <Badge color="pink">On Sale</Badge> */}
       </Group>
 
       <Text size="sm" c="dimmed">
-        With Fjord Tours you can explore more of the magical fjord landscapes with tours and
-        activities on and around the fjords of Norway
+        {nft.description ?? nft.raw?.error}
       </Text>
 
-      <Button color="blue" fullWidth mt="md" radius="md">
+      {/* <Button color="blue" fullWidth mt="md" radius="md">
         Book classic tour now
-      </Button>
+      </Button> */}
     </Card>
   );
 }
