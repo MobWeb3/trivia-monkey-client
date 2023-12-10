@@ -11,6 +11,9 @@ import { ActionButton } from '../components/nft_wallet/ActionButton';
 import useLocalStorageState from 'use-local-storage-state';
 import { SessionData } from './SessionData';
 import { MutableNftGameSession } from '../game-domain/ nfts/NftGameSession';
+import { getWeb3AuthSigner } from '../evm/Login';
+import { getProvider } from '../evm/alchemy/Web3AuthSigner';
+import { mintNftComplete } from '../evm/user-operation/mint';
 
 type AvatarPosition = {
     top: number;
@@ -28,6 +31,7 @@ const ScoreScreen = () => {
     const navigate = useNavigate();
     const useGameSessionHook = useGameSession("mk-pbid-c3cd187c-5bfb-4d73-aeb3-297fd865eca0");
     const [sessionData] = useLocalStorageState<SessionData>('sessionData');
+    // const { web3auth } = useContext(SignerContext);
 
     const calculatePositions = () => {
         let result: AvatarPositionData[] = [];
@@ -82,7 +86,7 @@ const ScoreScreen = () => {
         const s = ['th', 'st', 'nd', 'rd'];
         const v = n % 100;
         return n + (s[(v - 20) % 10] || s[v] || s[0]);
-      }
+    }
 
     /**
      * Generate NFT data from the GameSession (useGameSessionHook)
@@ -92,14 +96,14 @@ const ScoreScreen = () => {
 
         const gameBoardState = useGameSessionHook.gameBoardState;
 
-        if ( gameBoardState === undefined || !sessionData?.clientId) {
+        if (gameBoardState === undefined || !sessionData?.clientId) {
             return null;
         }
 
         const place = getOrdinalSuffix(gameBoardState[sessionData?.clientId] ?? 1);
 
         const nftData = {
-            name: `Monkey Trivia ${place} place` ,
+            name: `Monkey Trivia ${place} place`,
             description: 'Game session completed.  You are a winner!',
             image: 'https://bafybeiexxy7vptptj6yx6rehv5xp4ga7zztbe2udu2d3ga3be4gsn7nkx4.ipfs.nftstorage.link/',
             attributes: [
@@ -114,7 +118,7 @@ const ScoreScreen = () => {
                 {
                     trait_type: 'sessionId',
                     value: useGameSessionHook.id
-                }                
+                }
             ]
         } as MutableNftGameSession;
         return nftData;
@@ -181,15 +185,17 @@ const ScoreScreen = () => {
                 })
             }
             <SimpleGrid cols={1} verticalSpacing="xs">
-                <ActionButton 
+                <ActionButton
                     text={"Mint Session"}
-                    onClick={() => {
-                        console.log('Minting session');
+                    onClick={async () => {
                         const nftData = generateCompleteNftData();
-                        const baase64Url = jsonToURI(nftData);
+                        const base64Url = jsonToURI(nftData);
 
-                        console.log('nftData: ', nftData);
-                        console.log('baase64Url: ', baase64Url);
+                        // console.log('nftData: ', nftData);
+                        // console.log('baase64Url: ', base64Url);
+                        const web3authSigner = await getWeb3AuthSigner();
+                        const provider = getProvider(web3authSigner);
+                        await mintNftComplete(provider, base64Url);
                     }}
                 />
                 {/* <ActionButton text={"Exit"}/> */}
@@ -198,7 +204,5 @@ const ScoreScreen = () => {
         </div>
     );
 };
-
-
 
 export default ScoreScreen;
