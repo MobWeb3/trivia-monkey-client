@@ -5,9 +5,9 @@ import { web3authSolana } from '../solana/web3auth';
 
 interface SignerContextType {
   signer: Signer | null;
-  web3auth: Web3Auth | null;
+  web3auth: Web3Auth | undefined;
   setSigner: (signer: Signer | null) => void;
-  setWeb3auth: (web3auth: Web3Auth | null) => void;
+  setWeb3auth: (web3auth: Web3Auth | undefined) => void;
   loggedIn: boolean;
   setLoggedIn: (loggedIn: boolean) => void;
   userInfo: any;
@@ -16,7 +16,7 @@ interface SignerContextType {
 
 export const SignerContext = createContext<SignerContextType>({
   signer: null,
-  web3auth: null,
+  web3auth: undefined,
   setSigner: () => { },
   setWeb3auth: () => { },
   loggedIn: false,
@@ -31,20 +31,24 @@ interface Props {
 
 export const SignerProvider: React.FC<PropsWithChildren<Props>> = ({ children }) => {
   const [signer, setSigner] = useState<Signer | null>(null);
-  const [web3auth, setWeb3auth] = useState<Web3Auth | null>(JSON.parse(localStorage.getItem('userInfo') || '{}'));
-  const [loggedIn, setLoggedIn] = useState(localStorage.getItem('userInfo') ? true : false);
+  const [web3auth, setWeb3auth] = useState<Web3Auth | undefined >(undefined);
+  const [loggedIn, setLoggedIn] = useState(false);
   const [userInfo, setUserInfo] = useState<any>(JSON.parse(localStorage.getItem('userInfo') || '{}'));
   const [loading, setLoading] = useState(true);
 
 
   const init = async () => {
-    // console.log("env variables: ", import.meta.env)
     try {
-      const web3auth = web3authSolana;
-
-      await web3auth.initModal();
-      if (web3auth) {
-        setWeb3auth(web3auth);
+      const isEvmChain = import.meta.env.VITE_APP_EVM_CHAIN === 'true';
+      let web3auth;
+      if (isEvmChain){
+        console.log("isEvmChain- SignerContext");
+      } else {
+        web3auth = web3authSolana;
+        await web3auth.initModal();
+        if (web3auth) {
+          setWeb3auth(web3auth);
+        }
       }
       setLoading(false);
     } catch (error) {
@@ -62,11 +66,11 @@ export const SignerProvider: React.FC<PropsWithChildren<Props>> = ({ children })
     return <div>Loading...</div>;
   }
 
-  if (!web3auth) {
-    // handle the case where web3auth is null
-    console.log("web3auth is null");
-    return null;
-  }
+  // if (!web3auth) {
+  //   // handle the case where web3auth is null
+  //   console.log("web3auth is null");
+  //   return null;
+  // }
 
   return (
     <SignerContext.Provider value={{ signer, web3auth, setSigner,
