@@ -11,15 +11,19 @@ import { isEqual } from 'lodash';
 const COLLECTION_NAME = "GameSession";
 const db = new Polybase({ defaultNamespace: POLYBASE_NAMESPACE });
 
-function useGameSession() {
+function useGameSession(customId?: string) {
   const [session, setSession] = useState<GameSession>({});
-  const [sessionData] = useLocalStorageState<SessionData>('sessionData', {});
+  const [sessionData, setSessionData] = useLocalStorageState<SessionData>('sessionData');
 
   const hasChanged = (before: any, after: any) => {
     return !isEqual(before, after);
   }
 
   useEffect(() => {
+
+    if (customId) {
+      setSessionData({...sessionData, sessionId: customId })
+    }
 
     if (!sessionData?.sessionId) {
       return;
@@ -45,9 +49,11 @@ function useGameSession() {
       }
     );
   
+    // console.log("sessionData", sessionData);
     return () => {
       collectionReference();
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session, sessionData]); // Dependencies
   
   return session;

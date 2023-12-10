@@ -21,7 +21,15 @@ export const SignInPage = () => {
 
     if (isEvmChain) {
       const web3authSigner = await getWeb3AuthSigner();
-      setWeb3auth(web3authSigner.inner);
+      const web3auth = web3authSigner.inner;
+      const userInfo = await web3auth?.getUserInfo();
+      const email =  userInfo?.email ?? "";
+      setSessionData({ ...sessionData, clientId: email});
+      setWeb3auth(web3auth);
+      // const address = await web3authSigner.getAddress();
+      // console.log(`Logged in public address: ${address}`);
+      // console.log(`Logged info:`, userInfo);
+      
     } else {
       if (!web3auth) {
         console.log("web3auth not initialized yet");

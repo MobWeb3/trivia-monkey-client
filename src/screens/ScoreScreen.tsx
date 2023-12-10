@@ -8,6 +8,9 @@ import { IGNORANCE_MONKEY_NAME } from '../game-domain/Session';
 import { IconHome2 } from '@tabler/icons-react';
 import { useNavigate } from 'react-router-dom';
 import { ActionButton } from '../components/nft_wallet/ActionButton';
+import useLocalStorageState from 'use-local-storage-state';
+import { SessionData } from './SessionData';
+import { MutableNftGameSession } from '../game-domain/ nfts/NftGameSession';
 
 type AvatarPosition = {
     top: number;
@@ -23,12 +26,11 @@ type AvatarPositionData = {
 
 const ScoreScreen = () => {
     const navigate = useNavigate();
-    const useGameSessionHook = useGameSession();
+    const useGameSessionHook = useGameSession("mk-pbid-c3cd187c-5bfb-4d73-aeb3-297fd865eca0");
+    const [sessionData] = useLocalStorageState<SessionData>('sessionData');
 
     const calculatePositions = () => {
         let result: AvatarPositionData[] = [];
-
-
         if (!useGameSessionHook || !useGameSessionHook.gameBoardState) return [];
 
         const { gameBoardState } = useGameSessionHook;
@@ -76,6 +78,55 @@ const ScoreScreen = () => {
 
     const avatarPositionsData = calculatePositions();
 
+    function getOrdinalSuffix(n: number) {
+        const s = ['th', 'st', 'nd', 'rd'];
+        const v = n % 100;
+        return n + (s[(v - 20) % 10] || s[v] || s[0]);
+      }
+
+    /**
+     * Generate NFT data from the GameSession (useGameSessionHook)
+     */
+    const generateCompleteNftData = () => {
+        // const session = useGameSessionHook;
+
+        const gameBoardState = useGameSessionHook.gameBoardState;
+
+        if ( gameBoardState === undefined || !sessionData?.clientId) {
+            return null;
+        }
+
+        const place = getOrdinalSuffix(gameBoardState[sessionData?.clientId] ?? 1);
+
+        const nftData = {
+            name: `Monkey Trivia ${place} place` ,
+            description: 'Game session completed.  You are a winner!',
+            image: 'https://bafybeiexxy7vptptj6yx6rehv5xp4ga7zztbe2udu2d3ga3be4gsn7nkx4.ipfs.nftstorage.link/',
+            attributes: [
+                {
+                    trait_type: 'timestamp',
+                    value: Date.now()
+                },
+                {
+                    trait_type: 'place',
+                    value: place
+                },
+                {
+                    trait_type: 'sessionId',
+                    value: useGameSessionHook.id
+                }                
+            ]
+        } as MutableNftGameSession;
+        return nftData;
+    };
+
+    /**
+     * Function to convert Json to URI using base64 encoding
+     */
+    const jsonToURI = (json: any) => {
+        return `data:application/json;base64,${btoa(JSON.stringify(json))}`;
+    };
+
     return (
         <div className="game-container">
             <Grid m={'xs'}>
@@ -116,7 +167,7 @@ const ScoreScreen = () => {
                 avatarPositionsData?.map((avatarPositionData) => {
                     const { position, src, id } = avatarPositionData;
 
-                    console.log('avatarPositionData: ', avatarPositionData);
+                    // console.log('avatarPositionData: ', avatarPositionData);
                     return (
                         <img
                             key={id}
@@ -130,7 +181,17 @@ const ScoreScreen = () => {
                 })
             }
             <SimpleGrid cols={1} verticalSpacing="xs">
-                <ActionButton text={"Mint Session"} />
+                <ActionButton 
+                    text={"Mint Session"}
+                    onClick={() => {
+                        console.log('Minting session');
+                        const nftData = generateCompleteNftData();
+                        const baase64Url = jsonToURI(nftData);
+
+                        console.log('nftData: ', nftData);
+                        console.log('baase64Url: ', baase64Url);
+                    }}
+                />
                 {/* <ActionButton text={"Exit"}/> */}
             </SimpleGrid>
 
