@@ -6,7 +6,7 @@ type NftCardProps = {
   };
 
 export function NftCard({nft}: NftCardProps) {
-  
+
   function getIpfsHashFromUrl(url?: string) {
     if (url === undefined) return "";
     const parts = url.split('/');
@@ -21,11 +21,11 @@ export function NftCard({nft}: NftCardProps) {
   
   return ( 
      <Card shadow="sm" padding="lg" radius="md" withBorder>
-      <Card.Section component="a" href="https://mantine.dev/">
+      <Card.Section /*component="a" href="https://mantine.dev/*/>
         <Image
           src={nft.image ? getCloudflareIpfsUrl(nft.image) : "https://bafybeiahlgcpkogk3rynat27ol4mdi7my3t7ykrrlel5wxnmpcy2fgmxqi.ipfs.nftstorage.link/"}
           height={160}
-          alt="Norway"
+          alt="Nft image"
         />
       </Card.Section>
 

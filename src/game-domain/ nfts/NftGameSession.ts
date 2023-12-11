@@ -13,4 +13,17 @@ export interface NftGameSession {
     readonly raw?: NftRawMetadata;
 }
 
+export interface MutableNftGameSession {
+    name?: string;
+    tokenUri?: string;
+    description?: string;
+    image?: string;
+    contract?: string;
+    tokenId?: string;
+    owner?: string;
+    timestampMint?: string;
+    attributes?: Record<string, any>[];
+    raw?: NftRawMetadata;
+  }
+
 
