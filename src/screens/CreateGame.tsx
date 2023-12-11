@@ -109,7 +109,7 @@ const CreateGame = () => {
                 if (response) {
                     const questionSessionId = response.recordData.data.id;
                     // Deploy generation of AI questions
-                    await generateAllQuestions(topics, questionSessionId, true);
+                    generateAllQuestions(topics, questionSessionId, true);
                     // Update topics to Game session
                     await updateTopics({ id: gameSessionData?.sessionId, topics: topics.map((topic: Topic) => topic[0]) });
                     // console.log('updatedTopics response:', addTopicResponse);

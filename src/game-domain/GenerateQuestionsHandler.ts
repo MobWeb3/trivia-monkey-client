@@ -40,16 +40,8 @@ export const generateAllQuestions = async (topics: Topic[], questionSessionId: s
                 console.log("GENERATING GENERAL QUESTIONS FOR TOPIC: ", topic[0]);
                 axios.post(
                     `${BASE_URL}/api/openai/generalTopicQuestions`,
-                    { topic: topic[0] }
-                ).then((response) => { // TODO: should be done on the server
-                    const json = JSON.stringify(response.data);
-                    const cleanedJsonString: string = json.replace(/\\"/g, '"');
-                    const jsonObject = JSON.parse(cleanedJsonString);
-                    const result: any = {};
-                    result[topic[0]] = jsonObject;
-                    addQuestions(questionSessionId, result); // TODO: should be done on the server
-                    console.log("added questions: ", { genralTopics: result });
-                });
+                    { topic: topic[0], id: questionSessionId }
+                );
             } catch (error) {
                 console.error(error);
             }
