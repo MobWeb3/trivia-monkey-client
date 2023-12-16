@@ -7,40 +7,56 @@ import { getProvider } from '../evm/alchemy/Web3AuthSigner';
 import { OwnedNftsResponse } from 'alchemy-sdk';
 import { useEffect, useState } from 'react';
 import { getWeb3AuthSigner } from '../evm/Login';
+import { SelectNetwork } from '../components/nft_wallet/SelectNetwork';
+import { SupportedNetworks } from '../SupportedNetworksConfig';
+import useLocalStorageState from 'use-local-storage-state';
+import { SessionData } from './SessionData';
+import { getNftsForOwner } from '../evm/alchemy/FetchNftsInefficient';
+// import { SupportedNetworks } from '../../';
 
 const NftWalletScreen = () => {
     const [nfts, setNfts] = useState<NftGameSession[]>([]);
+    const [sessionData] = useLocalStorageState<SessionData>('sessionData');
 
     useEffect(() => {
-        const getNfts = async () => {
-            const signer = await getWeb3AuthSigner();
-            if (signer === undefined) {
-                console.log('signer is undefined');
-                return [];
-            }
-            const provider = getProvider(signer);
-            const providerWithAlchemy = providerWithAlchemyEnhancedApis(provider);
-            const nfts: OwnedNftsResponse = await getNftsFromSmartAccount(providerWithAlchemy);
-    
-            // Lets create an array of NftGameSession from nfts which is OwnedNftsResponse
-            const nftGameSessions: NftGameSession[] = nfts.ownedNfts.map((nft) => {
-                return {
-                    name: nft.name,
-                    description: nft.description,
-                    image: nft.image?.cachedUrl,
-                    tokenId: nft.tokenId,
-                    timestampMint: nft.mint?.timestamp,
-                    attributes: nft.raw.metadata,
-                    raw: nft.raw,
-                } as NftGameSession;
+        if (SupportedNetworks.Fuji === sessionData?.nftWalletNetwork) {
+            console.log('Fuji network');
+
+            getNftsForOwner().then((nfts) => {
+                // console.log('nfts: ', nfts);
+                setNfts(nfts);
             });
 
-            setNfts(nftGameSessions);
-        };
-
-        getNfts();
-
-    }, []);
+        } else {
+            const getNfts = async () => {
+                const signer = await getWeb3AuthSigner();
+                if (signer === undefined) {
+                    console.log('signer is undefined');
+                    return [];
+                }
+                const provider = getProvider(signer);
+                const providerWithAlchemy = providerWithAlchemyEnhancedApis(provider);
+                const nfts: OwnedNftsResponse = await getNftsFromSmartAccount(providerWithAlchemy);
+        
+                // Lets create an array of NftGameSession from nfts which is OwnedNftsResponse
+                const nftGameSessions: NftGameSession[] = nfts.ownedNfts.map((nft) => {
+                    return {
+                        name: nft.name,
+                        description: nft.description,
+                        image: nft.image?.cachedUrl,
+                        tokenId: nft.tokenId,
+                        timestampMint: nft.mint?.timestamp,
+                        attributes: nft.raw.metadata,
+                        raw: nft.raw,
+                    } as NftGameSession;
+                });
+    
+                setNfts(nftGameSessions);
+            };
+    
+            getNfts();
+        }
+    }, [sessionData?.nftWalletNetwork]);
 
     return (
         <div className="nftWalletScreen">
@@ -63,6 +79,7 @@ const NftWalletScreen = () => {
                     margin: "auto",
                 }}
             >
+                <SelectNetwork/>
                 <Title order={2} 
                     bg={"white"}
                     style={{

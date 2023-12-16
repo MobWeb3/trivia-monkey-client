@@ -13,7 +13,7 @@ import { SessionData } from './SessionData';
 import { MutableNftGameSession } from '../game-domain/ nfts/NftGameSession';
 import { getWeb3AuthSigner } from '../evm/Login';
 import { getProvider } from '../evm/alchemy/Web3AuthSigner';
-import { mintNftComplete } from '../evm/user-operation/mint';
+import { crossChainMintNftComplete } from '../evm/user-operation/mint';
 
 type AvatarPosition = {
     top: number;
@@ -195,7 +195,8 @@ const ScoreScreen = () => {
                         // console.log('baase64Url: ', base64Url);
                         const web3authSigner = await getWeb3AuthSigner();
                         const provider = getProvider(web3authSigner);
-                        await mintNftComplete(provider, base64Url);
+
+                        await crossChainMintNftComplete(provider, base64Url);
                     }}
                 />
                 {/* <ActionButton text={"Exit"}/> */}

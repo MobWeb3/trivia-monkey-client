@@ -7,4 +7,5 @@ export interface SessionData {
     channelId?: string;
     questionSessionId?: string;
     web3AuthSigner?: Web3AuthSigner
+    nftWalletNetwork?: string;
 }

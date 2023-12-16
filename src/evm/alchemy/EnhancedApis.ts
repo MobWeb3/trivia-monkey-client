@@ -1,10 +1,10 @@
 import { AlchemyProvider } from "@alchemy/aa-alchemy";
 import { Alchemy, Network } from "alchemy-sdk";
 
-const API_KEY = import.meta.env.VITE_ALCHEMY_API_KEY_SEPOLIA ?? "";
+const API_KEY = import.meta.env.VITE_ALCHEMY_API_KEY_MUMBAI ?? "";
 
 const alchemy = new Alchemy({
-    network: Network.ETH_SEPOLIA,
+    network: Network.MATIC_MUMBAI,
     apiKey: API_KEY,
 });
 
