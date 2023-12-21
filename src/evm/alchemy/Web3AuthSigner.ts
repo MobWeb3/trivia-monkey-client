@@ -4,7 +4,7 @@
 import { Web3AuthSigner } from "root/packages/signers/src";
 import { CHAIN_NAMESPACES } from "@web3auth/base";
 import { AlchemyProvider } from "@alchemy/aa-alchemy";
-import { sepolia } from "viem/chains";
+import { polygonMumbai } from "viem/chains";
 import { LightSmartContractAccount, getDefaultLightAccountFactoryAddress } from "@alchemy/aa-accounts";
 
 /* Mainnet Ethereum*/
@@ -20,7 +20,7 @@ import { LightSmartContractAccount, getDefaultLightAccountFactoryAddress } from 
 /* Sepolia */
 const clientId = import.meta.env.VITE_APP_WEB3AUTH_CLIENT_ID_EVM_TESTNET ?? "";
 const network = import.meta.env.VITE_APP_WEB3AUTH_NETWORK_TESTNET ?? "";
-const chain = sepolia;
+const chain = polygonMumbai;
 
 export const createWeb3AuthSigner = async () => {
   const web3AuthSigner = new Web3AuthSigner({
@@ -48,7 +48,8 @@ export const createWeb3AuthSigner = async () => {
 };
 
 export function getProvider(signer: Web3AuthSigner) {
-  const API_KEY = import.meta.env.VITE_ALCHEMY_API_KEY_SEPOLIA ?? "";
+  // const API_KEY = import.meta.env.VITE_ALCHEMY_API_KEY_SEPOLIA ?? "";
+  const API_KEY = import.meta.env.VITE_ALCHEMY_API_KEY_MUMBAI ?? "";
 
   // Create a provider to send user operations from your smart account
   return new AlchemyProvider({

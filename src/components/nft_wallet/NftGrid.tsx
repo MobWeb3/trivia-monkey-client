@@ -14,8 +14,6 @@ export function NftGrid({ nfts }: NftGridProps) {
         const handleResize = () => {
           setCardSpan(window.innerWidth >= 768 ? 4 : 6);
         };
-
-        console.log('cardSpan: ', cardSpan);
     
         window.addEventListener('resize', handleResize);
     
