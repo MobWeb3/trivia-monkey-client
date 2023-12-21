@@ -6,7 +6,7 @@ export const createQuestionSession = async (data: any) => {
         const response = await axios.post(`${BASE_URL}/api/polybase/questions/createQuestion`, data);
         return response.data;
     } catch (error) {
-        console.error(error);
+        console.error("createQuestionSession: ", error);
     }
     return false;
 }

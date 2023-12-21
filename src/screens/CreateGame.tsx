@@ -1,6 +1,5 @@
 import { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { createChannelListenerWrapper } from '../ably/ChannelListener';
-import { SignerContext } from '../components/SignerContext';
 import { useNavigate } from 'react-router-dom';
 import { Flex, Loader } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
@@ -18,12 +17,12 @@ import CustomButton from '../components/CustomButton';
 import { Topic, TopicContext } from '../components/topics/TopicContext';
 import useGameSession from '../polybase/useGameSession';
 import { SessionPhase } from '../game-domain/SessionPhase';
+import imageSource from '../assets/monkeys_avatars/astronaut-monkey1-200x200.png';
 
 const CreateGame = () => {
     const [nickname, setNickname] = useState('');
     const [numberPlayers, setNumberPlayers] = useState('2');
     const [pointsToWin, setPointsToWin] = useState('10');
-    const { web3auth } = useContext(SignerContext);
     const [sessionData, setSessionData] = useLocalStorageState<SessionData>('sessionData', {});
     const navigate = useNavigate();
     const [opened, { open, close }] = useDisclosure(false);
@@ -33,13 +32,14 @@ const CreateGame = () => {
     const urlRef = useRef('');
     const ref = useRef(null); //qr code ref
     const useGameSessionHook = useGameSession();
+    const [createGamePressed, setCreateGamePressed] = useState(false);
 
     const qrCode = useMemo(() => new QRCodeStyling({
         width: 300,
         height: 300,
         type: "svg",
         data: "",
-        image: "https://cryptologos.cc/logos/chimpion-bnana-logo.svg",
+        image: imageSource,
         dotsOptions: {
             color: "#4267b2",
             type: "rounded"
@@ -49,11 +49,19 @@ const CreateGame = () => {
         },
         imageOptions: {
             crossOrigin: "anonymous",
-            margin: 20
+            margin: 10  
         }
     }), []);
 
     useEffect(() => {
+
+        // This useEffect will run only if create sesion has been clicked
+        if (!createGamePressed) {
+            // lets clear the sessionData.sessionId. Let's have a clean start
+            setSessionData({ ...sessionData, sessionId: undefined, channelId: undefined });
+            return;
+        } 
+
         if (!useGameSessionHook) return;
 
     //  Check if all players have joined
@@ -63,51 +71,60 @@ const CreateGame = () => {
         if (playerList === undefined || playerList === null ||
              numberPlayers === undefined) return;
 
-        console.log('playerList', playerList);
+        // console.log('playerList', playerList);
         const canGoToSpin = playerList.length >= numberPlayers && gamePhase === SessionPhase.TURN_ORDER;
-        console.log('canGoToSpin', canGoToSpin);
+        // console.log('canGoToSpin', canGoToSpin);
         if (canGoToSpin) {
             navigate('/spinwheel');
         }
-    },[navigate, useGameSessionHook]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    },[createGamePressed, useGameSessionHook?.playerList, useGameSessionHook?.numberPlayers, useGameSessionHook?.gamePhase]);
+
+
 
     useEffect(() => {
+        if (!createGamePressed) return;
+
         const url = `${window.location.origin}/joingame?sessionId=${useGameSessionHook?.id}&channelId=${useGameSessionHook?.channelId}`;
-        urlRef.current = url; qrCode.update({
+        urlRef.current = url;
+        qrCode.update({
             data: url,
         });
         console.log('qrCode URL to share: ', url);
         if (ref.current) {
             qrCode.append(ref.current);
         }
-    }, [sessionCreated, qrCode, useGameSessionHook]);
+    }, [createGamePressed, qrCode, sessionCreated, useGameSessionHook?.id, useGameSessionHook?.channelId]);
 
-    const handleCreateChannel = async (data: any) => {
-        if (web3auth) {
-            const { sessionId, channelId, clientId } = await createChannelListenerWrapper(web3auth, data);
-            setSessionData({ sessionId, channelId, clientId });
-            return { sessionId, channelId, clientId };
-        }
-        return {};
+    const createChannel = async (data: any) => {
+        const { sessionId, channelId } = await createChannelListenerWrapper(data);
+        setSessionData({ ...sessionId, sessionId, channelId });
+        return { sessionId, channelId };
     };
 
     const handleCreateGameButton = async () => {
         setLoading(true);
-
-        if (nickname !== '' && numberPlayers !== '' && pointsToWin !== '') {
+        setCreateGamePressed(true);
+        console.log("session data: ", sessionData)
+        if (nickname !== '' && numberPlayers !== '' && pointsToWin !== '' && sessionData?.clientId) {
             
             // Create AI session question database record in Polybase
-            const gameSessionData = await handleCreateChannel({ nickname, numberPlayers, pointsToWin, topics });
+            const gameSessionData = await createChannel(
+                { nickname, numberPlayers, pointsToWin, topics,
+                    clientId: sessionData?.clientId
+                 });
             
-            if (gameSessionData) {
+            if (gameSessionData?.sessionId && gameSessionData?.channelId) {
                 // Create question session
                 const response = await createQuestionSession({
                     sessionId: gameSessionData.sessionId,
                     clientId: sessionData?.clientId
                 });
 
-                if (response) {
-                    const questionSessionId = response.recordData.data.id;
+                const questionSessionId = response?.recordData?.data?.id;
+
+                if (questionSessionId) {
+                    
                     // Deploy generation of AI questions
                     generateAllQuestions(topics, questionSessionId, true);
                     // Update topics to Game session
@@ -131,11 +148,24 @@ const CreateGame = () => {
                         clientId: sessionData?.clientId,
                         questionSessionId
                     });
-                }
 
+                    setSessionCreated(true);
+                }
+                else {
+                    console.error('Error creating question session A');
+                    setLoading(false);
+                }
+            }
+            else {
+                console.error('Error creating question session');
+                console.log(`Error creating question session. Missing any of the following data
+                channelId or sessionId `);
             }
             // console.log('handlePlayButtonClick setSessionCreated');
-            setSessionCreated(true);
+        }
+        else {
+            console.error(`Error creating question session. Missing any of the following data
+            nickname,poinstToWin, numberPlayers,clientId `);        
         }
         setLoading(false);
     };

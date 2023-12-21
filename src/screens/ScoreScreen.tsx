@@ -29,7 +29,7 @@ type AvatarPositionData = {
 
 const ScoreScreen = () => {
     const navigate = useNavigate();
-    const useGameSessionHook = useGameSession("mk-pbid-c3cd187c-5bfb-4d73-aeb3-297fd865eca0");
+    const useGameSessionHook = useGameSession();
     const [sessionData] = useLocalStorageState<SessionData>('sessionData');
     // const { web3auth } = useContext(SignerContext);
 
