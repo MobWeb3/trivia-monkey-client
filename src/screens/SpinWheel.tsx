@@ -134,7 +134,6 @@ function SpinWheel() {
     }
 
     function getSpaces() {
-        console.log('getSpaces sessionData', sessionData);
         return getSpacesInstance(sessionData?.clientId ?? "");
     }
 

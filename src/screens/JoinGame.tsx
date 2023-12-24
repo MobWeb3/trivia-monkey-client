@@ -17,12 +17,12 @@ import SelectedTopicEntries from '../components/topics/SelectedTopicEntries';
 import { TopicContext } from '../components/topics/TopicContext';
 import useGameSession from '../polybase/useGameSession';
 import { UserInfo } from '@web3auth/base';
+import { AuthSessionData } from '../game-domain/AuthSessionData';
 
 const JoinGame = () => {
-    // const [channelId, setChannelId] = useState('');
-    // const { web3auth } = useContext(SignerContext);
     const navigate = useNavigate();
     const [sessionData, setSessionData] = useLocalStorageState<SessionData>('sessionData', {});
+    const [authSessionData, setAuthSessionData] = useLocalStorageState<AuthSessionData>('authSessionData', {});
     const location = useLocation();
     const [opened, { open, close }] = useDisclosure(false);
     const [numberPlayers, setNumberPlayers] = useState<string>('');
@@ -66,8 +66,6 @@ const JoinGame = () => {
                     questionSessionId: _sessionData.questionSessionId
                 });
             });
-            // setChannelId(channelId as string);
-
             console.log('JoinGame sessionData state ', sessionData);
             // handleJoinGame({ channelId });
         }
@@ -124,7 +122,8 @@ const JoinGame = () => {
     const retryLogin = async () => {
         // initialize web3auth
         const userInfo = await login();
-        localStorage.setItem('userInfo', JSON.stringify(userInfo));
+        setSessionData({ ...sessionData, clientId: userInfo?.email});
+        setAuthSessionData({ ...authSessionData, userInfo});
         if (sessionData && userInfo) {
             setSessionData({ ...sessionData, clientId: userInfo.email });
             userInfoRef.current = userInfo;

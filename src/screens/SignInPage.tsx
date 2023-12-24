@@ -9,10 +9,12 @@ import { createUser, userExists } from '../polybase/UserHandler';
 import useLocalStorageState from 'use-local-storage-state';
 import { SessionData } from './SessionData';
 import { getWeb3AuthSigner } from '../evm/Login';
+import { AuthSessionData } from '../game-domain/AuthSessionData';
 
 export const SignInPage = () => {
-  const { web3auth, setWeb3auth, setLoggedIn, setUserInfo } = useContext(SignerContext);
+  const { web3auth, setWeb3auth, setLoggedIn } = useContext(SignerContext);
   const [sessionData, setSessionData] = useLocalStorageState<SessionData>('sessionData', {});
+  const [authSessionData, setAuthSessionData] = useLocalStorageState<AuthSessionData>('authSessionData', {});
   const navigate = useNavigate();
 
   const login = async () => {
@@ -25,10 +27,8 @@ export const SignInPage = () => {
       const userInfo = await web3auth?.getUserInfo();
       const email =  userInfo?.email ?? "";
       setSessionData({ ...sessionData, clientId: email});
-      setWeb3auth(web3auth);
-      // const address = await web3authSigner.getAddress();
-      // console.log(`Logged in public address: ${address}`);
-      // console.log(`Logged info:`, userInfo);
+      setAuthSessionData({ ...authSessionData, userInfo});
+      setWeb3auth(web3auth); // Deprecated
       
     } else {
       if (!web3auth) {
@@ -41,10 +41,6 @@ export const SignInPage = () => {
       const userInfo = await web3auth.getUserInfo();
       const publicKey = await getConnectedPublicKey(web3auth);
       console.log(`publick key: ${publicKey?.toString()}`);
-      // console.log(`userInfo: ${JSON.stringify(userInfo)}`);
-
-      setUserInfo(userInfo);
-      localStorage.setItem('userInfo', JSON.stringify(userInfo));
       setSessionData({ ...sessionData, clientId: userInfo.email, name: userInfo.name });
 
       const userExist = await userExists(userInfo?.email ?? "");
