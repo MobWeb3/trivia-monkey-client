@@ -1,5 +1,4 @@
 import { useContext, useEffect, useRef, useState } from 'react';
-import { SignerContext } from '../components/SignerContext';
 import { useLocation, useNavigate } from 'react-router-dom';
 import queryString from 'query-string';
 import { Container, Flex, Modal } from '@mantine/core';
@@ -21,12 +20,11 @@ import { UserInfo } from '@web3auth/base';
 
 const JoinGame = () => {
     // const [channelId, setChannelId] = useState('');
-    const { web3auth } = useContext(SignerContext);
+    // const { web3auth } = useContext(SignerContext);
     const navigate = useNavigate();
     const [sessionData, setSessionData] = useLocalStorageState<SessionData>('sessionData', {});
     const location = useLocation();
     const [opened, { open, close }] = useDisclosure(false);
-    // const [selectedChips] = useState<string[]>([]);
     const [numberPlayers, setNumberPlayers] = useState<string>('');
     const [joined, setJoined] = useState(false);
     const { topics } = useContext(TopicContext);
@@ -43,7 +41,7 @@ const JoinGame = () => {
             if (playerList === undefined || numberPlayers === undefined || gamePhase === undefined) return;
 
             const canGoToSpin = playerList.length >= numberPlayers && gamePhase === SessionPhase.TURN_ORDER;
-            console.log('canGoToSpin', canGoToSpin);
+            // console.log('canGoToSpin', canGoToSpin);
             if (canGoToSpin) {
                 navigate('/spinwheel');
             }
@@ -56,8 +54,8 @@ const JoinGame = () => {
         const parsed = queryString.parse(location.search);
         const { sessionId, channelId } = parsed;
 
-        console.log('JoinGame loaded: ', sessionId, channelId);
-        console.log("topics: ", topics)
+        // console.log('JoinGame loaded: ', sessionId, channelId);
+        // console.log("topics: ", topics)
         if (sessionId && channelId) {
             getSession({ id: sessionId }).then((_sessionData) => {
                 setNumberPlayers(_sessionData.numberPlayers);
@@ -79,22 +77,20 @@ const JoinGame = () => {
         await retryLogin();
         await joinIfAlreadyActiveGame();
         if (sessionData?.channelId !== '') {
-            if (web3auth) {
-                // await enterChannelListenerWrapper(web3auth, data);
-    
-                // Generate questions
-                await generateAllQuestions(topics, sessionData?.questionSessionId as string, true);
-                
-                // Update topics to Game session
-                await updateTopics({ id: sessionData?.sessionId, topics: topics.map((topic) => topic[0]) })
-    
-                console.log('JoinGame handleJoinGame: ', sessionData);
-    
-                // add player to game session
-                await addPlayer({ id: sessionData?.sessionId, playerId: userInfoRef.current?.email as string })
-    
-                setJoined(true);
-            }
+
+            // Generate questions
+            await generateAllQuestions(topics, sessionData?.questionSessionId as string, true);
+
+            // Update topics to Game session
+            await updateTopics({ id: sessionData?.sessionId, topics: topics.map((topic) => topic[0]) })
+
+            console.log('JoinGame handleJoinGame: ', sessionData);
+
+            // add player to game session
+            await addPlayer({ id: sessionData?.sessionId, playerId: userInfoRef.current?.email as string })
+
+            setJoined(true);
+
         }
     };
 
@@ -110,14 +106,11 @@ const JoinGame = () => {
                     });
 
                     // initialize web3auth
-                    if (web3auth) {
-                        const userInfo = await login(web3auth);
-                        localStorage.setItem('userInfo', JSON.stringify(userInfo));
-                        if (sessionData) {
-                            setSessionData({ ...sessionData, clientId: userInfo.email });
-                        }
+                    const userInfo = await login();
+                    localStorage.setItem('userInfo', JSON.stringify(userInfo));
+                    if (sessionData) {
+                        setSessionData({ ...sessionData, clientId: userInfo.email });
                     }
-
                     navigate('/aigame');
                 }
             } catch (error) {
@@ -130,13 +123,11 @@ const JoinGame = () => {
 
     const retryLogin = async () => {
         // initialize web3auth
-        if (web3auth) {
-            const userInfo = await login(web3auth);
-            localStorage.setItem('userInfo', JSON.stringify(userInfo));
-            if (sessionData && userInfo) {
-                setSessionData({ ...sessionData, clientId: userInfo.email });
-                userInfoRef.current = userInfo;
-            }
+        const userInfo = await login();
+        localStorage.setItem('userInfo', JSON.stringify(userInfo));
+        if (sessionData && userInfo) {
+            setSessionData({ ...sessionData, clientId: userInfo.email });
+            userInfoRef.current = userInfo;
         }
     }
 
@@ -209,8 +200,6 @@ const JoinGame = () => {
 
                 </div>
             }
-
-
         </div>
 
     );

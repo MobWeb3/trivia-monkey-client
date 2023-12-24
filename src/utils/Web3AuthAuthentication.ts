@@ -3,34 +3,27 @@ import { Web3Auth } from "@web3auth/modal";
 import { SolanaWallet } from "@web3auth/solana-provider";
 import { MySolanaWallet } from "../solana/MySolanaWallet";
 import { Connection } from '@solana/web3.js'
+import { getWeb3AuthSigner } from "../evm/Login";
 
-export const login = async (web3auth: Web3Auth) => {
-    if (!web3auth) {
-        console.log("web3auth not initialized yet");
-        return {};
-    }
-    await web3auth.connect();
+const isEvmChain = import.meta.env.VITE_APP_EVM_CHAIN === 'true';
 
-    const userInfo = await web3auth.getUserInfo();
+export const login = async () => {
 
-    const evmChain = false;
-
-    if (evmChain) {
-        // const _signer = await getZeroDevSigner({
-        //     projectId: "5682ee04-d8d3-436a-ae63-479e063a23c4",
-        //     owner: getRPCProviderOwner(web3auth.provider),
-        // })
+    if (isEvmChain) {
+        const web3authSigner = await getWeb3AuthSigner();
+        const web3auth = web3authSigner.inner;
+        return await web3auth?.getUserInfo();
 
     } else {
-        const publicKey = await getConnectedPublicKey(web3auth);
-        console.log(`publick key: ${publicKey?.toString()}`);
+        // const publicKey = await getConnectedPublicKey(web3auth);
+        // console.log(`publick key: ${publicKey?.toString()}`);
         // console.log(`userInfo: ${JSON.stringify(userInfo)}`);
-        return userInfo;
+        // return userInfo;
     }
     return {}
 };
 
-export const getConnectedPublicKey = async (web3auth: Web3Auth) => {
+export const getConnectedPublicKey = async (web3auth?: Web3Auth) => {
     const web3authProvider = await web3auth?.connect();
     if (web3authProvider) {
         const solanaWallet = new SolanaWallet(web3authProvider as any);
