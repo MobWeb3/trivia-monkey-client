@@ -34,9 +34,10 @@ const PlayLobbyScene = () => {
         } catch (error) {
             console.error(error);
         }
-        localStorage.removeItem('userInfo');
-        localStorage.removeItem('web3auth');
+        localStorage.removeItem('userInfo'); // Deprecated
+        localStorage.removeItem('web3auth'); // Deprecated
         localStorage.removeItem('sessionData');
+        localStorage.removeItem('authSessionData');
         console.log('Disconnected');
     };
 
