@@ -21,15 +21,15 @@ export const updateSessionPhase = async (data: any) => {
     return false;
 }
 
-export const getSessionPhase = async (data: any) => {
-    try {
-        const response = await axios.post(`${BASE_URL}/api/polybase/session/getGamePhase`, data);
-        return response.data;
-    } catch (error) {
-        console.error(error);
-    }
-    return false;
-}
+// export const getSessionPhase = async (data: any) => {
+//     try {
+//         const response = await axios.post(`${BASE_URL}/api/polybase/session/getGamePhase`, data);
+//         return response.data;
+//     } catch (error) {
+//         console.error(error);
+//     }
+//     return false;
+// }
 
 export const updateInitialTurnPosition = async (data: any) => {
     try {
@@ -52,16 +52,16 @@ export const getSession = async (data: any) => {
 }
 
 
-export const getHostId = async (data: any) => {
-    try {
-        const response = await axios.post(`${BASE_URL}/api/polybase/session/getHostPlayerId`, data);
-        const { hostPlayerId } = response.data;
-        return hostPlayerId;
-    } catch (error) {
-        console.error(error);
-    }
-    return false;
-}
+// export const getHostId = async (data: any) => {
+//     try {
+//         const response = await axios.post(`${BASE_URL}/api/polybase/session/getHostPlayerId`, data);
+//         const { hostPlayerId } = response.data;
+//         return hostPlayerId;
+//     } catch (error) {
+//         console.error(error);
+//     }
+//     return false;
+// }
 
 export const updateTopics = async (data: any) => {
     try {

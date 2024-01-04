@@ -9,18 +9,6 @@ let faviconURL = '/favicon.ico'
 // https://vitejs.dev/config/
 export default defineConfig(({ command, mode }) => {
     const env = loadEnv(mode, process.cwd(), '')
-
-    // let apiUrl: string;
-
-    // if (mode === 'development') {
-    //     console.log("DEV MODE set!!");
-    //     apiUrl = DEV_BASE_URL;
-
-    //     console.log("baseUrl: ", apiUrl);
-    // } else {
-    //     apiUrl = PROD_BASE_URL;
-    // }
-
     return {
         base: './',
         plugins: [
@@ -114,7 +102,14 @@ export default defineConfig(({ command, mode }) => {
             // minify: true,
             // sourcemap: false, // uncomment this line to debug source maps
         },
-
+        test: {
+            globals: true,
+            environment: 'jsdom',
+            setupFiles: 'src/test/utils/setup.ts',
+            // you might want to disable it, if you don't have tests that rely on CSS
+            // since parsing CSS is slow
+            css: true,
+          }
     }
 
 })

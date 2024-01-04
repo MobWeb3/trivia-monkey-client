@@ -4,9 +4,6 @@ import *  as  Realm from "realm-web";
 // Define an interface representing a session document in MongoDB.
 export interface ISession extends Document, GameSession { }
 
-// Mongo db
-// Add your App ID
-const app = new Realm.App({ id: import.meta.env.VITE_MONGODB_APP_ID });
 
 class SessionConnection {
 
@@ -21,8 +18,8 @@ class SessionConnection {
   public static async getInstance() {
     if (!SessionConnection.instance) {
       const MONGO_URL = import.meta.env.VITE_MONGODB_URL ?? '';
-
-      SessionConnection.instance =  await SessionConnection.connectAndCreateInstance(MONGO_URL, "monkey-trivia");
+      const app = new Realm.App({ id: import.meta.env.VITE_MONGODB_APP_ID });
+      SessionConnection.instance =  await SessionConnection.connectAndCreateInstance(MONGO_URL, "monkey-trivia", app);
     }
     return SessionConnection.instance;
   }
@@ -55,12 +52,9 @@ class SessionConnection {
 
     for await (const change of this.changeStream)  {
       const { fullDocument } = change as unknown as MyChangeEvent;
-
-      // if (documentKey._id === sessionId) {
-        console.log("changed!", change)
-        console.log("fullDocument", fullDocument)
-      //   callback(change.fullDocument);
-      // }
+        // console.log("changed!", change)
+        // console.log("fullDocument", fullDocument)
+        callback(fullDocument);
     };
   }
 
@@ -69,7 +63,7 @@ class SessionConnection {
   }
 
   // Static method to create an instance
-  static async connectAndCreateInstance(dbUrl: string, dbName: string) {
+  static async connectAndCreateInstance(dbUrl: string, dbName: string, app: Realm.App) {
     // Create an anonymous credential
     const credentials = Realm.Credentials.apiKey(import.meta.env.VITE_MONGODB_API_KEY);
     // Authenticate the user

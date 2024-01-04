@@ -2,7 +2,7 @@ import './SpinWheel.css';
 import { useEffect, useState } from 'react';
 import { Container, Flex, Image, Loader } from '@mantine/core';
 import { useNavigate } from 'react-router-dom';
-import { setCurrentTurnPlayerId, updateInitialTurnPosition, updatePlayerListOrder, updateSessionPhase } from '../polybase/SessionHandler';
+import { setCurrentTurnPlayerId, updateInitialTurnPosition, updatePlayerListOrder } from '../polybase/SessionHandler';
 import { SessionData } from './SessionData';
 import { SessionPhase } from '../game-domain/SessionPhase';
 import useLocalStorageState from 'use-local-storage-state';
@@ -15,6 +15,8 @@ import AvatarStack from '../components/avatar_stack/AvatarStack';
 import CustomButton from '../components/CustomButton';
 import { getSpacesInstance } from '../ably/SpacesSingleton';
 import useGameSession from '../polybase/useGameSession';
+import { GameSession } from '../game-domain/GameSession';
+import { updateSession } from '../mongo/SessionHandler';
 
 function SpinWheel() {
 
@@ -89,12 +91,10 @@ function SpinWheel() {
         // console.log('handleStartGame SpinWheel sesionData: ', sessionData);
         if (sessionData === null) return;
         const { clientId, channelId } = sessionData as SessionData;
-        if (clientId && channelId) {
+        if (clientId && channelId && sessionData?.sessionId) {
             setIsLoading(true);
             await updatePlayerAndTurn()
-
-            // Upldate polybase session phase to GAME_ACTIVE
-            await updateSessionPhase({ id: sessionData?.sessionId, newPhase: SessionPhase.GAME_ACTIVE });
+            await updateSession( sessionData?.sessionId, {gamePhase: SessionPhase.GAME_ACTIVE } as GameSession);
             setIsLoading(false);
             navigate('/aigame');
         }

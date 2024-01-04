@@ -1,12 +1,12 @@
 import { useContext, useEffect, useMemo, useRef, useState } from 'react';
-import { createChannelListenerWrapper } from '../ably/ChannelListener';
+import { createChannelId } from '../ably/ChannelListener';
 import { useNavigate } from 'react-router-dom';
 import { Flex, Loader } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import QRCodeStyling from "qr-code-styling";
 import { createQuestionSession } from '../polybase/QuestionsHandler';
 import { generateAllQuestions } from '../game-domain/GenerateQuestionsHandler';
-import { addPlayer, updateQuestionSessionId, updateSessionPhase, updateTopics } from '../polybase/SessionHandler';
+import { addPlayer, updateQuestionSessionId, updateTopics } from '../polybase/SessionHandler';
 import { SessionData } from './SessionData';
 import useLocalStorageState from 'use-local-storage-state';
 import CreateGameForm from '../components/CreateGameFields';
@@ -18,6 +18,8 @@ import { Topic, TopicContext } from '../components/topics/TopicContext';
 import { SessionPhase } from '../game-domain/SessionPhase';
 import imageSource from '../assets/monkeys_avatars/astronaut-monkey1-200x200.png';
 import useGameSession from '../mongo/useGameSession';
+import { createSession, updateSession } from '../mongo/SessionHandler';
+import { GameSession } from '../game-domain/GameSession';
 
 const CreateGame = () => {
     const [nickname, setNickname] = useState('');
@@ -97,9 +99,28 @@ const CreateGame = () => {
     }, [createGamePressed, qrCode, sessionCreated, useGameSessionHook?.sessionId, useGameSessionHook?.channelId]);
 
     const createChannel = async (data: any) => {
-        const { sessionId, channelId } = await createChannelListenerWrapper(data);
-        setSessionData({ ...sessionId, sessionId, channelId });
-        return { sessionId, channelId };
+        const channelId = await createChannelId(data);
+
+
+        if (channelId && data.clientId && data.numberPlayers && data.pointsToWin) {
+            // Create polybase game session
+            const response = await createSession({
+                hostPlayerId: data.clientId,
+                numberPlayers: data.numberPlayers,
+                pointsToWin: data.pointsToWin,
+                channelId,
+            } as GameSession);
+    
+            if (response) {
+                const pbSessionId = response?.recordData?.data?.id;
+    
+                return {sessionId: pbSessionId, channelId};
+            }
+        }
+        else {
+            console.error(`missing any of channelId, clientId, numberPlayers,
+             pointsToWin. See current data: `, data);
+        }
     };
 
     const handleCreateGameButton = async () => {
@@ -138,7 +159,7 @@ const CreateGame = () => {
                     await addPlayer({ id: gameSessionData?.sessionId, playerId: sessionData?.clientId });
 
                     // Change game state to TURN_ORDER
-                    await updateSessionPhase({id: gameSessionData?.sessionId, newPhase: SessionPhase.TURN_ORDER});
+                    await updateSession(gameSessionData?.sessionId, {gamePhase: SessionPhase.TURN_ORDER} as GameSession);
 
                     // save to sessionData
                     setSessionData({
