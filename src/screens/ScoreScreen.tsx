@@ -94,7 +94,7 @@ const ScoreScreen = () => {
     const generateCompleteNftData = () => {
         // const session = useGameSessionHook;
 
-        const gameBoardState = useGameSessionHook.gameBoardState;
+        const gameBoardState = useGameSessionHook?.gameBoardState;
 
         if (gameBoardState === undefined || !sessionData?.clientId) {
             return null;
@@ -117,7 +117,7 @@ const ScoreScreen = () => {
                 },
                 {
                     trait_type: 'sessionId',
-                    value: useGameSessionHook.id
+                    value: useGameSessionHook?.sessionId
                 }
             ]
         } as MutableNftGameSession;
@@ -136,7 +136,7 @@ const ScoreScreen = () => {
             <Grid m={'xs'}>
                 <Grid.Col span={10}>
                     <Container fluid bg="#FDD673" className='messageBox'>
-                        {`${useGameSessionHook.winner} WINS!`}
+                        {`${useGameSessionHook?.winner} WINS!`}
                     </Container>
                 </Grid.Col>
                 <Grid.Col span={2} >

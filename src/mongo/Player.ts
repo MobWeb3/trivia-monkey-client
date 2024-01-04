@@ -5,7 +5,7 @@ import { Player } from '../game-domain/Player';
 export const userExists = async (clientId: string) => {
     try {
         const response = await axios.post(`${BASE_URL}/api/mongo/userExists`, {
-            clientId
+            id: clientId
         });
         return response.data as boolean;
     } catch (error) {

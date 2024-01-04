@@ -20,16 +20,7 @@ export const SignInPage = () => {
 
   const login = async () => {
 
-        // Mongo db
-    // Add your App ID
-    // const app = new Realm.App({ id: import.meta.env.VITE_MONGODB_APP_ID });
 
-    // // Create an anonymous credential
-    // const credentials = Realm.Credentials.apiKey(import.meta.env.VITE_MONGODB_API_KEY);
-    // // Authenticate the user
-    // const user = await app.logIn(credentials);
-    // // `App.currentUser` updates to match the logged in user
-    // console.log("Logged in with user id:", user.id);
 
     const isEvmChain = import.meta.env.VITE_APP_EVM_CHAIN === 'true';
 

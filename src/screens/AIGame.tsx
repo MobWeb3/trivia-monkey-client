@@ -116,19 +116,19 @@ function AIGame() {
      */
     useEffect(() => {
         if (useGameSessionHook) {
-            const { gamePhase, pointsToWinTheGame, gameBoardState } = useGameSessionHook;
-            if (gamePhase === 'GAME_ACTIVE' && pointsToWinTheGame && gameBoardState) {
+            const { gamePhase, pointsToWin, gameBoardState } = useGameSessionHook;
+            if (gamePhase === 'GAME_ACTIVE' && pointsToWin && gameBoardState) {
 
 
-                const winner = Object.keys(gameBoardState).find((key) => gameBoardState[key] >= pointsToWinTheGame);
+                const winner = Object.keys(gameBoardState).find((key) => gameBoardState[key] >= pointsToWin);
                 if (winner) {
                     setMessage(`${winner} wins!`);
                     setCanSpin(false);
                     // Update game phase to GAME_OVER
-                    updateSessionPhase({ id: useGameSessionHook?.id, newPhase: SessionPhase.GAME_OVER });
+                    updateSessionPhase({ id: useGameSessionHook?.sessionId, newPhase: SessionPhase.GAME_OVER });
 
                     // update winner on polybase
-                    setWinner({ id: useGameSessionHook?.id, winner });
+                    setWinner({ id: useGameSessionHook?.sessionId, winner });
                 }
             }
             else if (gamePhase === 'GAME_OVER') {

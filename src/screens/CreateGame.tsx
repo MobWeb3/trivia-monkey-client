@@ -15,9 +15,9 @@ import DisplayTitle from '../components/DisplayTitle';
 import ShareModal from '../components/share/ShareModal';
 import CustomButton from '../components/CustomButton';
 import { Topic, TopicContext } from '../components/topics/TopicContext';
-import useGameSession from '../polybase/useGameSession';
 import { SessionPhase } from '../game-domain/SessionPhase';
 import imageSource from '../assets/monkeys_avatars/astronaut-monkey1-200x200.png';
+import useGameSession from '../mongo/useGameSession';
 
 const CreateGame = () => {
     const [nickname, setNickname] = useState('');
@@ -85,7 +85,7 @@ const CreateGame = () => {
     useEffect(() => {
         if (!createGamePressed) return;
 
-        const url = `${window.location.origin}/joingame?sessionId=${useGameSessionHook?.id}&channelId=${useGameSessionHook?.channelId}`;
+        const url = `${window.location.origin}/joingame?sessionId=${useGameSessionHook?.sessionId}&channelId=${useGameSessionHook?.channelId}`;
         urlRef.current = url;
         qrCode.update({
             data: url,
@@ -94,7 +94,7 @@ const CreateGame = () => {
         if (ref.current) {
             qrCode.append(ref.current);
         }
-    }, [createGamePressed, qrCode, sessionCreated, useGameSessionHook?.id, useGameSessionHook?.channelId]);
+    }, [createGamePressed, qrCode, sessionCreated, useGameSessionHook?.sessionId, useGameSessionHook?.channelId]);
 
     const createChannel = async (data: any) => {
         const { sessionId, channelId } = await createChannelListenerWrapper(data);

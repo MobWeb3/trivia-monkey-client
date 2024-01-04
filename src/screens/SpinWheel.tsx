@@ -35,14 +35,14 @@ function SpinWheel() {
         // console.log('useEffect sessionData', sessionData);
 
         // check if we can start the game
-        if (sessionData?.sessionId) {
-            const { initialTurnPosition, numberPlayers } = useGameSessionHook;
+        if (sessionData?.sessionId && useGameSessionHook) {
+            const { initialTurnPositions, numberPlayers } = useGameSessionHook;
 
-            if (initialTurnPosition === undefined || numberPlayers === undefined) return;
+            if (initialTurnPositions === undefined || numberPlayers === undefined) return;
 
             // console.log('initialTurnPosition', initialTurnPosition);
             // console.log('numberPlayers', numberPlayers);
-            const initialTurnPositionLength = Object.keys(initialTurnPosition).length;
+            const initialTurnPositionLength = Object.keys(initialTurnPositions).length;
             const canStartGame = initialTurnPositionLength >= numberPlayers;
             // console.log('canStartGame', canStartGame);
             if (canStartGame) {
@@ -74,7 +74,7 @@ function SpinWheel() {
     useEffect(() => {
 
         // automatically take to AI game if game phase is GAME_ACTIVE
-        if (sessionData?.sessionId) {
+        if (sessionData?.sessionId && useGameSessionHook) {
             const { gamePhase } = useGameSessionHook;
 
             if (gamePhase === SessionPhase.GAME_ACTIVE) {
@@ -189,7 +189,7 @@ function SpinWheel() {
                 }}>
                     {isLoading ? <Loader /> :
                         // check if we can start the game annd if we are the host to display the start game button
-                        (mayStartGame && useGameSessionHook.hostPlayerId === sessionData?.clientId ) ? (
+                        (mayStartGame && useGameSessionHook?.hostPlayerId === sessionData?.clientId ) ? (
                             <CustomButton
                                 fontSize='1.5rem'
                                 onClick={handleStartGame}

@@ -11,7 +11,7 @@ const COLLECTION_NAME = "GameSession";
 const db = new Polybase({ defaultNamespace: POLYBASE_NAMESPACE });
 
 function useGameSession() {
-  const [session, setSession] = useState<GameSession>({});
+  const [session, setSession] = useState<GameSession>();
   const [sessionData] = useLocalStorageState<SessionData>('sessionData');
   
   const hasChanged = (before: any, after: any) => {

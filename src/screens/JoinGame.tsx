@@ -35,7 +35,7 @@ const JoinGame = () => {
 
         // If all players have joined, navigate to SpinWheel and joined the game
         // automatically navigate to SpinWheel
-        if (sessionData?.sessionId && sessionData?.channelId) {
+        if (sessionData?.sessionId && sessionData?.channelId && useGameSessionHook) {
             const { playerList, numberPlayers, gamePhase } = useGameSessionHook;
 
             if (playerList === undefined || numberPlayers === undefined || gamePhase === undefined) return;
