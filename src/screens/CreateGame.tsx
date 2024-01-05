@@ -6,7 +6,6 @@ import { useDisclosure } from '@mantine/hooks';
 import QRCodeStyling from "qr-code-styling";
 import { createQuestionSession } from '../polybase/QuestionsHandler';
 import { generateAllQuestions } from '../game-domain/GenerateQuestionsHandler';
-import { addPlayer, updateQuestionSessionId, updateTopics } from '../polybase/SessionHandler';
 import { SessionData } from './SessionData';
 import useLocalStorageState from 'use-local-storage-state';
 import CreateGameForm from '../components/CreateGameFields';
@@ -18,7 +17,7 @@ import { Topic, TopicContext } from '../components/topics/TopicContext';
 import { SessionPhase } from '../game-domain/SessionPhase';
 import imageSource from '../assets/monkeys_avatars/astronaut-monkey1-200x200.png';
 import useGameSession from '../mongo/useGameSession';
-import { createSession, updateSession } from '../mongo/SessionHandler';
+import { addPlayer, createSession, updateSession, addTopics } from '../mongo/SessionHandler';
 import { GameSession } from '../game-domain/GameSession';
 
 const CreateGame = () => {
@@ -96,12 +95,10 @@ const CreateGame = () => {
         if (ref.current) {
             qrCode.append(ref.current);
         }
-    }, [createGamePressed, qrCode, sessionCreated, useGameSessionHook?.sessionId, useGameSessionHook?.channelId]);
+    }, [createGamePressed, qrCode, sessionCreated, useGameSessionHook]);
 
     const createChannel = async (data: any) => {
         const channelId = await createChannelId(data);
-
-
         if (channelId && data.clientId && data.numberPlayers && data.pointsToWin) {
             // Create polybase game session
             const response = await createSession({
@@ -112,7 +109,7 @@ const CreateGame = () => {
             } as GameSession);
     
             if (response) {
-                const pbSessionId = response?.recordData?.data?.id;
+                const pbSessionId = response?.sessionId;
     
                 return {sessionId: pbSessionId, channelId};
             }
@@ -149,14 +146,14 @@ const CreateGame = () => {
                     // Deploy generation of AI questions
                     generateAllQuestions(topics, questionSessionId, true);
                     // Update topics to Game session
-                    await updateTopics({ id: gameSessionData?.sessionId, topics: topics.map((topic: Topic) => topic[0]) });
+                    await addTopics({ sessionId: gameSessionData?.sessionId, topics: topics.map((topic: Topic) => topic[0]) });
                     // console.log('updatedTopics response:', addTopicResponse);
 
                     // Set questionSessionId in the Game session records
-                    await updateQuestionSessionId({ id: gameSessionData?.sessionId, questionSessionId });
+                    await updateSession(gameSessionData?.sessionId, { questionSessionId } as GameSession);
 
                     // add player to game session
-                    await addPlayer({ id: gameSessionData?.sessionId, playerId: sessionData?.clientId });
+                    await addPlayer({ sessionId: gameSessionData?.sessionId, playerId: sessionData?.clientId });
 
                     // Change game state to TURN_ORDER
                     await updateSession(gameSessionData?.sessionId, {gamePhase: SessionPhase.TURN_ORDER} as GameSession);
@@ -178,7 +175,6 @@ const CreateGame = () => {
                 }
             }
             else {
-                console.error('Error creating question session');
                 console.log(`Error creating question session. Missing any of the following data
                 channelId or sessionId `);
             }

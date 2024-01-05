@@ -2,7 +2,6 @@ import './SpinWheel.css';
 import { useEffect, useState } from 'react';
 import { Container, Flex, Image, Loader } from '@mantine/core';
 import { useNavigate } from 'react-router-dom';
-import { setCurrentTurnPlayerId, updateInitialTurnPosition, updatePlayerListOrder } from '../polybase/SessionHandler';
 import { SessionData } from './SessionData';
 import { SessionPhase } from '../game-domain/SessionPhase';
 import useLocalStorageState from 'use-local-storage-state';
@@ -16,7 +15,7 @@ import CustomButton from '../components/CustomButton';
 import { getSpacesInstance } from '../ably/SpacesSingleton';
 import useGameSession from '../polybase/useGameSession';
 import { GameSession } from '../game-domain/GameSession';
-import { updateSession } from '../mongo/SessionHandler';
+import { updateInitialTurnPosition, updateSession, sortPlayerList } from '../mongo/SessionHandler';
 
 function SpinWheel() {
 
@@ -63,8 +62,9 @@ function SpinWheel() {
             setMessage(selectedSlice?.toString() ?? "");
             // Here you can add your logic to update the turn position and publish the 'turn-selected' event
 
+            if (!selectedSlice || !sessionData?.sessionId || !sessionData?.clientId) return;
             // report to our polybase server our turn position.
-            await updateInitialTurnPosition({ initialTurnPosition: selectedSlice, id: sessionData?.sessionId, clientId: sessionData?.clientId });
+            await updateInitialTurnPosition({ position: selectedSlice, sessionId: sessionData?.sessionId, playerId: sessionData?.clientId });
         }
 
         if (hasSpun) {
@@ -102,9 +102,19 @@ function SpinWheel() {
 
     // setup player list order and current turn player(which is the first player in the list)
     async function updatePlayerAndTurn() {
-        const playerList = (await updatePlayerListOrder({ id: sessionData?.sessionId })).playerList;
-        // set the first player in the list as the current turn player
-        await setCurrentTurnPlayerId({ id: sessionData?.sessionId, playerId: playerList[0] })
+        if (sessionData?.sessionId === undefined) return;
+    
+        try {
+            const playerList = (await sortPlayerList(sessionData.sessionId)).playerList;
+    
+            if (playerList?.length === 0) return;
+    
+            const gameSession = { currentTurnPlayerId: playerList![0] } as GameSession;
+            await updateSession(sessionData.sessionId, gameSession);
+        } catch (error) {
+            console.error(error);
+            // Handle the error appropriately
+        }
     }
 
     const spin = async () => {

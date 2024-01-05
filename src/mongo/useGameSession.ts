@@ -6,6 +6,7 @@ import SessionConnection from './SessionConnection';
 
 function useGameSession(sessionId?: string) {
   const currentSessionRef = useRef<GameSession>();
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [sessionData, setSessionData] = useLocalStorageState<SessionData>('sessionData');
 
   // useEffect(() => {

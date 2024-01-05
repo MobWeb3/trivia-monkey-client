@@ -13,6 +13,7 @@ export interface MutableGameSession {
     playerList?: string[] | undefined;
     gameBoardState?: { [key: string]: number };
     winner?: string;
+    questionSessionId?: string;
 }
 
 // Define the read-only session interface based on the mutable session interface

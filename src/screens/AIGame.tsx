@@ -5,7 +5,6 @@ import { getQuestion } from '../polybase/QuestionsHandler';
 import { Question } from '../game-domain/Question';
 import { addMessageListener, removeMessageListener } from '../utils/MessageListener';
 import { Messages } from '../utils/Messages';
-import { getNextTurnPlayerId, getSession, setWinner } from '../polybase/SessionHandler';
 import { SessionData } from './SessionData';
 import useLocalStorageState from 'use-local-storage-state';
 import { Wheel } from 'react-custom-roulette'
@@ -21,7 +20,7 @@ import useGameSession from '../polybase/useGameSession';
 import { SessionPhase } from '../game-domain/SessionPhase';
 import { useNavigate } from 'react-router-dom';
 import { IGNORANCE_MONKEY_NAME } from '../game-domain/Session';
-import { updateSession } from '../mongo/SessionHandler';
+import { getNextTurnPlayerId, getSession, updateSession } from '../mongo/SessionHandler';
 import { GameSession } from '../game-domain/GameSession';
 
 
@@ -46,8 +45,8 @@ function AIGame() {
 
     const handleShowQuestion = async (topic: string) => {
 
-        if (!sessionData?.questionSessionId) {
-            const { questionSessionId } = await getSession({ id: sessionData?.sessionId })
+        if (!sessionData?.questionSessionId && sessionData?.sessionId) {
+            const { questionSessionId } = await getSession(sessionData?.sessionId)
             setSessionData({ ...sessionData, questionSessionId });
         }
 
@@ -62,8 +61,10 @@ function AIGame() {
 
     const finishTurnAndSaveState = async () => {
         setShowQuestionModal(false);
-        // Update turn on polybase
-        await getNextTurnPlayerId({ id: sessionData?.sessionId });
+        if (!sessionData?.sessionId) return;
+
+        // Update the current player state to the next player
+        await getNextTurnPlayerId(sessionData.sessionId);
     }
 
     useEffect(() => {
@@ -130,7 +131,7 @@ function AIGame() {
                     updateSession(useGameSessionHook?.sessionId, {gamePhase: SessionPhase.GAME_OVER } as GameSession);
 
                     // update winner on polybase
-                    setWinner({ id: useGameSessionHook?.sessionId, winner });
+                    updateSession( useGameSessionHook?.sessionId, { winner } as GameSession);
                 }
             }
             else if (gamePhase === 'GAME_OVER') {

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { getSession } from './SessionHandler';
+import { getSession } from './SessionHandler_backup';
 import useLocalStorageState from 'use-local-storage-state';
 import { SessionData } from '../screens/SessionData';
 import { Polybase } from "@polybase/client"

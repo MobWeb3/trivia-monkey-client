@@ -2,113 +2,98 @@ import axios from 'axios';
 import { BASE_URL } from '../ApiServiceConfig';
 import { GameSession } from '../game-domain/GameSession';
 
-export const getSession = async (sessionId: string) => {
+interface ApiPostParams {
+    url: string;
+    data: any;
+}
+
+async function apiPost({ url, data }: ApiPostParams): Promise<GameSession> {
     try {
-        const response = await axios.post(`${BASE_URL}/api/mongo/getSession`, { sessionId });
-        return response.data.session;
+        const response = await axios.post(`${BASE_URL}${url}`, data);
+        return response.data as GameSession;
     } catch (error) {
         console.error(error);
         throw error;
     }
+}
+
+export const getSession = async (sessionId: string) => {
+    return apiPost({
+        url: '/api/mongo/getSession',
+        data: { sessionId },
+    });
 }
 
 export const createSession = async (gameSession: GameSession) => {
-    try {
-        const response = await axios.post(`${BASE_URL}/api/mongo/createSession`, gameSession);
-        return response.data.session;
-    } catch (error) {
-        console.error(error);
-        throw error;
-    }
+    return await apiPost({
+        url: '/api/mongo/createSession',
+        data: gameSession,
+    });
 }
 
 export const updateSession = async (sessionId: string, updateData: GameSession) => {
-    try {
-        const response = await axios.post(`${BASE_URL}/api/mongo/updateSession`, { sessionId, updateData });
-        return response.data.session;
-    } catch (error) {
-        console.error(error);
-        throw error;
-    }
+    return apiPost({
+        url: '/api/mongo/updateSession',
+        data: { sessionId, updateData },
+    });
 }
 
-
-export const updateInitialTurnPosition = async ({ sessionId, playerId, position }: 
+export const updateInitialTurnPosition = async ({ sessionId, playerId, position }:
     { sessionId: string, playerId: string, position: number }) => {
-    try {
-        const response = await axios.post(`${BASE_URL}/api/mongo/updateInitialTurnPosition`, {
-            sessionId, playerId, position
-        });
-        return response.data.session;
-    } catch (error) {
-        console.error(error);
-        throw error;
-    }
+    return apiPost({
+        url: '/api/mongo/updateInitialTurnPosition',
+        data: { sessionId, playerId, position },
+    });
 }
 
-// export const updateTopics = async (sessionId: string, topics: string[]) => {
-//     try {
-//         const response = await axios.post(`${BASE_URL}/api/mongo/updateTopics`, { sessionId, topics });
-//         return response.data.session;
-//     } catch (error) {
-//         console.error(error);
-//         throw error;
-//     }
-// }
+export const addTopics = async ({ sessionId, topics }:
+    {
+        sessionId: string,
+        topics: string[],
+    }) => {
+    return apiPost({
+        url: '/api/mongo/addTopics',
+        data: { sessionId, topics },
+    });
+}
 
-// export const addPlayer = async (sessionId: string, playerId: string) => {
-//     try {
-//         const response = await axios.post(`${BASE_URL}/api/mongo/addPlayer`, { sessionId, playerId });
-//         return response.data.session;
-//     } catch (error) {
-//         console.error(error);
-//         throw error;
-//     }
-// }
+export const addPlayer = async ({ sessionId, playerId }:
+    {
+        sessionId: string,
+        playerId: string,
+    }
+) => {
+    return apiPost({
+        url: '/api/mongo/addPlayer',
+        data: { sessionId, playerId },
+    });
+}
 
-// export const updatePlayerListOrder = async (sessionId: string, playerListOrder: string[]) => {
-//     try {
-//         const response = await axios.post(`${BASE_URL}/api/mongo/updatePlayerListOrder`, { sessionId, playerListOrder });
-//         return response.data.session;
-//     } catch (error) {
-//         console.error(error);
-//         throw error;
-//     }
-// }
+export const sortPlayerList = async (sessionId: string) => {
+    return apiPost({
+        url: '/api/mongo/sortPlayerList',
+        data: { sessionId },
+    });
+}
 
-// export const setCurrentTurnPlayerId = async (sessionId: string, playerId: string) => {
-//     try {
-//         const response = await axios.post(`${BASE_URL}/api/mongo/setCurrentTurnPlayerId`, { sessionId, playerId });
-//         return response.data.session;
-//     } catch (error) {
-//         console.error(error);
-//         throw error;
-//     }
-// }
+export const getNextTurnPlayerId = async (sessionId: string) => {
+    return apiPost({
+        url: '/api/mongo/getNextTurnPlayerId',
+        data: { sessionId },
+    });
+}
 
-// export const getNextTurnPlayerId = async (sessionId: string) => {
-//     try {
-//         const response = await axios.post(`${BASE_URL}/api/mongo/getNextTurnPlayerId`, { sessionId });
-//         return response.data;
-//     } catch (error) {
-//         console.error(error);
-//         throw error;
-//     }
-// }
+export const addPointToPlayer = async ({sessionId, playerId}:
+     {sessionId: string, playerId: string}) => {
+    return apiPost({
+        url: '/api/mongo/addPointToPlayer',
+        data: { sessionId, playerId },
+    });
+}
 
 // export const updateQuestionSessionId = async (sessionId: string, questionSessionId: string) => {
 //     try {
 //         const response = await axios.post(`${BASE_URL}/api/mongo/updateQuestionSessionId`, { sessionId, questionSessionId });
-//         return response.data.session;
-//     } catch (error) {
-//         console.error(error);
-//         throw error;
-//     }
-// }
-
-// export const addPointToPlayer = async (sessionId: string, playerId: string) => {
-//     try {
-//         const response = await axios.post(`${BASE_URL}/api/mongo/addPointToPlayer`, { sessionId, playerId });
 //         return response.data.session;
 //     } catch (error) {
 //         console.error(error);
