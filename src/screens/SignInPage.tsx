@@ -19,9 +19,6 @@ export const SignInPage = () => {
   const navigate = useNavigate();
 
   const login = async () => {
-
-
-
     const isEvmChain = import.meta.env.VITE_APP_EVM_CHAIN === 'true';
 
     if (isEvmChain) {
@@ -55,9 +52,9 @@ export const SignInPage = () => {
       });
       console.log('createdPlayer: ', createdPlayer);
     }
-      setSessionData({ ...sessionData, clientId: userInfo.email, name: userInfo.name });
-      setAuthSessionData({ ...authSessionData, userInfo});
-      setWeb3auth(web3authInstance); // Deprecated
+    setSessionData({ ...sessionData, clientId: userInfo.email, name: userInfo.name });
+    setAuthSessionData({ ...authSessionData, userInfo});
+    setWeb3auth(web3authInstance); // Deprecated
   }
 
   const handleSignIn = async () => {

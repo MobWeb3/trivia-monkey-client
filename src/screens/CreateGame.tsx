@@ -33,7 +33,6 @@ const CreateGame = () => {
     const urlRef = useRef('');
     const ref = useRef(null); //qr code ref
     const useGameSessionHook = useGameSession();
-    const [createGamePressed, setCreateGamePressed] = useState(false);
 
     const qrCode = useMemo(() => new QRCodeStyling({
         width: 300,
@@ -57,7 +56,7 @@ const CreateGame = () => {
     useEffect(() => {
 
         // This useEffect will run only if create sesion has been clicked
-        if (!createGamePressed) {
+        if (!sessionCreated) {
             // lets clear the sessionData.sessionId. Let's have a clean start
             setSessionData({ ...sessionData, sessionId: undefined, channelId: undefined });
             return;
@@ -79,12 +78,12 @@ const CreateGame = () => {
             navigate('/spinwheel');
         }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    },[createGamePressed, useGameSessionHook?.playerList, useGameSessionHook?.numberPlayers, useGameSessionHook?.gamePhase]);
+    },[sessionCreated, useGameSessionHook?.playerList, useGameSessionHook?.numberPlayers, useGameSessionHook?.gamePhase]);
 
 
 
     useEffect(() => {
-        if (!createGamePressed) return;
+        if (!sessionCreated) return;
 
         const url = `${window.location.origin}/joingame?sessionId=${useGameSessionHook?.sessionId}&channelId=${useGameSessionHook?.channelId}`;
         urlRef.current = url;
@@ -95,7 +94,7 @@ const CreateGame = () => {
         if (ref.current) {
             qrCode.append(ref.current);
         }
-    }, [createGamePressed, qrCode, sessionCreated, useGameSessionHook]);
+    }, [sessionCreated, qrCode, useGameSessionHook]);
 
     const createChannel = async (data: any) => {
         const channelId = await createChannelId(data);
@@ -122,7 +121,6 @@ const CreateGame = () => {
 
     const handleCreateGameButton = async () => {
         setLoading(true);
-        setCreateGamePressed(true);
         console.log("session data: ", sessionData)
         if (nickname !== '' && numberPlayers !== '' && pointsToWin !== '' && sessionData?.clientId) {
             
