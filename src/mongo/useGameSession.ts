@@ -1,13 +1,12 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import useLocalStorageState from 'use-local-storage-state';
 import { SessionData } from '../screens/SessionData';
 import { GameSession } from '../game-domain/GameSession'; // Import the Session type
 import SessionConnection from './SessionConnection';
 
 function useGameSession(sessionId?: string) {
-  const currentSessionRef = useRef<GameSession>();
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [sessionData, setSessionData] = useLocalStorageState<SessionData>('sessionData');
+  const [currentSession, setCurrentSession] = useState<GameSession | null>(null);
+  const [sessionData] = useLocalStorageState<SessionData>('sessionData');
 
   // useEffect(() => {
   //   setSessionData({ ...sessionData, sessionId: "mk-pbid-8f199b67-debc-4210-a327-43505d86a91d" })
@@ -24,7 +23,7 @@ function useGameSession(sessionId?: string) {
       // watch for changes to the session
       SessionConnection.watchSession(sessionData?.sessionId ?? sessionId ?? "", (session: GameSession) => {
         // console.log("session", session);
-        currentSessionRef.current = session;
+        setCurrentSession(session);
       });
       
     };
@@ -36,7 +35,7 @@ function useGameSession(sessionId?: string) {
 
   }, [sessionData, sessionId]); // Dependencies
 
-  return currentSessionRef.current as GameSession;
+  return currentSession as GameSession;
 }
 
 

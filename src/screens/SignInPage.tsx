@@ -4,7 +4,6 @@ import { CustomButton } from '../components/CustomButton';
 import { SignerContext } from '../components/SignerContext';
 import { useNavigate } from 'react-router-dom';
 import monkeyTriviaLogo from '../assets/Screens/signin/monkey-trivia-arched-name-400x200.png';
-import { getConnectedPublicKey } from '../utils/Web3AuthAuthentication';
 import useLocalStorageState from 'use-local-storage-state';
 import { SessionData } from './SessionData';
 import { getWeb3AuthSigner } from '../evm/Login';
@@ -38,8 +37,6 @@ export const SignInPage = () => {
 
   const createPlayerIfNotExists = async (web3authInstance: Web3Auth) => {
     const userInfo = await web3authInstance.getUserInfo();
-    const publicKey = await getConnectedPublicKey(web3auth);
-    console.log(`publick key: ${publicKey?.toString()}`);
 
     const userExist = await userExists(userInfo?.email ?? "");
     if (!userExist) {
@@ -47,8 +44,7 @@ export const SignInPage = () => {
       // create user
       const createdPlayer = await createUser({
         clientId: userInfo.email ?? "",
-        name: userInfo.name ?? "",
-        publicKey: publicKey ?? ""
+        name: userInfo.name ?? ""
       });
       console.log('createdPlayer: ', createdPlayer);
     }

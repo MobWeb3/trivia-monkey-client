@@ -78,14 +78,18 @@ const CreateGame = () => {
             navigate('/spinwheel');
         }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    },[sessionCreated, useGameSessionHook?.playerList, useGameSessionHook?.numberPlayers, useGameSessionHook?.gamePhase]);
+    },[sessionCreated, useGameSessionHook]);
 
 
 
     useEffect(() => {
         if (!sessionCreated) return;
 
-        const url = `${window.location.origin}/joingame?sessionId=${useGameSessionHook?.sessionId}&channelId=${useGameSessionHook?.channelId}`;
+        if (!useGameSessionHook || !useGameSessionHook.channelId || !useGameSessionHook.sessionId) {
+            return;
+        }
+
+        const url = `${window.location.origin}/joingame?sessionId=${useGameSessionHook.sessionId}&channelId=${useGameSessionHook.channelId}`;
         urlRef.current = url;
         qrCode.update({
             data: url,
