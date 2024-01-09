@@ -14,7 +14,7 @@ import AvatarStack from '../components/avatar_stack/AvatarStack';
 import CustomButton from '../components/CustomButton';
 import { getSpacesInstance } from '../ably/SpacesSingleton';
 import { GameSession } from '../game-domain/GameSession';
-import { updateInitialTurnPosition, updateSession, sortPlayerList } from '../mongo/SessionHandler';
+import { updateInitialTurnPosition, updateSession, sortPlayerList, getNextTurnPlayerId } from '../mongo/SessionHandler';
 import useGameSession from '../mongo/useGameSession';
 
 function SpinWheel() {
@@ -97,7 +97,7 @@ function SpinWheel() {
         const { clientId, channelId } = sessionData as SessionData;
         if (clientId && channelId && sessionData?.sessionId) {
             setIsLoading(true);
-            await updatePlayerAndTurn()
+            await sortAndFetchFirstInTurn()
             await updateSession( sessionData?.sessionId, {gamePhase: SessionPhase.GAME_ACTIVE } as GameSession);
             setIsLoading(false);
             navigate('/aigame');
@@ -105,16 +105,12 @@ function SpinWheel() {
     };
 
     // setup player list order and current turn player(which is the first player in the list)
-    async function updatePlayerAndTurn() {
+    async function sortAndFetchFirstInTurn() {
         if (sessionData?.sessionId === undefined) return;
     
         try {
-            const playerList = (await sortPlayerList(sessionData.sessionId)).playerList;
-    
-            if (playerList?.length === 0) return;
-    
-            const gameSession = { currentTurnPlayerId: playerList![0] } as GameSession;
-            await updateSession(sessionData.sessionId, gameSession);
+            await sortPlayerList(sessionData.sessionId);
+            await getNextTurnPlayerId(sessionData.sessionId);
         } catch (error) {
             console.error(error);
             // Handle the error appropriately

@@ -91,10 +91,14 @@ function AIGame() {
 
     useEffect(() => {
         function isPlayerTurn(): boolean {
-            console.log('isPlayerTurn: ', sessionData?.clientId, useGameSessionHook?.currentTurnPlayerId);
-            if (!sessionData?.clientId || !useGameSessionHook?.currentTurnPlayerId)
-                return false;
-            return sessionData.clientId === useGameSessionHook.currentTurnPlayerId;
+            const { clientId } = sessionData || {};
+            const { currentTurnPlayer } = useGameSessionHook || {};
+        
+            console.log('isPlayerTurn: ', clientId, currentTurnPlayer);
+        
+            const email = currentTurnPlayer?.email;
+
+            return email ? clientId === email : false;
         }
 
         if (useGameSessionHook) {
@@ -105,13 +109,13 @@ function AIGame() {
                 setCanSpin(false);
 
                 //message to show
-                const _message = `Waiting for ${useGameSessionHook?.currentTurnPlayerId ?? ""} to finish turn..`;
+                const _message = `Waiting for ${useGameSessionHook?.currentTurnPlayer?.email ?? ""} to finish turn..`;
                 setMessage(_message);
 
                 console.log("message: ", _message);                
             }
         }
-    }, [sessionData?.clientId, useGameSessionHook]);
+    }, [sessionData, useGameSessionHook]);
 
     // Lets detect the winner that reaches the points to win.
     /**

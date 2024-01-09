@@ -1,3 +1,4 @@
+import { PlayerOrderType } from "./Player";
 
 export interface MutableGameSession {
     sessionId: string;
@@ -8,8 +9,8 @@ export interface MutableGameSession {
     currentPhase?: string;
     gamePhase?: string;
     topics?: string[];
-    currentTurnPlayerId?: string;
-    playerList?: string[] | undefined;
+    currentTurnPlayer: PlayerOrderType;
+    playerList?: PlayerOrderType[];
     gameBoardState?: { [key: string]: number };
     winner?: string;
     questionSessionId?: string;
