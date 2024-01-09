@@ -12,12 +12,12 @@ import type { Member } from "../utils/helpers";
 import styles from "./Avatars.module.css";
 import useLocalStorageState from "use-local-storage-state";
 import { SessionData } from "../../screens/SessionData";
-import { GameBoardState } from "../../game-domain/Session";
+import { PlayerOrderType } from "../../game-domain/Session";
 import useGameSession from "../../mongo/useGameSession";
 
-const SelfAvatar = ({ self, gameBoardState, showScoreBadge=false }: 
+const SelfAvatar = ({ self, playerList, showScoreBadge=false }: 
 { self: Member | null;
-  gameBoardState: GameBoardState;
+  playerList: PlayerOrderType[];
   showScoreBadge?:boolean;
 }) => {
   const [hover, setHover] = useState(false);
@@ -26,8 +26,8 @@ const SelfAvatar = ({ self, gameBoardState, showScoreBadge=false }:
   const [sessionData] = useLocalStorageState<SessionData>('sessionData', {});
 
   function getSelfScore() { 
-    if (Object.keys(gameBoardState).length > 0 && sessionData && sessionData.clientId) {
-      const selfScore = gameBoardState[sessionData.clientId];
+    if (playerList.length > 0 && sessionData && sessionData.clientId) {
+      const selfScore = playerList.find(player => player.email === sessionData.clientId)?.points;
       return selfScore !== undefined && selfScore !== null ? selfScore : 0;
     }
     return 0;
@@ -61,12 +61,12 @@ const SelfAvatar = ({ self, gameBoardState, showScoreBadge=false }:
 const OtherAvatars = ({
   users,
   usersCount,
-  gameBoardState,
+  playerList,
   showScoreBadge=false,
 }: {
   users: Member[];
   usersCount: number;
-  gameBoardState: GameBoardState;
+  playerList: PlayerOrderType[];
   showScoreBadge?:boolean;
 }) => {
   const [hoveredClientId, setHoveredClientId] = useState<string | null>(null);
@@ -77,9 +77,9 @@ const OtherAvatars = ({
 
         // get score from gameBoardState for this user
         function getScore() {
-          if (Object.keys(gameBoardState).length > 0 && user.clientId) {
+          if (playerList.length > 0 && user.clientId) {
             // console.log(`gameBoardState-${user.clientId}`, gameBoardState[user.clientId]);
-            const selfScore = gameBoardState[user.clientId];
+            const selfScore = playerList.find(player => player.email === user.clientId)?.points;
             return selfScore !== undefined && selfScore !== null ? selfScore : 0;
           }
           return 0;
@@ -145,15 +145,15 @@ const Avatars = ({
 }) => {
   const totalWidth = calculateTotalWidth({ users: otherUsers });
   // Get the game board state
-  const gameBoardState = useGameSession()?.gameBoardState || {};
+  const playerList = useGameSession()?.playerList || [];
 
   return (
     <div className={styles.container} style={{ width: `${totalWidth}px` }}>
-      <SelfAvatar self={self} gameBoardState= {gameBoardState} showScoreBadge={showScoreBadge}/>
+      <SelfAvatar self={self} playerList= {playerList} showScoreBadge={showScoreBadge}/>
       <OtherAvatars
         usersCount={otherUsers.length}
         users={otherUsers.slice(0, MAX_USERS_BEFORE_LIST).reverse()}
-        gameBoardState= {gameBoardState}
+        playerList= {playerList}
         showScoreBadge={showScoreBadge}
       />
       {/** 💡 Dropdown list of surplus users 💡 */}

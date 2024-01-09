@@ -1,4 +1,4 @@
-import { PlayerOrderType } from "./Player";
+import { PlayerOrderType } from "./Session";
 
 export interface MutableGameSession {
     sessionId: string;
@@ -11,9 +11,9 @@ export interface MutableGameSession {
     topics?: string[];
     currentTurnPlayer: PlayerOrderType;
     playerList?: PlayerOrderType[];
-    gameBoardState?: { [key: string]: number };
-    winner?: string;
+    winner?: PlayerOrderType;
     questionSessionId?: string;
+    ignoranceMonkey?: PlayerOrderType;
 }
 
 // Define the read-only session interface based on the mutable session interface

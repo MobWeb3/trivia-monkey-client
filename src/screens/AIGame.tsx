@@ -18,7 +18,6 @@ import Spaces from '@ably/spaces';
 import { getSpacesInstance } from '../ably/SpacesSingleton';
 import { SessionPhase } from '../game-domain/SessionPhase';
 import { useNavigate } from 'react-router-dom';
-import { IGNORANCE_MONKEY_NAME } from '../game-domain/Session';
 import { getNextTurnPlayerId, getSession, updateSession } from '../mongo/SessionHandler';
 import { GameSession } from '../game-domain/GameSession';
 import useGameSession from '../mongo/useGameSession';
@@ -123,18 +122,16 @@ function AIGame() {
      */
     useEffect(() => {
         if (useGameSessionHook) {
-            const { gamePhase, pointsToWin, gameBoardState } = useGameSessionHook;
-            if (gamePhase === 'GAME_ACTIVE' && pointsToWin && gameBoardState) {
+            const { gamePhase, pointsToWin, playerList } = useGameSessionHook;
+            if (gamePhase === 'GAME_ACTIVE' && pointsToWin && playerList) {
 
 
-                const winner = Object.keys(gameBoardState).find((key) => gameBoardState[key] >= pointsToWin);
+                const winner = playerList.find((player) => player.points >= pointsToWin);
                 if (winner) {
                     setMessage(`${winner} wins!`);
                     setCanSpin(false);
                     // Update game phase to GAME_OVER
                     updateSession(useGameSessionHook?.sessionId, {gamePhase: SessionPhase.GAME_OVER } as GameSession);
-
-                    // update winner on polybase
                     updateSession( useGameSessionHook?.sessionId, { winner } as GameSession);
                 }
             }
@@ -215,7 +212,7 @@ function AIGame() {
 
                 <IgnoranceMonkeyCard 
                     message={'heyooo.... fdssfd fd fsdfdsf sfsdf sdfdsfdsfds\nsdfdsf'}
-                    score={useGameSessionHook?.gameBoardState?.[IGNORANCE_MONKEY_NAME] ?? 0}
+                    score={useGameSessionHook?.ignoranceMonkey?.points ?? 0}
                 />
 
                 {data && data.length > 0 && (
