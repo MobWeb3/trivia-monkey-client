@@ -37,13 +37,13 @@ export const SignInPage = () => {
 
   const createPlayerIfNotExists = async (web3authInstance: Web3Auth) => {
     const userInfo = await web3authInstance.getUserInfo();
-
+    console.log('userInfo: ', userInfo);
     const userExist = await userExists(userInfo?.email ?? "");
     if (!userExist) {
       console.log('user does not exist, creating user');
       // create user
       const createdPlayer = await createUser({
-        clientId: userInfo.email ?? "",
+        email: userInfo.email ?? "",
         name: userInfo.name ?? ""
       });
       console.log('createdPlayer: ', createdPlayer);

@@ -16,12 +16,12 @@ import IgnoranceMonkeyCard from '../components/game/IgnorantMonkeyCard';
 import CustomButton from '../components/CustomButton';
 import Spaces from '@ably/spaces';
 import { getSpacesInstance } from '../ably/SpacesSingleton';
-import useGameSession from '../polybase/useGameSession';
 import { SessionPhase } from '../game-domain/SessionPhase';
 import { useNavigate } from 'react-router-dom';
 import { IGNORANCE_MONKEY_NAME } from '../game-domain/Session';
 import { getNextTurnPlayerId, getSession, updateSession } from '../mongo/SessionHandler';
 import { GameSession } from '../game-domain/GameSession';
+import useGameSession from '../mongo/useGameSession';
 
 
 function AIGame() {

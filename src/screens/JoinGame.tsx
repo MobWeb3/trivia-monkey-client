@@ -18,6 +18,7 @@ import { UserInfo } from '@web3auth/base';
 import { AuthSessionData } from '../game-domain/AuthSessionData';
 import { addPlayer, getSession, addTopics } from '../mongo/SessionHandler';
 import useGameSession from '../mongo/useGameSession';
+import { createUser, userExists } from '../mongo/Player';
 
 const JoinGame = () => {
     const navigate = useNavigate();
@@ -121,6 +122,7 @@ const JoinGame = () => {
     const retryLogin = async () => {
         // initialize web3auth
         const userInfo = await login();
+        await mCreatePlayerIfNotExists(userInfo);
         setSessionData({ ...sessionData, clientId: userInfo?.email});
         setAuthSessionData({ ...authSessionData, userInfo});
         if (sessionData && userInfo) {
@@ -128,6 +130,20 @@ const JoinGame = () => {
             userInfoRef.current = userInfo;
         }
     }
+
+    const mCreatePlayerIfNotExists = async (userInfo: Partial<UserInfo>) => {
+        console.log('userInfo: ', userInfo);
+        const userExist = await userExists(userInfo?.email ?? "");
+        if (!userExist) {
+          console.log('user does not exist, creating user');
+          // create user
+          const createdPlayer = await createUser({
+            email: userInfo.email ?? "",
+            name: userInfo.name ?? ""
+          });
+          console.log('createdPlayer: ', createdPlayer);
+        }
+      }
 
     return (
         <div className='JoinGamePage'>

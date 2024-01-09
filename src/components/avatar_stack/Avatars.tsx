@@ -13,7 +13,7 @@ import styles from "./Avatars.module.css";
 import useLocalStorageState from "use-local-storage-state";
 import { SessionData } from "../../screens/SessionData";
 import { GameBoardState } from "../../game-domain/Session";
-import useGameSession from "../../polybase/useGameSession";
+import useGameSession from "../../mongo/useGameSession";
 
 const SelfAvatar = ({ self, gameBoardState, showScoreBadge=false }: 
 { self: Member | null;

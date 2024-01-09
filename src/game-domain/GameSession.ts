@@ -6,7 +6,6 @@ export interface MutableGameSession {
     pointsToWin: number;
     numberPlayers: number;
     currentPhase?: string;
-    initialTurnPositions?: {[key: string]: number};
     gamePhase?: string;
     topics?: string[];
     currentTurnPlayerId?: string;

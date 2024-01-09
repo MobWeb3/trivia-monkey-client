@@ -13,9 +13,9 @@ import { SpaceProvider, SpacesProvider } from "@ably/spaces/react";
 import AvatarStack from '../components/avatar_stack/AvatarStack';
 import CustomButton from '../components/CustomButton';
 import { getSpacesInstance } from '../ably/SpacesSingleton';
-import useGameSession from '../polybase/useGameSession';
 import { GameSession } from '../game-domain/GameSession';
 import { updateInitialTurnPosition, updateSession, sortPlayerList } from '../mongo/SessionHandler';
+import useGameSession from '../mongo/useGameSession';
 
 function SpinWheel() {
 
@@ -32,19 +32,23 @@ function SpinWheel() {
     const navigate = useNavigate();
     const useGameSessionHook = useGameSession();
 
+    // Check if connected to a session
+    useEffect(() => {
+        if (!sessionData?.sessionId) {
+            setMessage("You are not connected to a session");
+        }
+    }, [sessionData]);
+
     useEffect(() => {
         // console.log('useEffect sessionData', sessionData);
 
         // check if we can start the game
         if (sessionData?.sessionId && useGameSessionHook) {
-            const { initialTurnPositions, numberPlayers } = useGameSessionHook;
+            const { playerList, numberPlayers } = useGameSessionHook;
 
-            if (initialTurnPositions === undefined || numberPlayers === undefined) return;
+            if (playerList === undefined || numberPlayers === undefined) return;
 
-            // console.log('initialTurnPosition', initialTurnPosition);
-            // console.log('numberPlayers', numberPlayers);
-            const initialTurnPositionLength = Object.keys(initialTurnPositions).length;
-            const canStartGame = initialTurnPositionLength >= numberPlayers;
+            const canStartGame = playerList.length >= numberPlayers;
             // console.log('canStartGame', canStartGame);
             if (canStartGame) {
                 // console.log('GAME_ACTIVE!');

@@ -2,10 +2,10 @@ import axios from 'axios';
 import { BASE_URL } from '../ApiServiceConfig';
 import { Player } from '../game-domain/Player';
 
-export const userExists = async (clientId: string) => {
+export const userExists = async (email: string) => {
     try {
-        const response = await axios.post(`${BASE_URL}/api/mongo/userExists`, {
-            id: clientId
+        const response = await axios.post(`${BASE_URL}/api/mongo/userExistsByEmail`, {
+            email
         });
         return response.data as boolean;
     } catch (error) {
@@ -14,7 +14,7 @@ export const userExists = async (clientId: string) => {
     }
 }
 
-export const createUser = async (data: any) => {
+export const createUser = async (data: Player) => {
     try {
         const response = await axios.post(`${BASE_URL}/api/mongo/addUser`, data);
         return response.data as Player;
