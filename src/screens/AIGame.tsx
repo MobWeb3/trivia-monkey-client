@@ -122,13 +122,16 @@ function AIGame() {
      */
     useEffect(() => {
         if (useGameSessionHook) {
-            const { gamePhase, pointsToWin, playerList } = useGameSessionHook;
+            const { gamePhase, pointsToWin, playerList, ignoranceMonkey } = useGameSessionHook;
             if (gamePhase === 'GAME_ACTIVE' && pointsToWin && playerList) {
 
+                // Check if ignoranceMonkey has won
+                const isIgnoranceMonkeyWinner = ignoranceMonkey && ignoranceMonkey?.points >= pointsToWin;
 
-                const winner = playerList.find((player) => player.points >= pointsToWin);
+                const winner = playerList.find((player) => player.points >= pointsToWin) ??
+                 (isIgnoranceMonkeyWinner ? ignoranceMonkey : undefined);
                 if (winner) {
-                    setMessage(`${winner} wins!`);
+                    setMessage(`${winner.email} wins!`);
                     setCanSpin(false);
                     // Update game phase to GAME_OVER
                     updateSession(useGameSessionHook?.sessionId, {gamePhase: SessionPhase.GAME_OVER } as GameSession);

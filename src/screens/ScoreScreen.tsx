@@ -3,7 +3,6 @@ import scoreTreeSrc from '../assets/Screens/scoreTree/final-10level-tree-phone-1
 import avatarImgSrc from '../assets/monkeys_avatars/astronaut-monkey1-200x200.png';
 import ignoranceImgSrc from '../assets/monkeys_avatars/ignorance-buchon-monkey3-200x200.png';
 import { ActionIcon, Container, Grid, SimpleGrid } from '@mantine/core';
-import useGameSession from '../polybase/useGameSession';
 import { IGNORANCE_MONKEY_NAME } from '../game-domain/Session';
 import { IconHome2 } from '@tabler/icons-react';
 import { useNavigate } from 'react-router-dom';
@@ -14,6 +13,7 @@ import { MutableNftGameSession } from '../game-domain/ nfts/NftGameSession';
 import { getWeb3AuthSigner } from '../evm/Login';
 import { getProvider } from '../evm/alchemy/Web3AuthSigner';
 import { crossChainMintNftComplete } from '../evm/user-operation/mint';
+import useGameSession from '../mongo/useGameSession';
 
 type AvatarPosition = {
     top: number;
