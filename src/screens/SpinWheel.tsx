@@ -40,17 +40,22 @@ function SpinWheel() {
     }, [sessionData]);
 
     useEffect(() => {
-        // console.log('useEffect sessionData', sessionData);
+        /*
+            function to check if we can start game. check that each player has a turn position.
+        */
+        function canStartGame() {
+            const { playerList, numberPlayers } = useGameSessionHook || {};
+            if (playerList === undefined || numberPlayers === undefined) return false;
+            return playerList?.length >= numberPlayers && playerList.every((player) => player.turn_position > 0);
+        }
 
         // check if we can start the game
         if (sessionData?.sessionId && useGameSessionHook) {
             const { playerList, numberPlayers } = useGameSessionHook;
 
             if (playerList === undefined || numberPlayers === undefined) return;
-
-            const canStartGame = playerList.length >= numberPlayers;
-            // console.log('canStartGame', canStartGame);
-            if (canStartGame) {
+                        // console.log('canStartGame', canStartGame);
+            if (canStartGame()) {
                 // console.log('GAME_ACTIVE!');
                 setMayStartGame(true);
             }

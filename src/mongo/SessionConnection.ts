@@ -17,9 +17,8 @@ class SessionConnection {
 
   public static async getInstance() {
     if (!SessionConnection.instance) {
-      const MONGO_URL = import.meta.env.VITE_MONGODB_URL ?? '';
       const app = new Realm.App({ id: import.meta.env.VITE_MONGODB_APP_ID });
-      SessionConnection.instance =  await SessionConnection.connectAndCreateInstance(MONGO_URL, "monkey-trivia", app);
+      SessionConnection.instance =  await SessionConnection.connectAndCreateInstance("monkey-trivia", app);
     }
     return SessionConnection.instance;
   }
@@ -63,7 +62,7 @@ class SessionConnection {
   }
 
   // Static method to create an instance
-  static async connectAndCreateInstance(dbUrl: string, dbName: string, app: Realm.App) {
+  static async connectAndCreateInstance(dbName: string, app: Realm.App) {
     // Create an anonymous credential
     const credentials = Realm.Credentials.apiKey(import.meta.env.VITE_MONGODB_API_KEY);
     // Authenticate the user
