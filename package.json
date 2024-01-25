@@ -7,7 +7,7 @@
     "@ably/spaces": "^0.2.0",
     "@alchemy/aa-accounts": "^1.2.0",
     "@alchemy/aa-alchemy": "^1.2.0",
-    "@alchemy/aa-core": "^1.2.0",
+    "@alchemy/aa-core": "^2.3.0",
     "@babel/runtime": "^7.23.8",
     "@mantine/core": "^7.3.0",
     "@mantine/hooks": "^7.0.0",
