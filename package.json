@@ -42,7 +42,7 @@
     "react-share": "^5.0.3",
     "react-timer-hook": "^3.0.7",
     "realm-web": "^2.0.0",
-    "root": "github:alchemyplatform/aa-sdk",
+    "root": "github:alchemyplatform/aa-sdk#a1376c4ad38a62517092ebdd8c87557712c4aecc",
     "use-local-storage-state": "^19.1.0",
     "viem": "^1.19.11",
     "wagmi": "^1.4.10"
