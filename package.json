@@ -31,7 +31,7 @@
     "dayjs": "^1.11.10",
     "framer-motion": "^11.0.3",
     "lodash": "^4.17.21",
-    "magic-sdk": "^21.3.1",
+    "magic-sdk": "^22.0.0",
     "qr-code-styling": "^1.6.0-rc.1",
     "query-string": "^8.1.0",
     "random-words": "^2.0.0",
