@@ -20,18 +20,18 @@
     "@types/react-dom": "^18.2.15",
     "@types/uuid": "^9.0.2",
     "@vitejs/plugin-react-swc": "^3.5.0",
-    "@walletconnect/sign-client": "^2.9.1",
     "@web3auth/base": "^7.0.1",
     "@web3auth/modal": "^7.0.3",
     "@web3auth/solana-provider": "^7.0.4",
     "@web3auth/web3auth-wagmi-connector": "^5.0.1",
-    "@zerodevapp/sdk": "^3.2.11",
     "ably": "^1.2.46",
+    "abort-controller": "^3.0.0",
     "alchemy-sdk": "^3.1.0",
     "dayjs": "^1.11.10",
     "framer-motion": "^11.0.3",
     "lodash": "^4.17.21",
-    "magic-sdk": "^21.3.1",
+    "magic-sdk": "^22.0.0",
+    "node-fetch": "^3.3.2",
     "qr-code-styling": "^1.6.0-rc.1",
     "query-string": "^8.1.0",
     "random-words": "^2.0.0",
@@ -41,8 +41,8 @@
     "react-router-dom": "^6.15.0",
     "react-share": "^5.0.3",
     "react-timer-hook": "^3.0.7",
-    "rollup-plugin-polyfill-node": "^0.12.0",
-    "root": "github:alchemyplatform/aa-sdk",
+    "realm-web": "^2.0.0",
+    "root": "github:alchemyplatform/aa-sdk#a1376c4ad38a62517092ebdd8c87557712c4aecc",
     "use-local-storage-state": "^19.1.0",
     "viem": "^1.19.11",
     "wagmi": "^1.4.10"
@@ -51,10 +51,14 @@
     "@esbuild-plugins/node-globals-polyfill": "^0.2.3",
     "@esbuild-plugins/node-modules-polyfill": "^0.2.2",
     "@rollup/plugin-commonjs": "^25.0.7",
+    "@testing-library/jest-dom": "^6.2.0",
+    "@testing-library/react": "^14.1.2",
+    "@testing-library/user-event": "^14.5.2",
     "@types/lodash": "^4.14.202",
     "empty-module": "^0.0.2",
     "eslint": "^8.53.0",
     "eslint-config-react-app": "^7.0.1",
+    "jsdom": "^23.0.1",
     "postcss": "^8.4.30",
     "postcss-preset-mantine": "^1.12.3",
     "postcss-simple-vars": "^7.0.1",
@@ -65,6 +69,7 @@
     "vite": "^5.0.12",
     "vite-plugin-babel": "^1.2.0",
     "vite-plugin-checker": "^0.6.2",
+    "vitest": "^1.1.1",
     "vite-plugin-pwa": "^0.17.4",
     "vite-plugin-svgr": "^4.2.0",
     "vite-tsconfig-paths": "^4.2.1"
@@ -74,7 +79,8 @@
     "build": "tsc && vite build",
     "serve": "vite preview",
     "start-dev-service": "vite --mode dev-service",
-    "start-prod-service": "vite --mode prod-service"
+    "start-prod-service": "vite --mode prod-service",
+    "test": "vitest run"
   },
   "eslintConfig": {
     "extends": [
@@ -93,5 +99,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  }
+  },
+  "engines": {
+    "node": "18.16"
+  } 
 }

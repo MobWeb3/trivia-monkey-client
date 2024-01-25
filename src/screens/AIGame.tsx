@@ -5,7 +5,6 @@ import { getQuestion } from '../polybase/QuestionsHandler';
 import { Question } from '../game-domain/Question';
 import { addMessageListener, removeMessageListener } from '../utils/MessageListener';
 import { Messages } from '../utils/Messages';
-import { getNextTurnPlayerId, getSession, setWinner, updateSessionPhase } from '../polybase/SessionHandler';
 import { SessionData } from './SessionData';
 import useLocalStorageState from 'use-local-storage-state';
 import { Wheel } from 'react-custom-roulette'
@@ -17,10 +16,11 @@ import IgnoranceMonkeyCard from '../components/game/IgnorantMonkeyCard';
 import CustomButton from '../components/CustomButton';
 import Spaces from '@ably/spaces';
 import { getSpacesInstance } from '../ably/SpacesSingleton';
-import useGameSession from '../polybase/useGameSession';
 import { SessionPhase } from '../game-domain/SessionPhase';
 import { useNavigate } from 'react-router-dom';
-import { IGNORANCE_MONKEY_NAME } from '../game-domain/Session';
+import { getNextTurnPlayerId, getSession, updateSession } from '../mongo/SessionHandler';
+import { GameSession } from '../game-domain/GameSession';
+import useGameSession from '../mongo/useGameSession';
 
 
 function AIGame() {
@@ -44,8 +44,8 @@ function AIGame() {
 
     const handleShowQuestion = async (topic: string) => {
 
-        if (!sessionData?.questionSessionId) {
-            const { questionSessionId } = await getSession({ id: sessionData?.sessionId })
+        if (!sessionData?.questionSessionId && sessionData?.sessionId) {
+            const { questionSessionId } = await getSession(sessionData?.sessionId)
             setSessionData({ ...sessionData, questionSessionId });
         }
 
@@ -60,8 +60,10 @@ function AIGame() {
 
     const finishTurnAndSaveState = async () => {
         setShowQuestionModal(false);
-        // Update turn on polybase
-        await getNextTurnPlayerId({ id: sessionData?.sessionId });
+        if (!sessionData?.sessionId) return;
+
+        // Update the current player state to the next player
+        await getNextTurnPlayerId(sessionData.sessionId);
     }
 
     useEffect(() => {
@@ -88,10 +90,14 @@ function AIGame() {
 
     useEffect(() => {
         function isPlayerTurn(): boolean {
-            console.log('isPlayerTurn: ', sessionData?.clientId, useGameSessionHook?.currentTurnPlayerId);
-            if (!sessionData?.clientId || !useGameSessionHook?.currentTurnPlayerId)
-                return false;
-            return sessionData.clientId === useGameSessionHook.currentTurnPlayerId;
+            const { clientId } = sessionData || {};
+            const { currentTurnPlayer } = useGameSessionHook || {};
+        
+            console.log('isPlayerTurn: ', clientId, currentTurnPlayer);
+        
+            const email = currentTurnPlayer?.email;
+
+            return email ? clientId === email : false;
         }
 
         if (useGameSessionHook) {
@@ -102,13 +108,13 @@ function AIGame() {
                 setCanSpin(false);
 
                 //message to show
-                const _message = `Waiting for ${useGameSessionHook?.currentTurnPlayerId ?? ""} to finish turn..`;
+                const _message = `Waiting for ${useGameSessionHook?.currentTurnPlayer?.email ?? ""} to finish turn..`;
                 setMessage(_message);
 
                 console.log("message: ", _message);                
             }
         }
-    }, [sessionData?.clientId, useGameSessionHook]);
+    }, [sessionData, useGameSessionHook]);
 
     // Lets detect the winner that reaches the points to win.
     /**
@@ -116,19 +122,20 @@ function AIGame() {
      */
     useEffect(() => {
         if (useGameSessionHook) {
-            const { gamePhase, pointsToWinTheGame, gameBoardState } = useGameSessionHook;
-            if (gamePhase === 'GAME_ACTIVE' && pointsToWinTheGame && gameBoardState) {
+            const { gamePhase, pointsToWin, playerList, ignoranceMonkey } = useGameSessionHook;
+            if (gamePhase === 'GAME_ACTIVE' && pointsToWin && playerList) {
 
+                // Check if ignoranceMonkey has won
+                const isIgnoranceMonkeyWinner = ignoranceMonkey && ignoranceMonkey?.points >= pointsToWin;
 
-                const winner = Object.keys(gameBoardState).find((key) => gameBoardState[key] >= pointsToWinTheGame);
+                const winner = playerList.find((player) => player.points >= pointsToWin) ??
+                 (isIgnoranceMonkeyWinner ? ignoranceMonkey : undefined);
                 if (winner) {
-                    setMessage(`${winner} wins!`);
+                    setMessage(`${winner.email} wins!`);
                     setCanSpin(false);
                     // Update game phase to GAME_OVER
-                    updateSessionPhase({ id: useGameSessionHook?.id, newPhase: SessionPhase.GAME_OVER });
-
-                    // update winner on polybase
-                    setWinner({ id: useGameSessionHook?.id, winner });
+                    updateSession(useGameSessionHook?.sessionId, {gamePhase: SessionPhase.GAME_OVER } as GameSession);
+                    updateSession( useGameSessionHook?.sessionId, { winner } as GameSession);
                 }
             }
             else if (gamePhase === 'GAME_OVER') {
@@ -208,7 +215,7 @@ function AIGame() {
 
                 <IgnoranceMonkeyCard 
                     message={'heyooo.... fdssfd fd fsdfdsf sfsdf sdfdsfdsfds\nsdfdsf'}
-                    score={useGameSessionHook?.gameBoardState?.[IGNORANCE_MONKEY_NAME] ?? 0}
+                    score={useGameSessionHook?.ignoranceMonkey?.points ?? 0}
                 />
 
                 {data && data.length > 0 && (

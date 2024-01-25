@@ -2,7 +2,6 @@ import './SpinWheel.css';
 import { useEffect, useState } from 'react';
 import { Container, Flex, Image, Loader } from '@mantine/core';
 import { useNavigate } from 'react-router-dom';
-import { setCurrentTurnPlayerId, updateInitialTurnPosition, updatePlayerListOrder, updateSessionPhase } from '../polybase/SessionHandler';
 import { SessionData } from './SessionData';
 import { SessionPhase } from '../game-domain/SessionPhase';
 import useLocalStorageState from 'use-local-storage-state';
@@ -14,7 +13,9 @@ import { SpaceProvider, SpacesProvider } from "@ably/spaces/react";
 import AvatarStack from '../components/avatar_stack/AvatarStack';
 import CustomButton from '../components/CustomButton';
 import { getSpacesInstance } from '../ably/SpacesSingleton';
-import useGameSession from '../polybase/useGameSession';
+import { GameSession } from '../game-domain/GameSession';
+import { updateInitialTurnPosition, updateSession, sortPlayerList, getNextTurnPlayerId } from '../mongo/SessionHandler';
+import useGameSession from '../mongo/useGameSession';
 
 function SpinWheel() {
 
@@ -31,21 +32,30 @@ function SpinWheel() {
     const navigate = useNavigate();
     const useGameSessionHook = useGameSession();
 
+    // Check if connected to a session
     useEffect(() => {
-        // console.log('useEffect sessionData', sessionData);
+        if (!sessionData?.sessionId) {
+            setMessage("You are not connected to a session");
+        }
+    }, [sessionData]);
+
+    useEffect(() => {
+        /*
+            function to check if we can start game. check that each player has a turn position.
+        */
+        function canStartGame() {
+            const { playerList, numberPlayers } = useGameSessionHook || {};
+            if (playerList === undefined || numberPlayers === undefined) return false;
+            return playerList?.length >= numberPlayers && playerList.every((player) => player.turn_position > 0);
+        }
 
         // check if we can start the game
-        if (sessionData?.sessionId) {
-            const { initialTurnPosition, numberPlayers } = useGameSessionHook;
+        if (sessionData?.sessionId && useGameSessionHook) {
+            const { playerList, numberPlayers } = useGameSessionHook;
 
-            if (initialTurnPosition === undefined || numberPlayers === undefined) return;
-
-            // console.log('initialTurnPosition', initialTurnPosition);
-            // console.log('numberPlayers', numberPlayers);
-            const initialTurnPositionLength = Object.keys(initialTurnPosition).length;
-            const canStartGame = initialTurnPositionLength >= numberPlayers;
-            // console.log('canStartGame', canStartGame);
-            if (canStartGame) {
+            if (playerList === undefined || numberPlayers === undefined) return;
+                        // console.log('canStartGame', canStartGame);
+            if (canStartGame()) {
                 // console.log('GAME_ACTIVE!');
                 setMayStartGame(true);
             }
@@ -61,8 +71,9 @@ function SpinWheel() {
             setMessage(selectedSlice?.toString() ?? "");
             // Here you can add your logic to update the turn position and publish the 'turn-selected' event
 
+            if (!selectedSlice || !sessionData?.sessionId || !sessionData?.clientId) return;
             // report to our polybase server our turn position.
-            await updateInitialTurnPosition({ initialTurnPosition: selectedSlice, id: sessionData?.sessionId, clientId: sessionData?.clientId });
+            await updateInitialTurnPosition({ position: selectedSlice, sessionId: sessionData?.sessionId, playerId: sessionData?.clientId });
         }
 
         if (hasSpun) {
@@ -74,7 +85,7 @@ function SpinWheel() {
     useEffect(() => {
 
         // automatically take to AI game if game phase is GAME_ACTIVE
-        if (sessionData?.sessionId) {
+        if (sessionData?.sessionId && useGameSessionHook) {
             const { gamePhase } = useGameSessionHook;
 
             if (gamePhase === SessionPhase.GAME_ACTIVE) {
@@ -89,22 +100,26 @@ function SpinWheel() {
         // console.log('handleStartGame SpinWheel sesionData: ', sessionData);
         if (sessionData === null) return;
         const { clientId, channelId } = sessionData as SessionData;
-        if (clientId && channelId) {
+        if (clientId && channelId && sessionData?.sessionId) {
             setIsLoading(true);
-            await updatePlayerAndTurn()
-
-            // Upldate polybase session phase to GAME_ACTIVE
-            await updateSessionPhase({ id: sessionData?.sessionId, newPhase: SessionPhase.GAME_ACTIVE });
+            await sortAndFetchFirstInTurn()
+            await updateSession( sessionData?.sessionId, {gamePhase: SessionPhase.GAME_ACTIVE } as GameSession);
             setIsLoading(false);
             navigate('/aigame');
         }
     };
 
     // setup player list order and current turn player(which is the first player in the list)
-    async function updatePlayerAndTurn() {
-        const playerList = (await updatePlayerListOrder({ id: sessionData?.sessionId })).playerList;
-        // set the first player in the list as the current turn player
-        await setCurrentTurnPlayerId({ id: sessionData?.sessionId, playerId: playerList[0] })
+    async function sortAndFetchFirstInTurn() {
+        if (sessionData?.sessionId === undefined) return;
+    
+        try {
+            await sortPlayerList(sessionData.sessionId);
+            await getNextTurnPlayerId(sessionData.sessionId);
+        } catch (error) {
+            console.error(error);
+            // Handle the error appropriately
+        }
     }
 
     const spin = async () => {
@@ -189,7 +204,7 @@ function SpinWheel() {
                 }}>
                     {isLoading ? <Loader /> :
                         // check if we can start the game annd if we are the host to display the start game button
-                        (mayStartGame && useGameSessionHook.hostPlayerId === sessionData?.clientId ) ? (
+                        (mayStartGame && useGameSessionHook?.hostPlayerId === sessionData?.clientId ) ? (
                             <CustomButton
                                 fontSize='1.5rem'
                                 onClick={handleStartGame}

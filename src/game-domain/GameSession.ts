@@ -1,18 +1,20 @@
-import { Types } from 'ably';
+import { PlayerOrderType } from "./Session";
 
-export interface GameSession {
-    readonly id?: string;
-    readonly channelId?: string;
-    readonly currentPhase?: string;
-    readonly channel?: Types.RealtimeChannelPromise;
-    readonly initialTurnPosition?: any;
-    readonly numberPlayers?: number;
-    readonly gamePhase?: string;
-    readonly topics?: readonly [];
-    readonly currentTurnPlayerId?: string;
-    readonly hostPlayerId?: string;
-    readonly playerList?: readonly [];
-    readonly pointsToWinTheGame?: number;
-    readonly gameBoardState?: Readonly<{ [key: string]: number }>;
-    readonly winner?: string;
+export interface MutableGameSession {
+    sessionId: string;
+    channelId: string;
+    hostPlayerId: string;
+    pointsToWin: number;
+    numberPlayers: number;
+    currentPhase?: string;
+    gamePhase?: string;
+    topics?: string[];
+    currentTurnPlayer: PlayerOrderType;
+    playerList?: PlayerOrderType[];
+    winner?: PlayerOrderType;
+    questionSessionId?: string;
+    ignoranceMonkey?: PlayerOrderType;
 }
+
+// Define the read-only session interface based on the mutable session interface
+export type GameSession = Readonly<MutableGameSession>;

@@ -3,7 +3,6 @@ import scoreTreeSrc from '../assets/Screens/scoreTree/final-10level-tree-phone-1
 import avatarImgSrc from '../assets/monkeys_avatars/astronaut-monkey1-200x200.png';
 import ignoranceImgSrc from '../assets/monkeys_avatars/ignorance-buchon-monkey3-200x200.png';
 import { ActionIcon, Container, Grid, SimpleGrid } from '@mantine/core';
-import useGameSession from '../polybase/useGameSession';
 import { IGNORANCE_MONKEY_NAME } from '../game-domain/Session';
 import { IconHome2 } from '@tabler/icons-react';
 import { useNavigate } from 'react-router-dom';
@@ -14,6 +13,7 @@ import { MutableNftGameSession } from '../game-domain/ nfts/NftGameSession';
 import { getWeb3AuthSigner } from '../evm/Login';
 import { getProvider } from '../evm/alchemy/Web3AuthSigner';
 import { crossChainMintNftComplete } from '../evm/user-operation/mint';
+import useGameSession from '../mongo/useGameSession';
 
 type AvatarPosition = {
     top: number;
@@ -35,9 +35,9 @@ const ScoreScreen = () => {
 
     const calculatePositions = () => {
         let result: AvatarPositionData[] = [];
-        if (!useGameSessionHook || !useGameSessionHook.gameBoardState) return [];
+        if (!useGameSessionHook || !useGameSessionHook.playerList) return [];
 
-        const { gameBoardState } = useGameSessionHook;
+        const { playerList } = useGameSessionHook;
         // gameBoardState[0] = 10;
         // gameBoardState[11] = 9;
         // gameBoardState[1] = 8;
@@ -49,7 +49,7 @@ const ScoreScreen = () => {
         // gameBoardState[7] = 2;
         // gameBoardState[8] = 1;
 
-        Object.keys(gameBoardState).forEach((key) => {
+        playerList.forEach((player) => {
             // console.log('key: ', key);
             // console.log('value: ', gameBoardState[key]);
 
@@ -67,10 +67,10 @@ const ScoreScreen = () => {
                 0: { top: 82, left: 48 }
             };
 
-            if (positions.hasOwnProperty(gameBoardState[key])) {
+            if (positions.hasOwnProperty(player.points)) {
                 // result.push(positions[gameBoardState[key]]);
                 result.push(
-                    { position: positions[gameBoardState[key]], src: avatarImgSrc, id: key, level: gameBoardState[key] }
+                    { position: positions[player.points], src: avatarImgSrc, id: player.email, level: player.points }
                 );
             }
         });
@@ -94,13 +94,13 @@ const ScoreScreen = () => {
     const generateCompleteNftData = () => {
         // const session = useGameSessionHook;
 
-        const gameBoardState = useGameSessionHook.gameBoardState;
+        const playerList = useGameSessionHook?.playerList;
 
-        if (gameBoardState === undefined || !sessionData?.clientId) {
+        if (playerList === undefined || !sessionData?.clientId) {
             return null;
         }
 
-        const place = getOrdinalSuffix(gameBoardState[sessionData?.clientId] ?? 1);
+        const place = getOrdinalSuffix(playerList.find(player => player.email === sessionData.clientId)?.points ?? 1);
 
         const nftData = {
             name: `Monkey Trivia ${place} place`,
@@ -117,7 +117,7 @@ const ScoreScreen = () => {
                 },
                 {
                     trait_type: 'sessionId',
-                    value: useGameSessionHook.id
+                    value: useGameSessionHook?.sessionId
                 }
             ]
         } as MutableNftGameSession;
@@ -136,7 +136,7 @@ const ScoreScreen = () => {
             <Grid m={'xs'}>
                 <Grid.Col span={10}>
                     <Container fluid bg="#FDD673" className='messageBox'>
-                        {`${useGameSessionHook.winner} WINS!`}
+                        {`${useGameSessionHook?.winner?.email} WINS!`}
                     </Container>
                 </Grid.Col>
                 <Grid.Col span={2} >

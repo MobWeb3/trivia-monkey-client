@@ -24,7 +24,7 @@ export const generateAllQuestions = async (topics: Topic[], questionSessionId: s
             axios.post(getUrl, customTopics).then((response) => {
                 console.log("RESPONSE: ", response);
                 const result = response.data;
-                addQuestions(questionSessionId, result); // TODO: should be done on the server
+                addQuestions(questionSessionId, result);
                 console.log("added questions: ", { result });
             });
 

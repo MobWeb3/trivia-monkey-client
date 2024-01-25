@@ -4,12 +4,12 @@ import './QuestionModal.css';
 import { IconSquareLetterA, IconSquareLetterB, IconSquareLetterC, IconSquareLetterD } from '@tabler/icons-react';
 import { useTimer } from 'react-timer-hook';
 import { Question } from '../game-domain/Question';
-import { addPointToPlayer } from '../polybase/SessionHandler';
 import { sendMessage } from '../utils/MessageListener';
 import { Messages } from '../utils/Messages';
 import { SessionData } from '../screens/SessionData';
 import useLocalStorageState from 'use-local-storage-state'
 import { IGNORANCE_MONKEY_NAME } from '../game-domain/Session';
+import { addPointToPlayer } from '../mongo/SessionHandler';
 
 const placeholderQuestionText = "What is the capital of the United States of America?"
 const placeholderOptionA = "Lorem Ipsum long anser that is very long, and more text";
@@ -81,14 +81,18 @@ const QuestionModal: React.FC<QuestionModalProps> = ({ open, onClose, question, 
         setShowCorrectAnswer(true);
         setShowContinueButton(true);
 
+        if (sessionData?.clientId === undefined || sessionData?.sessionId === undefined) {
+            return;
+        }
+
         if (isValid) {
             // Add point to player
             console.log('adding point to player', sessionData?.clientId);
-            addPointToPlayer({ playerId: sessionData?.clientId, id: sessionData?.sessionId });
+            addPointToPlayer({ playerId: sessionData?.clientId, sessionId: sessionData?.sessionId });
         } else {
             // add point to ignorant monkey
             console.log('adding point to ignorant monkey');
-            addPointToPlayer({ playerId: IGNORANCE_MONKEY_NAME, id: sessionData?.sessionId });
+            addPointToPlayer({ playerId: IGNORANCE_MONKEY_NAME, sessionId: sessionData?.sessionId });
         }
 
     }

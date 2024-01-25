@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { getSession } from './SessionHandler';
+import { getSession } from './SessionHandler_backup';
 import useLocalStorageState from 'use-local-storage-state';
 import { SessionData } from '../screens/SessionData';
 import { Polybase } from "@polybase/client"
@@ -11,7 +11,7 @@ const COLLECTION_NAME = "GameSession";
 const db = new Polybase({ defaultNamespace: POLYBASE_NAMESPACE });
 
 function useGameSession() {
-  const [session, setSession] = useState<GameSession>({});
+  const [session, setSession] = useState<GameSession>();
   const [sessionData] = useLocalStorageState<SessionData>('sessionData');
   
   const hasChanged = (before: any, after: any) => {

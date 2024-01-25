@@ -4,7 +4,6 @@ import queryString from 'query-string';
 import { Container, Flex, Modal } from '@mantine/core';
 import { PickTopicComponent } from '../components/topics/PickTopicComponent';
 import { useDisclosure } from '@mantine/hooks';
-import { addPlayer, getSession, updateTopics } from '../polybase/SessionHandler';
 import { generateAllQuestions } from '../game-domain/GenerateQuestionsHandler';
 import { SessionPhase } from '../game-domain/SessionPhase';
 import { login } from '../utils/Web3AuthAuthentication';
@@ -15,9 +14,11 @@ import './JoinGame.css';
 import CustomButton from '../components/CustomButton';
 import SelectedTopicEntries from '../components/topics/SelectedTopicEntries';
 import { TopicContext } from '../components/topics/TopicContext';
-import useGameSession from '../polybase/useGameSession';
 import { UserInfo } from '@web3auth/base';
 import { AuthSessionData } from '../game-domain/AuthSessionData';
+import { addPlayer, getSession, addTopics } from '../mongo/SessionHandler';
+import useGameSession from '../mongo/useGameSession';
+import { createUser, userExists } from '../mongo/Player';
 
 const JoinGame = () => {
     const navigate = useNavigate();
@@ -25,7 +26,7 @@ const JoinGame = () => {
     const [authSessionData, setAuthSessionData] = useLocalStorageState<AuthSessionData>('authSessionData', {});
     const location = useLocation();
     const [opened, { open, close }] = useDisclosure(false);
-    const [numberPlayers, setNumberPlayers] = useState<string>('');
+    const [numberPlayers, setNumberPlayers] = useState<number>(0);
     const [joined, setJoined] = useState(false);
     const { topics } = useContext(TopicContext);
     const useGameSessionHook = useGameSession();
@@ -35,7 +36,7 @@ const JoinGame = () => {
 
         // If all players have joined, navigate to SpinWheel and joined the game
         // automatically navigate to SpinWheel
-        if (sessionData?.sessionId && sessionData?.channelId) {
+        if (sessionData?.sessionId && sessionData?.channelId && useGameSessionHook) {
             const { playerList, numberPlayers, gamePhase } = useGameSessionHook;
 
             if (playerList === undefined || numberPlayers === undefined || gamePhase === undefined) return;
@@ -52,21 +53,20 @@ const JoinGame = () => {
 
     useEffect(() => {
         const parsed = queryString.parse(location.search);
-        const { sessionId, channelId } = parsed;
+        const channelId = parsed.channelId as string;
+        const sessionId = parsed.sessionId as string;
 
-        // console.log('JoinGame loaded: ', sessionId, channelId);
-        // console.log("topics: ", topics)
         if (sessionId && channelId) {
-            getSession({ id: sessionId }).then((_sessionData) => {
-                setNumberPlayers(_sessionData.numberPlayers);
+            getSession(sessionId).then((gameSession) => {
+                setNumberPlayers(gameSession.numberPlayers);
                 setSessionData({
                     ...sessionData,
-                    sessionId: sessionId as string,
-                    channelId: channelId as string,
-                    questionSessionId: _sessionData.questionSessionId
+                    sessionId: sessionId,
+                    channelId: channelId,
+                    questionSessionId: gameSession.questionSessionId
                 });
             });
-            console.log('JoinGame sessionData state ', sessionData);
+            // console.log('JoinGame sessionData state ', sessionData);
             // handleJoinGame({ channelId });
         }
     });
@@ -74,18 +74,18 @@ const JoinGame = () => {
     const handleJoinButtonClick = async () => {
         await retryLogin();
         await joinIfAlreadyActiveGame();
-        if (sessionData?.channelId !== '') {
+        if (sessionData?.channelId !== '' && sessionData?.sessionId) {
 
             // Generate questions
             generateAllQuestions(topics, sessionData?.questionSessionId as string, true);
 
             // Update topics to Game session
-            await updateTopics({ id: sessionData?.sessionId, topics: topics.map((topic) => topic[0]) })
+            await addTopics({ sessionId: sessionData?.sessionId, topics: topics.map((topic) => topic[0]) })
 
-            console.log('JoinGame handleJoinGame: ', sessionData);
+            // console.log('JoinGame handleJoinGame: ', sessionData);
 
             // add player to game session
-            await addPlayer({ id: sessionData?.sessionId, playerId: userInfoRef.current?.email as string })
+            await addPlayer({ sessionId: sessionData?.sessionId, playerId: userInfoRef.current?.email as string })
 
             setJoined(true);
 
@@ -95,7 +95,7 @@ const JoinGame = () => {
     const joinIfAlreadyActiveGame = async () => {
         if (sessionData?.sessionId && sessionData?.channelId) {
             try {
-                const { questionSessionId, gamePhase } = await getSession({ id: sessionData?.sessionId });
+                const { questionSessionId, gamePhase } = await getSession(sessionData?.sessionId);
 
                 if (gamePhase === SessionPhase.GAME_ACTIVE) {
                     setSessionData({
@@ -122,6 +122,7 @@ const JoinGame = () => {
     const retryLogin = async () => {
         // initialize web3auth
         const userInfo = await login();
+        await mCreatePlayerIfNotExists(userInfo);
         setSessionData({ ...sessionData, clientId: userInfo?.email});
         setAuthSessionData({ ...authSessionData, userInfo});
         if (sessionData && userInfo) {
@@ -129,6 +130,20 @@ const JoinGame = () => {
             userInfoRef.current = userInfo;
         }
     }
+
+    const mCreatePlayerIfNotExists = async (userInfo: Partial<UserInfo>) => {
+        console.log('userInfo: ', userInfo);
+        const userExist = await userExists(userInfo?.email ?? "");
+        if (!userExist) {
+          console.log('user does not exist, creating user');
+          // create user
+          const createdPlayer = await createUser({
+            email: userInfo.email ?? "",
+            name: userInfo.name ?? ""
+          });
+          console.log('createdPlayer: ', createdPlayer);
+        }
+      }
 
     return (
         <div className='JoinGamePage'>
@@ -186,7 +201,7 @@ const JoinGame = () => {
                             }}
                         >
                             <PickTopicComponent
-                                numberOfPlayers={parseInt(numberPlayers)}
+                                numberOfPlayers={numberPlayers}
                                 closeModal={close}
                                 style={
                                     {

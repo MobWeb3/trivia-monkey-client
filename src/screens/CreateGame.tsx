@@ -1,12 +1,11 @@
 import { useContext, useEffect, useMemo, useRef, useState } from 'react';
-import { createChannelListenerWrapper } from '../ably/ChannelListener';
+import { createChannelId } from '../ably/ChannelListener';
 import { useNavigate } from 'react-router-dom';
 import { Flex, Loader } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import QRCodeStyling from "qr-code-styling";
 import { createQuestionSession } from '../polybase/QuestionsHandler';
 import { generateAllQuestions } from '../game-domain/GenerateQuestionsHandler';
-import { addPlayer, updateQuestionSessionId, updateSessionPhase, updateTopics } from '../polybase/SessionHandler';
 import { SessionData } from './SessionData';
 import useLocalStorageState from 'use-local-storage-state';
 import CreateGameForm from '../components/CreateGameFields';
@@ -15,9 +14,11 @@ import DisplayTitle from '../components/DisplayTitle';
 import ShareModal from '../components/share/ShareModal';
 import CustomButton from '../components/CustomButton';
 import { Topic, TopicContext } from '../components/topics/TopicContext';
-import useGameSession from '../polybase/useGameSession';
 import { SessionPhase } from '../game-domain/SessionPhase';
 import imageSource from '../assets/monkeys_avatars/astronaut-monkey1-200x200.png';
+import useGameSession from '../mongo/useGameSession';
+import { addPlayer, createSession, updateSession, addTopics } from '../mongo/SessionHandler';
+import { GameSession } from '../game-domain/GameSession';
 
 const CreateGame = () => {
     const [nickname, setNickname] = useState('');
@@ -32,7 +33,6 @@ const CreateGame = () => {
     const urlRef = useRef('');
     const ref = useRef(null); //qr code ref
     const useGameSessionHook = useGameSession();
-    const [createGamePressed, setCreateGamePressed] = useState(false);
 
     const qrCode = useMemo(() => new QRCodeStyling({
         width: 300,
@@ -56,7 +56,7 @@ const CreateGame = () => {
     useEffect(() => {
 
         // This useEffect will run only if create sesion has been clicked
-        if (!createGamePressed) {
+        if (!sessionCreated) {
             // lets clear the sessionData.sessionId. Let's have a clean start
             setSessionData({ ...sessionData, sessionId: undefined, channelId: undefined });
             return;
@@ -78,14 +78,18 @@ const CreateGame = () => {
             navigate('/spinwheel');
         }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    },[createGamePressed, useGameSessionHook?.playerList, useGameSessionHook?.numberPlayers, useGameSessionHook?.gamePhase]);
+    },[sessionCreated, useGameSessionHook]);
 
 
 
     useEffect(() => {
-        if (!createGamePressed) return;
+        if (!sessionCreated) return;
 
-        const url = `${window.location.origin}/joingame?sessionId=${useGameSessionHook?.id}&channelId=${useGameSessionHook?.channelId}`;
+        if (!useGameSessionHook || !useGameSessionHook.channelId || !useGameSessionHook.sessionId) {
+            return;
+        }
+
+        const url = `${window.location.origin}/joingame?sessionId=${useGameSessionHook.sessionId}&channelId=${useGameSessionHook.channelId}`;
         urlRef.current = url;
         qrCode.update({
             data: url,
@@ -94,17 +98,33 @@ const CreateGame = () => {
         if (ref.current) {
             qrCode.append(ref.current);
         }
-    }, [createGamePressed, qrCode, sessionCreated, useGameSessionHook?.id, useGameSessionHook?.channelId]);
+    }, [sessionCreated, qrCode, useGameSessionHook]);
 
     const createChannel = async (data: any) => {
-        const { sessionId, channelId } = await createChannelListenerWrapper(data);
-        setSessionData({ ...sessionId, sessionId, channelId });
-        return { sessionId, channelId };
+        const channelId = await createChannelId(data);
+        if (channelId && data.clientId && data.numberPlayers && data.pointsToWin) {
+            // Create polybase game session
+            const response = await createSession({
+                hostPlayerId: data.clientId,
+                numberPlayers: data.numberPlayers,
+                pointsToWin: data.pointsToWin,
+                channelId,
+            } as GameSession);
+    
+            if (response) {
+                const pbSessionId = response?.sessionId;
+    
+                return {sessionId: pbSessionId, channelId};
+            }
+        }
+        else {
+            console.error(`missing any of channelId, clientId, numberPlayers,
+             pointsToWin. See current data: `, data);
+        }
     };
 
     const handleCreateGameButton = async () => {
         setLoading(true);
-        setCreateGamePressed(true);
         console.log("session data: ", sessionData)
         if (nickname !== '' && numberPlayers !== '' && pointsToWin !== '' && sessionData?.clientId) {
             
@@ -128,17 +148,17 @@ const CreateGame = () => {
                     // Deploy generation of AI questions
                     generateAllQuestions(topics, questionSessionId, true);
                     // Update topics to Game session
-                    await updateTopics({ id: gameSessionData?.sessionId, topics: topics.map((topic: Topic) => topic[0]) });
+                    await addTopics({ sessionId: gameSessionData?.sessionId, topics: topics.map((topic: Topic) => topic[0]) });
                     // console.log('updatedTopics response:', addTopicResponse);
 
                     // Set questionSessionId in the Game session records
-                    await updateQuestionSessionId({ id: gameSessionData?.sessionId, questionSessionId });
+                    await updateSession(gameSessionData?.sessionId, { questionSessionId } as GameSession);
 
                     // add player to game session
-                    await addPlayer({ id: gameSessionData?.sessionId, playerId: sessionData?.clientId });
+                    await addPlayer({ sessionId: gameSessionData?.sessionId, playerId: sessionData?.clientId });
 
                     // Change game state to TURN_ORDER
-                    await updateSessionPhase({id: gameSessionData?.sessionId, newPhase: SessionPhase.TURN_ORDER});
+                    await updateSession(gameSessionData?.sessionId, {gamePhase: SessionPhase.TURN_ORDER} as GameSession);
 
                     // save to sessionData
                     setSessionData({
@@ -157,7 +177,6 @@ const CreateGame = () => {
                 }
             }
             else {
-                console.error('Error creating question session');
                 console.log(`Error creating question session. Missing any of the following data
                 channelId or sessionId `);
             }
