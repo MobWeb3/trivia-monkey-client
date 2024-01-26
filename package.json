@@ -15,7 +15,7 @@
     "@polybase/client": "^0.6.6",
     "@project-serum/anchor": "^0.26.0",
     "@tabler/icons-react": "^2.42.0",
-    "@types/node": "^20.8.9",
+    "@types/node": "^20.11.7",
     "@types/react": "^18.2.37",
     "@types/react-dom": "^18.2.15",
     "@types/uuid": "^9.0.2",
