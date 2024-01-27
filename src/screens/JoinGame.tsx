@@ -18,7 +18,7 @@ import { UserInfo } from '@web3auth/base';
 import { AuthSessionData } from '../game-domain/AuthSessionData';
 import { addPlayer, getSession, addTopics } from '../mongo/SessionHandler';
 import useGameSession from '../mongo/useGameSession';
-import { createUser, userExists } from '../mongo/Player';
+import { createUser, userExists } from '../mongo/PlayerHandler';
 
 const JoinGame = () => {
     const navigate = useNavigate();
