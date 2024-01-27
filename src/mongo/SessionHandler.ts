@@ -90,23 +90,3 @@ export const addPointToPlayer = async ({sessionId, playerId}:
         data: { sessionId, playerId },
     });
 }
-
-// export const updateQuestionSessionId = async (sessionId: string, questionSessionId: string) => {
-//     try {
-//         const response = await axios.post(`${BASE_URL}/api/mongo/updateQuestionSessionId`, { sessionId, questionSessionId });
-//         return response.data.session;
-//     } catch (error) {
-//         console.error(error);
-//         throw error;
-//     }
-// }
-
-// export const setWinner = async (sessionId: string, playerId: string) => {
-//     try {
-//         const response = await axios.post(`${BASE_URL}/api/mongo/setWinner`, { sessionId, playerId });
-//         return response.data.session;
-//     } catch (error) {
-//         console.error(error);
-//         throw error;
-//     }
-// }

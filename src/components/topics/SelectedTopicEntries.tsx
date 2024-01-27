@@ -13,11 +13,11 @@ const SelectedTopicEntries: React.FC<SelectedTopicEntriesProps> = ({ entrySize }
     const { topics } = useContext(TopicContext);
 
     for (let i = 0; i < entrySize; i++) {
-        if (topics[i][0] === undefined) continue;
+        if (topics[i].name === undefined) continue;
         inputs.push(
             <SelectedTopic
                 key={i}
-                text={removeSuffixes(topics[i][0])}
+                text={removeSuffixes(topics[i].name)}
             /> 
         );
     }

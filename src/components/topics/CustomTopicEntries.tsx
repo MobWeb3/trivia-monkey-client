@@ -10,14 +10,13 @@ const CustomTopicEntries: React.FC<CustomTopicEntriesProps> = ({ entrySize}) => 
     const inputs = [];
     const { topics } = useContext(TopicContext);
 
-    const getValue = (index: number) => {
+    // Filter only the topics with a metaphor_id
+    const filteredTopics = topics.filter((topic) => topic.metaphor_id !== '');
 
-        if (topics && topics.length > 0) {
-            if (topics[index] === undefined) return '';
-            if (topics[index][1] === '') return '';
-            return topics[index][0];
-        }
-        return '';
+    const getValue = (index: number) => {
+        // console.log(`topic name: ${topics[index].name}`);
+        // return value of the topic at index
+        return filteredTopics[index]?.name ?? "";
     }
 
     for (let i = 0; i < entrySize; i++) {

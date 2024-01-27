@@ -4,7 +4,6 @@ import { useNavigate } from 'react-router-dom';
 import { Flex, Loader } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import QRCodeStyling from "qr-code-styling";
-import { createQuestionSession } from '../polybase/QuestionsHandler';
 import { generateAllQuestions } from '../game-domain/GenerateQuestionsHandler';
 import { SessionData } from './SessionData';
 import useLocalStorageState from 'use-local-storage-state';
@@ -136,23 +135,23 @@ const CreateGame = () => {
             
             if (gameSessionData?.sessionId && gameSessionData?.channelId) {
                 // Create question session
-                const response = await createQuestionSession({
-                    sessionId: gameSessionData.sessionId,
-                    clientId: sessionData?.clientId
-                });
+                // const response = await createQuestionSession({
+                //     sessionId: gameSessionData.sessionId,
+                //     clientId: sessionData?.clientId
+                // });
 
-                const questionSessionId = response?.recordData?.data?.id;
+                // const questionSessionId = response?.recordData?.data?.id;
 
-                if (questionSessionId) {
+                // if (questionSessionId) {
                     
                     // Deploy generation of AI questions
-                    generateAllQuestions(topics, questionSessionId, true);
+                    generateAllQuestions(topics, true);
                     // Update topics to Game session
-                    await addTopics({ sessionId: gameSessionData?.sessionId, topics: topics.map((topic: Topic) => topic[0]) });
+                    await addTopics({ sessionId: gameSessionData?.sessionId, topics: topics.map((topic: Topic) => topic.name) });
                     // console.log('updatedTopics response:', addTopicResponse);
 
-                    // Set questionSessionId in the Game session records
-                    await updateSession(gameSessionData?.sessionId, { questionSessionId } as GameSession);
+                    // // Set questionSessionId in the Game session records
+                    // await updateSession(gameSessionData?.sessionId, { questionSessionId } as GameSession);
 
                     // add player to game session
                     await addPlayer({ sessionId: gameSessionData?.sessionId, playerId: sessionData?.clientId });
@@ -165,16 +164,15 @@ const CreateGame = () => {
                         ...sessionData,
                         sessionId: gameSessionData?.sessionId,
                         channelId: gameSessionData?.channelId,
-                        clientId: sessionData?.clientId,
-                        questionSessionId
+                        clientId: sessionData?.clientId
                     });
 
                     setSessionCreated(true);
-                }
-                else {
-                    console.error('Error creating question session A');
-                    setLoading(false);
-                }
+                // }
+                // else {
+                //     console.error('Error creating question session A');
+                //     setLoading(false);
+                // }
             }
             else {
                 console.log(`Error creating question session. Missing any of the following data

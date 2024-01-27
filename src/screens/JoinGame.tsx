@@ -77,10 +77,10 @@ const JoinGame = () => {
         if (sessionData?.channelId !== '' && sessionData?.sessionId) {
 
             // Generate questions
-            generateAllQuestions(topics, sessionData?.questionSessionId as string, true);
+            generateAllQuestions(topics, true);
 
             // Update topics to Game session
-            await addTopics({ sessionId: sessionData?.sessionId, topics: topics.map((topic) => topic[0]) })
+            await addTopics({ sessionId: sessionData?.sessionId, topics: topics.map((topic) => topic.name) })
 
             // console.log('JoinGame handleJoinGame: ', sessionData);
 

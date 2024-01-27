@@ -1,6 +1,10 @@
 import React, { createContext, useState } from 'react';
 
-export type Topic = [string, string]; // Tuple type for topics
+// topic is has an id and a name
+export interface Topic {
+    metaphor_id: string;
+    name: string;
+}
 
 type TopicContextType = {
     topics: Topic[];
