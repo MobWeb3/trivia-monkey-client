@@ -12,7 +12,7 @@ import './CreateGame.css'
 import DisplayTitle from '../components/DisplayTitle';
 import ShareModal from '../components/share/ShareModal';
 import CustomButton from '../components/CustomButton';
-import { Topic, TopicContext } from '../components/topics/TopicContext';
+import { TopicContext } from '../components/topics/TopicContext';
 import { SessionPhase } from '../game-domain/SessionPhase';
 import imageSource from '../assets/monkeys_avatars/astronaut-monkey1-200x200.png';
 import useGameSession from '../mongo/useGameSession';
@@ -138,7 +138,7 @@ const CreateGame = () => {
                 // Deploy generation of AI questions
                 generateAllQuestions(topics);
                 // Update topics to Game session
-                await addTopics({ sessionId: gameSessionData?.sessionId, topics: topics.map((topic: Topic) => topic.name) });
+                await addTopics({ sessionId: gameSessionData?.sessionId, topics});
 
                 // add player to game session
                 await addPlayer({ sessionId: gameSessionData?.sessionId, playerId: sessionData?.clientId });

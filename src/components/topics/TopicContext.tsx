@@ -2,8 +2,9 @@ import React, { createContext, useState } from 'react';
 
 // topic is has an id and a name
 export interface Topic {
-    metaphor_id: string;
+    metaphor_id?: string; // Used for metaphor identification
     name: string;
+    general_id?: string; // Used for general topic identification
 }
 
 type TopicContextType = {
