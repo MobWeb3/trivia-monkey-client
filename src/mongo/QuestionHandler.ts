@@ -1,5 +1,5 @@
-// import axios from 'axios';
-// import { MENG_URL } from '../ApiServiceConfig';
+import axios from 'axios';
+import { BASE_URL } from '../ApiServiceConfig';
 import { Topic } from '../components/topics/TopicContext';
 
 /**
@@ -9,8 +9,8 @@ import { Topic } from '../components/topics/TopicContext';
  */
 export const requestQuestions= async (topics: Topic[]) => {
     try {
-        // const response = await axios.post(`${MENG_URL}/api/mongo/addQuestions`, data);
-        // return response.data as Player;
+        const response = await axios.post(`${BASE_URL}/api/game/requestQuestionsByTopics`, topics);
+        return response.data;
     } catch (error) {
         console.error(error);
         throw error;

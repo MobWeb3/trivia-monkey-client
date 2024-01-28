@@ -134,51 +134,32 @@ const CreateGame = () => {
                  });
             
             if (gameSessionData?.sessionId && gameSessionData?.channelId) {
-                // Create question session
-                // const response = await createQuestionSession({
-                //     sessionId: gameSessionData.sessionId,
-                //     clientId: sessionData?.clientId
-                // });
 
-                // const questionSessionId = response?.recordData?.data?.id;
+                // Deploy generation of AI questions
+                generateAllQuestions(topics);
+                // Update topics to Game session
+                await addTopics({ sessionId: gameSessionData?.sessionId, topics: topics.map((topic: Topic) => topic.name) });
 
-                // if (questionSessionId) {
-                    
-                    // Deploy generation of AI questions
-                    generateAllQuestions(topics, true);
-                    // Update topics to Game session
-                    await addTopics({ sessionId: gameSessionData?.sessionId, topics: topics.map((topic: Topic) => topic.name) });
-                    // console.log('updatedTopics response:', addTopicResponse);
+                // add player to game session
+                await addPlayer({ sessionId: gameSessionData?.sessionId, playerId: sessionData?.clientId });
 
-                    // // Set questionSessionId in the Game session records
-                    // await updateSession(gameSessionData?.sessionId, { questionSessionId } as GameSession);
+                // Change game state to TURN_ORDER
+                await updateSession(gameSessionData?.sessionId, {gamePhase: SessionPhase.TURN_ORDER} as GameSession);
 
-                    // add player to game session
-                    await addPlayer({ sessionId: gameSessionData?.sessionId, playerId: sessionData?.clientId });
+                // save to sessionData
+                setSessionData({
+                    ...sessionData,
+                    sessionId: gameSessionData?.sessionId,
+                    channelId: gameSessionData?.channelId,
+                    clientId: sessionData?.clientId
+                });
 
-                    // Change game state to TURN_ORDER
-                    await updateSession(gameSessionData?.sessionId, {gamePhase: SessionPhase.TURN_ORDER} as GameSession);
-
-                    // save to sessionData
-                    setSessionData({
-                        ...sessionData,
-                        sessionId: gameSessionData?.sessionId,
-                        channelId: gameSessionData?.channelId,
-                        clientId: sessionData?.clientId
-                    });
-
-                    setSessionCreated(true);
-                // }
-                // else {
-                //     console.error('Error creating question session A');
-                //     setLoading(false);
-                // }
+                setSessionCreated(true);
             }
             else {
                 console.log(`Error creating question session. Missing any of the following data
                 channelId or sessionId `);
             }
-            // console.log('handlePlayButtonClick setSessionCreated');
         }
         else {
             console.error(`Error creating question session. Missing any of the following data
