@@ -1,3 +1,4 @@
+import { Topic } from "../components/topics/TopicContext";
 import { PlayerOrderType } from "./Session";
 
 export interface MutableGameSession {
@@ -8,7 +9,7 @@ export interface MutableGameSession {
     numberPlayers: number;
     currentPhase?: string;
     gamePhase?: string;
-    topics?: string[];
+    topics?: Topic[];
     currentTurnPlayer: PlayerOrderType;
     playerList?: PlayerOrderType[];
     winner?: PlayerOrderType;
