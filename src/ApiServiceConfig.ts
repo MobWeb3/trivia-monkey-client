@@ -8,4 +8,7 @@ export const BASE_URL = isDev ? DEV_BASE_URL : PROD_BASE_URL;
 
 // export const BASE_AI_URL = 'https://74.82.30.101:5000'
 
-export const BASE_AI_URL = 'https://mobweb3.com'
+export const PROD_MENG_URL = 'https://monkey-trivia-meng-8cabf9f7adc6.herokuapp.com'
+export const DEV_MENG_URL = 'http://127.0.0.1:8000'
+
+export const MENG_URL = isDev ? DEV_MENG_URL : PROD_MENG_URL;

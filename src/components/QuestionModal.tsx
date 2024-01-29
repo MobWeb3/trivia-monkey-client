@@ -10,6 +10,7 @@ import { SessionData } from '../screens/SessionData';
 import useLocalStorageState from 'use-local-storage-state'
 import { IGNORANCE_MONKEY_NAME } from '../game-domain/Session';
 import { addPointToPlayer } from '../mongo/SessionHandler';
+import { Topic } from './topics/TopicContext';
 
 const placeholderQuestionText = "What is the capital of the United States of America?"
 const placeholderOptionA = "Lorem Ipsum long anser that is very long, and more text";
@@ -18,7 +19,7 @@ interface QuestionModalProps {
     open: boolean;
     onClose: () => void;
     question: Question | null;
-    topic: string | null;
+    topic: Topic | null;
     onExpire: () => void;
 }
 
@@ -148,7 +149,7 @@ const QuestionModal: React.FC<QuestionModalProps> = ({ open, onClose, question, 
                 }}
                 radius="lg"
                 size="90%"
-                title={topic}
+                title={topic?.name}
                 className='centered-modal'
                 centered
                 withCloseButton={false}

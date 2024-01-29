@@ -18,7 +18,7 @@ import { UserInfo } from '@web3auth/base';
 import { AuthSessionData } from '../game-domain/AuthSessionData';
 import { addPlayer, getSession, addTopics } from '../mongo/SessionHandler';
 import useGameSession from '../mongo/useGameSession';
-import { createUser, userExists } from '../mongo/Player';
+import { createUser, userExists } from '../mongo/PlayerHandler';
 
 const JoinGame = () => {
     const navigate = useNavigate();
@@ -77,10 +77,10 @@ const JoinGame = () => {
         if (sessionData?.channelId !== '' && sessionData?.sessionId) {
 
             // Generate questions
-            generateAllQuestions(topics, sessionData?.questionSessionId as string, true);
+            generateAllQuestions(topics);
 
             // Update topics to Game session
-            await addTopics({ sessionId: sessionData?.sessionId, topics: topics.map((topic) => topic[0]) })
+            await addTopics({ sessionId: sessionData?.sessionId, topics })
 
             // console.log('JoinGame handleJoinGame: ', sessionData);
 

@@ -1,46 +1,36 @@
 import axios from 'axios';
-import { BASE_AI_URL, BASE_URL } from '../ApiServiceConfig';
+import { BASE_URL } from '../ApiServiceConfig';
 import { Topic } from '../components/topics/TopicContext';
-import { addQuestions } from '../polybase/QuestionsHandler';
+import { requestQuestions } from '../mongo/QuestionHandler';
 
-const BASE_PAPERSPACE_HOST = `${BASE_AI_URL}/api`;
-const GENERATE_QUESTIONS_URL = `${BASE_PAPERSPACE_HOST}/generateQuestions`;
-const GENERATE_QUESTIONS_33_URL = `${BASE_PAPERSPACE_HOST}/generateQuestions33`;
-
-export const generateAllQuestions = async (topics: Topic[], questionSessionId: string, isFastCreation: boolean = false) => {
-    const getUrl = isFastCreation ? GENERATE_QUESTIONS_33_URL : GENERATE_QUESTIONS_URL;
-
-    // from topics, create an array of topics that contain an id
-    const customTopics = topics.filter((topic) => topic[1].length > 0).map((topic) => {
-        const topicName = topic[0];
-        const id = topic[1];
-        return { id, topic: topicName };
+export const generateAllQuestions = async (topics: Topic[]) => {
+    // from topics, create an array of topics that contain a metaphor id
+    const customTopics = topics.filter((topic) => {
+        const metaphor_id = topic.metaphor_id;
+        return metaphor_id ? metaphor_id.length > 0: false;
+    }).map((topic) => {
+        const topicName = topic.name;
+        const metaphor_id = topic.metaphor_id;
+        return { metaphor_id, name: topicName };
     });
 
     if (customTopics.length > 0) {
         try {
-            // const ids = [topic[1]];
             console.log("GENERATING CUSTOM QUESTIONS FOR TOPICS: ", customTopics);
-            axios.post(getUrl, customTopics).then((response) => {
-                console.log("RESPONSE: ", response);
-                const result = response.data;
-                addQuestions(questionSessionId, result);
-                console.log("added questions: ", { result });
-            });
-
+            requestQuestions(customTopics);
         } catch (error) {
             console.error(error);
         }
     }
 
     topics.map(async (topic) => {
-        // If the topic has empty id, it is a general topic question
-        if (topic[1].length === 0) {
+        // If the topic has empty metaphor id, it is a general topic question
+        if (topic?.metaphor_id?.length === 0) {
             try {
-                console.log("GENERATING GENERAL QUESTIONS FOR TOPIC: ", topic[0]);
+                console.log("GENERATING GENERAL QUESTIONS FOR TOPIC: ", topic.name);
                 axios.post(
                     `${BASE_URL}/api/openai/generalTopicQuestions`,
-                    { topic: topic[0], id: questionSessionId }
+                    { topic: topic.name }
                 );
             } catch (error) {
                 console.error(error);

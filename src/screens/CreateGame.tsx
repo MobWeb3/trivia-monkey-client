@@ -4,7 +4,6 @@ import { useNavigate } from 'react-router-dom';
 import { Flex, Loader } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import QRCodeStyling from "qr-code-styling";
-import { createQuestionSession } from '../polybase/QuestionsHandler';
 import { generateAllQuestions } from '../game-domain/GenerateQuestionsHandler';
 import { SessionData } from './SessionData';
 import useLocalStorageState from 'use-local-storage-state';
@@ -13,7 +12,7 @@ import './CreateGame.css'
 import DisplayTitle from '../components/DisplayTitle';
 import ShareModal from '../components/share/ShareModal';
 import CustomButton from '../components/CustomButton';
-import { Topic, TopicContext } from '../components/topics/TopicContext';
+import { TopicContext } from '../components/topics/TopicContext';
 import { SessionPhase } from '../game-domain/SessionPhase';
 import imageSource from '../assets/monkeys_avatars/astronaut-monkey1-200x200.png';
 import useGameSession from '../mongo/useGameSession';
@@ -135,52 +134,32 @@ const CreateGame = () => {
                  });
             
             if (gameSessionData?.sessionId && gameSessionData?.channelId) {
-                // Create question session
-                const response = await createQuestionSession({
-                    sessionId: gameSessionData.sessionId,
+
+                // Deploy generation of AI questions
+                generateAllQuestions(topics);
+                // Update topics to Game session
+                await addTopics({ sessionId: gameSessionData?.sessionId, topics});
+
+                // add player to game session
+                await addPlayer({ sessionId: gameSessionData?.sessionId, playerId: sessionData?.clientId });
+
+                // Change game state to TURN_ORDER
+                await updateSession(gameSessionData?.sessionId, {gamePhase: SessionPhase.TURN_ORDER} as GameSession);
+
+                // save to sessionData
+                setSessionData({
+                    ...sessionData,
+                    sessionId: gameSessionData?.sessionId,
+                    channelId: gameSessionData?.channelId,
                     clientId: sessionData?.clientId
                 });
 
-                const questionSessionId = response?.recordData?.data?.id;
-
-                if (questionSessionId) {
-                    
-                    // Deploy generation of AI questions
-                    generateAllQuestions(topics, questionSessionId, true);
-                    // Update topics to Game session
-                    await addTopics({ sessionId: gameSessionData?.sessionId, topics: topics.map((topic: Topic) => topic[0]) });
-                    // console.log('updatedTopics response:', addTopicResponse);
-
-                    // Set questionSessionId in the Game session records
-                    await updateSession(gameSessionData?.sessionId, { questionSessionId } as GameSession);
-
-                    // add player to game session
-                    await addPlayer({ sessionId: gameSessionData?.sessionId, playerId: sessionData?.clientId });
-
-                    // Change game state to TURN_ORDER
-                    await updateSession(gameSessionData?.sessionId, {gamePhase: SessionPhase.TURN_ORDER} as GameSession);
-
-                    // save to sessionData
-                    setSessionData({
-                        ...sessionData,
-                        sessionId: gameSessionData?.sessionId,
-                        channelId: gameSessionData?.channelId,
-                        clientId: sessionData?.clientId,
-                        questionSessionId
-                    });
-
-                    setSessionCreated(true);
-                }
-                else {
-                    console.error('Error creating question session A');
-                    setLoading(false);
-                }
+                setSessionCreated(true);
             }
             else {
                 console.log(`Error creating question session. Missing any of the following data
                 channelId or sessionId `);
             }
-            // console.log('handlePlayButtonClick setSessionCreated');
         }
         else {
             console.error(`Error creating question session. Missing any of the following data

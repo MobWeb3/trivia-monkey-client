@@ -46,22 +46,22 @@ export const ChipGroup: React.FC<ChipGroupProps> = ({ options, disabled }) => {
 
     const isSelected = (option:string) => {
         // get all the topic labels
-        const topicLabelsSelected = topics.map((topic) => topic[0]);
+        const topicLabelsSelected = topics.map((topic) => topic.name);
         return topicLabelsSelected.includes(option)
     };
         
     const handleSelect = (option: string) => {
         // get all the topic labels
-        const topicLabelsSelected = topics.map((topic) => topic[0]);
+        const topicLabelsSelected = topics.map((topic) => topic.name);
         const isSelected = topicLabelsSelected.includes(option);
 
         if (isSelected) {
             // remove the topic from the list to deselect it
-            const newTopics = topics.filter((topic) => topic[0] !== option);
+            const newTopics = topics.filter((topic) => topic.name !== option);
             setTopics(newTopics);
         } else {
             // add the topic to the list to select it
-            const newTopic = [option, ''] as Topic;
+            const newTopic = {name: option, metaphor_id: ''} as Topic;
             setTopics([...topics, newTopic]);
         }
     };

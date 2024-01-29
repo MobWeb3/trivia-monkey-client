@@ -33,7 +33,9 @@ export function ComboboxEntry({ savedValue }: MyComboboxProps) {
         <Combobox
             onOptionSubmit={(optionValue) => {
                 // console.log("optionValue: ", optionValue);
-                const topic: Topic = [optionValue, getOptionId(optionValue)];
+                const topic: Topic = {
+                    name: optionValue,
+                    metaphor_id: getOptionId(optionValue)};
                 //previous topics and add new topic
                 setTopics([...topics, topic]);
                 combobox.closeDropdown();
@@ -92,7 +94,7 @@ export function ComboboxEntry({ savedValue }: MyComboboxProps) {
                                 const newTopics = topics.filter((topic) => { 
                                     // console.log("topic: ", topic);
                                     // console.log("currentValue: ", currentValue);
-                                    return topic[0] !== currentValue}
+                                    return topic.name !== currentValue}
                                 );
                                 // console.log("newTopics: ", newTopics);
                                 setTopics(newTopics);

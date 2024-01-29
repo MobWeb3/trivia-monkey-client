@@ -8,7 +8,7 @@ import useLocalStorageState from 'use-local-storage-state';
 import { SessionData } from './SessionData';
 import { getWeb3AuthSigner } from '../evm/Login';
 import { AuthSessionData } from '../game-domain/AuthSessionData';
-import { createUser, userExists } from '../mongo/Player';
+import { createUser, userExists } from '../mongo/PlayerHandler';
 import { Web3Auth } from '@web3auth/modal';
 
 export const SignInPage = () => {

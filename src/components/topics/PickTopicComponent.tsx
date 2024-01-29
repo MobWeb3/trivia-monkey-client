@@ -26,13 +26,13 @@ export const PickTopicComponent = ({numberOfPlayers, ...props }: ModalContentPro
 
 
     useEffect(() => {
-        // console.log(`selectedTopics:`, topics.map((topic) => topic[0]));
+        // console.log(`selectedTopics:`, topics);
 
         // Get number of selected chips. Chips are selected if label is not empty and id is empty.
         const selectedChips = () => {
             let count = 0;
             topics.forEach((topic) => {
-                if (topic[1] === "") {
+                if (topic.metaphor_id === "") {
                     count++;
                 }
             });
@@ -47,7 +47,7 @@ export const PickTopicComponent = ({numberOfPlayers, ...props }: ModalContentPro
             //iterate through topics and count the number of entries that contain an id
             let count = 0;
             topics.forEach((topic) => {
-                if (topic[1] !== "") {
+                if (topic.metaphor_id !== "") {
                     count++;
                 }
             });

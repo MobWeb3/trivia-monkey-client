@@ -1,7 +1,6 @@
 import './AIGame.css';
 import { useEffect, useRef, useState } from 'react';
 import QuestionModal from '../components/QuestionModal';
-import { getQuestion } from '../polybase/QuestionsHandler';
 import { Question } from '../game-domain/Question';
 import { addMessageListener, removeMessageListener } from '../utils/MessageListener';
 import { Messages } from '../utils/Messages';
@@ -21,6 +20,9 @@ import { useNavigate } from 'react-router-dom';
 import { getNextTurnPlayerId, getSession, updateSession } from '../mongo/SessionHandler';
 import { GameSession } from '../game-domain/GameSession';
 import useGameSession from '../mongo/useGameSession';
+import { getQuestion } from '../mongo/QuestionHandler';
+import { Topic } from '../components/topics/TopicContext';
+import { MersenneTwister19937, Random } from 'random-js';
 
 
 function AIGame() {
@@ -28,10 +30,10 @@ function AIGame() {
     const [sessionData, setSessionData] = useLocalStorageState<SessionData>('sessionData', {});
     const [showQuestionModal, setShowQuestionModal] = useState(false);
     const [currentQuestion, setCurrentQuestion] = useState<Question | null>(null);
-    const [chosenTopic, setChosenTopic] = useState<string | null>(null);
+    const [chosenTopic, setChosenTopic] = useState<Topic | null>(null);
     const [canSpin, setCanSpin] = useState(false);
     const [message, setMessage] = useState("Loading...");
-    const [sliceValues, setSliceValues] = useState<string[]>([]);
+    const [sliceValues, setSliceValues] = useState<Topic[]>([]);
     const spacesRef = useRef<Spaces | null>(null);
     const useGameSessionHook = useGameSession();
     const navigate = useNavigate();
@@ -42,20 +44,20 @@ function AIGame() {
         }
     }, [sessionData?.clientId]);
 
-    const handleShowQuestion = async (topic: string) => {
+    const handleShowQuestion = async (topic: Topic) => {
 
         if (!sessionData?.questionSessionId && sessionData?.sessionId) {
             const { questionSessionId } = await getSession(sessionData?.sessionId)
             setSessionData({ ...sessionData, questionSessionId });
+
+            console.log('handle show question button: topic: ', topic);
+            const question: Question = await getQuestion({ sessionId: sessionData?.sessionId,  topic});
+    
+            // // console.log('question', question);
+            setCurrentQuestion(question);
+            setChosenTopic(topic);
+            setShowQuestionModal(true);
         }
-
-        // console.log(`topic ${topic}, questionSessionId ${sessionData?.questionSessionId}`);
-        const question: Question = await getQuestion({ id: sessionData?.questionSessionId, topic });
-
-        // console.log('question', question);
-        setCurrentQuestion(question);
-        setChosenTopic(topic);
-        setShowQuestionModal(true);
     }
 
     const finishTurnAndSaveState = async () => {
@@ -75,7 +77,7 @@ function AIGame() {
             console.log('topics: ', topics)
 
             // Get topics
-            setSliceValues(topics as unknown as string[]);
+            setSliceValues(topics as Topic[]);
         }
 
         setupSessionData();
@@ -156,7 +158,7 @@ function AIGame() {
     const [prizeNumber, setPrizeNumber] = useState(0);
 
     const topicsLength = 6;
-    const data: WheelData[] = (useGameSessionHook?.topics ?? [])?.map((topic: string, index) => {
+    const data: WheelData[] = (useGameSessionHook?.topics ?? [])?.map((topic: Topic, index) => {
 
         // get sequential number from 0 to topicsLength
         let sequentialNumber = index % topicsLength;
@@ -166,13 +168,13 @@ function AIGame() {
         const sequentialColor = colors[sequentialNumber];
 
         // lets trim '- Wikipedia' from topic and empty spaces
-        topic = topic.replace('- Wikipedia', '').trim();
+        let label = topic.name.replace(' - Wikipedia', '').trim();
 
         // truncate topic to 20 characters
-        topic = topic.length > 10 ? topic.substring(0, 10) + "..." : topic;
+        label = label.length > 10 ? label.substring(0, 10) + "..." : label;
 
         return {
-            option: topic,
+            option: label,
             style: {
                 backgroundColor: sequentialColor,
                 textColor: 'black',
@@ -184,7 +186,8 @@ function AIGame() {
     const handleSpinClick = () => {
         console.log("data: ", data)
         if (!mustSpin) {
-            const newPrizeNumber = Math.floor(Math.random() * (6));
+            const random = new Random(MersenneTwister19937.autoSeed());
+            const newPrizeNumber = random.integer(0, 5);
             setPrizeNumber(newPrizeNumber);
             setMustSpin(true);
         }
