@@ -12,7 +12,6 @@
     "@mantine/core": "^7.3.0",
     "@mantine/hooks": "^7.0.0",
     "@metaplex-foundation/js": "^0.20.1",
-    "@polybase/client": "^0.6.6",
     "@project-serum/anchor": "^0.26.0",
     "@tabler/icons-react": "^2.42.0",
     "@types/node": "^20.8.9",
