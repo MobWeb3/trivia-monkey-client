@@ -4,7 +4,7 @@
 import { Web3AuthSigner } from "root/packages/signers/src";
 import { CHAIN_NAMESPACES } from "@web3auth/base";
 import { AlchemyProvider } from "@alchemy/aa-alchemy";
-import { polygonMumbai } from "viem/chains";
+import { sepolia } from "viem/chains";
 import { LightSmartContractAccount, getDefaultLightAccountFactoryAddress } from "@alchemy/aa-accounts";
 
 /* Mainnet Ethereum*/
@@ -20,7 +20,7 @@ import { LightSmartContractAccount, getDefaultLightAccountFactoryAddress } from 
 /* Sepolia */
 const clientId = import.meta.env.VITE_APP_WEB3AUTH_CLIENT_ID_EVM_TESTNET ?? "";
 const network = import.meta.env.VITE_APP_WEB3AUTH_NETWORK_TESTNET ?? "";
-const chain = polygonMumbai;
+const chain = sepolia;
 
 export const createWeb3AuthSigner = async () => {
   const web3AuthSigner = new Web3AuthSigner({
