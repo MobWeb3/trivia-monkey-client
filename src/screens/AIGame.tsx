@@ -17,7 +17,7 @@ import Spaces from '@ably/spaces';
 import { getSpacesInstance } from '../ably/SpacesSingleton';
 import { SessionPhase } from '../game-domain/SessionPhase';
 import { useNavigate } from 'react-router-dom';
-import { getNextTurnPlayerId, getSession, updateSession } from '../mongo/SessionHandler';
+import { getNextTurnPlayerId, updateSession } from '../mongo/SessionHandler';
 import { GameSession } from '../game-domain/GameSession';
 import useGameSession from '../mongo/useGameSession';
 import { getQuestion } from '../mongo/QuestionHandler';
@@ -27,7 +27,7 @@ import { MersenneTwister19937, Random } from 'random-js';
 
 function AIGame() {
 
-    const [sessionData, setSessionData] = useLocalStorageState<SessionData>('sessionData', {});
+    const [sessionData] = useLocalStorageState<SessionData>('sessionData', {});
     const [showQuestionModal, setShowQuestionModal] = useState(false);
     const [currentQuestion, setCurrentQuestion] = useState<Question | null>(null);
     const [chosenTopic, setChosenTopic] = useState<Topic | null>(null);
@@ -46,9 +46,7 @@ function AIGame() {
 
     const handleShowQuestion = async (topic: Topic) => {
 
-        if (!sessionData?.questionSessionId && sessionData?.sessionId) {
-            const { questionSessionId } = await getSession(sessionData?.sessionId)
-            setSessionData({ ...sessionData, questionSessionId });
+        if (sessionData?.sessionId) {
 
             console.log('handle show question button: topic: ', topic);
             const question: Question = await getQuestion({ sessionId: sessionData?.sessionId,  topic});

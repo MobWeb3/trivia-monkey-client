@@ -63,7 +63,6 @@ const JoinGame = () => {
                     ...sessionData,
                     sessionId: sessionId,
                     channelId: channelId,
-                    questionSessionId: gameSession.questionSessionId
                 });
             });
             // console.log('JoinGame sessionData state ', sessionData);
@@ -95,13 +94,9 @@ const JoinGame = () => {
     const joinIfAlreadyActiveGame = async () => {
         if (sessionData?.sessionId && sessionData?.channelId) {
             try {
-                const { questionSessionId, gamePhase } = await getSession(sessionData?.sessionId);
+                const { gamePhase } = await getSession(sessionData?.sessionId);
 
                 if (gamePhase === SessionPhase.GAME_ACTIVE) {
-                    setSessionData({
-                        ...sessionData,
-                        questionSessionId: questionSessionId
-                    });
 
                     // initialize web3auth
                     const userInfo = await login();
