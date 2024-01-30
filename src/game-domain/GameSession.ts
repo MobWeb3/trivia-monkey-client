@@ -13,7 +13,6 @@ export interface MutableGameSession {
     currentTurnPlayer: PlayerOrderType;
     playerList?: PlayerOrderType[];
     winner?: PlayerOrderType;
-    questionSessionId?: string;
     ignoranceMonkey?: PlayerOrderType;
 }
 
