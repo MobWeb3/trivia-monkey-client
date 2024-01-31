@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { BASE_URL } from '../ApiServiceConfig';
 import { GameSession } from '../game-domain/GameSession';
-import { Topic } from '../components/topics/TopicContext';
+import { Topic } from '../game-domain/Topic';
 
 interface ApiPostParams {
     url: string;

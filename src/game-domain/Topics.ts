@@ -1,11 +1,3 @@
-export const GeneralTopics = {
-    Geography: "Geography",
-    History: "History",
-    Music: "Music",
-    Sports: "Sports",
-    Art: "Art",
-    Science: "Science",
-}
 
 const questionsPerPlayer = {
     1: 6, // The only player can choose 6 topic questions

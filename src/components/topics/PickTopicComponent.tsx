@@ -1,12 +1,14 @@
 // import { Chip, Group } from '@mantine/core';
 import { useContext, useEffect, useState } from 'react';
-import { GeneralTopics, numberOfQuestionPlayerCanChoose } from '../../game-domain/Topics';
+import { numberOfQuestionPlayerCanChoose } from '../../game-domain/Topics';
 import "./PickTopicComponent.css"
 import DisplayBadge from './DisplayBadge';
 import CustomTopicEntries from './CustomTopicEntries';
 import CustomButton from '../CustomButton';
 import { ChipGroup } from './Chip';
 import { TopicContext } from './TopicContext';
+import { getAllGeneralTopics } from '../../mongo/TopicHandler';
+import { Topic } from '../../game-domain/Topic';
 
 type ModalContentProps = {
     numberOfPlayers: number;
@@ -15,31 +17,32 @@ type ModalContentProps = {
     children?: React.ReactNode;
 };
 
-export const PickTopicComponent = ({numberOfPlayers, ...props }: ModalContentProps) => {
+export const PickTopicComponent = ({ numberOfPlayers, ...props }: ModalContentProps) => {
 
     // Number of questions the player can choose in total
     const numberQuestions = numberOfQuestionPlayerCanChoose(numberOfPlayers);
     const [customEntriesAvailable, setCustomEntriesAvailable] = useState<number>(numberQuestions);
     const [chipDisabled, setChipDisabled] = useState(false);
     const { topics } = useContext(TopicContext);
-    
-
+    const [generalTopics, setGeneralTopics] = useState<Topic[]>([]);
 
     useEffect(() => {
         // console.log(`selectedTopics:`, topics);
 
-        // Get number of selected chips. Chips are selected if label is not empty and id is empty.
+        // Get number of selected chips. Chips are selected if general_id is not empty
         const selectedChips = () => {
             let count = 0;
             topics.forEach((topic) => {
-                if (topic.metaphor_id === "") {
+                if (topic.general_id !== undefined &&
+                    topic.general_id !== "") {
                     count++;
                 }
             });
             return count;
         }
 
-        // console.log("selectedChips: ", selectedChips());
+        // console.log("selectedChips: ", topics.length);
+        // console.log("selected topics: ", topics);
 
         //Get count number of occupied entries. entries that contain an id
         function occupiedEntriesNumber() {
@@ -47,7 +50,9 @@ export const PickTopicComponent = ({numberOfPlayers, ...props }: ModalContentPro
             //iterate through topics and count the number of entries that contain an id
             let count = 0;
             topics.forEach((topic) => {
-                if (topic.metaphor_id !== "") {
+                if (topic === undefined) return;
+                if (topic.metaphor_id !== undefined
+                    && topic.metaphor_id.length > 0) {
                     count++;
                 }
             });
@@ -80,6 +85,17 @@ export const PickTopicComponent = ({numberOfPlayers, ...props }: ModalContentPro
     }
         , [numberQuestions, topics]);
 
+    useEffect(() => {
+
+        // Get all general topics labels
+        const getAllGeneralTopicsLabels = async () => {
+            const generalTopics = await getAllGeneralTopics();
+            setGeneralTopics(generalTopics);
+        }
+
+        getAllGeneralTopicsLabels();
+    }, []);
+
     return (
         <div style={{
             display: 'flex', flexDirection: 'column', justifyContent: 'center',
@@ -89,7 +105,7 @@ export const PickTopicComponent = ({numberOfPlayers, ...props }: ModalContentPro
 
             <div style={{ padding: '5px' }}>
                 <ChipGroup
-                    options={Object.values(GeneralTopics)}
+                    options={generalTopics}
                     disabled={chipDisabled}
                 />
                 <DisplayBadge text="Topic of choice" fontSize='30px' />

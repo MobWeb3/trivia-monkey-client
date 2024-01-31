@@ -21,8 +21,8 @@ import { getNextTurnPlayerId, updateSession } from '../mongo/SessionHandler';
 import { GameSession } from '../game-domain/GameSession';
 import useGameSession from '../mongo/useGameSession';
 import { getQuestion } from '../mongo/QuestionHandler';
-import { Topic } from '../components/topics/TopicContext';
 import { MersenneTwister19937, Random } from 'random-js';
+import { Topic } from '../game-domain/Topic';
 
 
 function AIGame() {

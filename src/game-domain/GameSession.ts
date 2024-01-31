@@ -1,5 +1,5 @@
-import { Topic } from "../components/topics/TopicContext";
 import { PlayerOrderType } from "./Session";
+import { Topic } from "./Topic";
 
 export interface MutableGameSession {
     sessionId: string;

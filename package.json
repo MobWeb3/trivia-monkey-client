@@ -3,6 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "homepage": "./",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.js"
+  },
   "dependencies": {
     "@ably/spaces": "^0.2.0",
     "@alchemy/aa-accounts": "^1.2.0",
