@@ -1,12 +1,13 @@
 // import { Chip, Group } from '@mantine/core';
 import { useContext, useEffect, useState } from 'react';
-import { GeneralTopics, numberOfQuestionPlayerCanChoose } from '../../game-domain/Topics';
+import { numberOfQuestionPlayerCanChoose } from '../../game-domain/Topics';
 import "./PickTopicComponent.css"
 import DisplayBadge from './DisplayBadge';
 import CustomTopicEntries from './CustomTopicEntries';
 import CustomButton from '../CustomButton';
 import { ChipGroup } from './Chip';
 import { TopicContext } from './TopicContext';
+import { getAllGeneralTopics } from '../../mongo/TopicHandler';
 
 type ModalContentProps = {
     numberOfPlayers: number;
@@ -15,15 +16,14 @@ type ModalContentProps = {
     children?: React.ReactNode;
 };
 
-export const PickTopicComponent = ({numberOfPlayers, ...props }: ModalContentProps) => {
+export const PickTopicComponent = ({ numberOfPlayers, ...props }: ModalContentProps) => {
 
     // Number of questions the player can choose in total
     const numberQuestions = numberOfQuestionPlayerCanChoose(numberOfPlayers);
     const [customEntriesAvailable, setCustomEntriesAvailable] = useState<number>(numberQuestions);
     const [chipDisabled, setChipDisabled] = useState(false);
     const { topics } = useContext(TopicContext);
-    
-
+    const [generalTopics, setGeneralTopics] = useState<string[]>([]);
 
     useEffect(() => {
         // console.log(`selectedTopics:`, topics);
@@ -80,6 +80,21 @@ export const PickTopicComponent = ({numberOfPlayers, ...props }: ModalContentPro
     }
         , [numberQuestions, topics]);
 
+    useEffect(() => {
+
+        // Get all general topics labels
+        const getAllGeneralTopicsLabels = async () => {
+            const generalTopics = (await getAllGeneralTopics()).map((topic) => topic.name);
+            return generalTopics;
+        }
+        const fetchGeneralTopics = async () => {
+            const topics = await getAllGeneralTopicsLabels();
+            setGeneralTopics(topics);
+        };
+
+        fetchGeneralTopics();
+    }, []);
+
     return (
         <div style={{
             display: 'flex', flexDirection: 'column', justifyContent: 'center',
@@ -89,7 +104,7 @@ export const PickTopicComponent = ({numberOfPlayers, ...props }: ModalContentPro
 
             <div style={{ padding: '5px' }}>
                 <ChipGroup
-                    options={Object.values(GeneralTopics)}
+                    options={generalTopics}
                     disabled={chipDisabled}
                 />
                 <DisplayBadge text="Topic of choice" fontSize='30px' />

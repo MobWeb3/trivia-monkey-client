@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { BASE_URL } from '../ApiServiceConfig';
-import { Topic } from '../components/topics/TopicContext';
 import { requestQuestions } from '../mongo/QuestionHandler';
+import { Topic } from './Topic';
 
 export const generateAllQuestions = async (topics: Topic[]) => {
     // from topics, create an array of topics that contain a metaphor id

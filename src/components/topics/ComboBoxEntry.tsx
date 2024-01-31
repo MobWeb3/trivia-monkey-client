@@ -2,8 +2,9 @@ import { useContext, useState } from 'react';
 import { Combobox, ComboboxProps, TextInput, useCombobox } from '@mantine/core';
 import { IconSearch, IconCircleLetterX, IconLoader } from '@tabler/icons-react';
 import { getTopicEntries } from '../../metaphor/metaphor';
-import { Topic, TopicContext } from './TopicContext';
+import { TopicContext } from './TopicContext';
 import './ComboBoxEntry.css';
+import { Topic } from '../../game-domain/Topic';
 
 interface MyComboboxProps extends ComboboxProps {
     // other props...

@@ -10,7 +10,7 @@ import { SessionData } from '../screens/SessionData';
 import useLocalStorageState from 'use-local-storage-state'
 import { IGNORANCE_MONKEY_NAME } from '../game-domain/Session';
 import { addPointToPlayer } from '../mongo/SessionHandler';
-import { Topic } from './topics/TopicContext';
+import { Topic } from '../game-domain/Topic';
 
 const placeholderQuestionText = "What is the capital of the United States of America?"
 const placeholderOptionA = "Lorem Ipsum long anser that is very long, and more text";

@@ -1,5 +1,6 @@
 import React, { useContext } from 'react';
-import { Topic, TopicContext } from './TopicContext';
+import { TopicContext } from './TopicContext';
+import { Topic } from '../../game-domain/Topic';
 
 type ChipProps = {
     label: string;

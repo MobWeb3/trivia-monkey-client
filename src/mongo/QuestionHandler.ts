@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { BASE_URL } from '../ApiServiceConfig';
-import { Topic } from '../components/topics/TopicContext';
 import { Question } from '../game-domain/Question';
+import { Topic } from '../game-domain/Topic';
 
 /**
  * Dispatch a request to the backend to add questions to the database or make

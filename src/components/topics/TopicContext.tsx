@@ -1,11 +1,7 @@
 import React, { createContext, useState } from 'react';
+import { Topic } from '../../game-domain/Topic';
 
-// topic is has an id and a name
-export interface Topic {
-    metaphor_id?: string; // Used for metaphor identification
-    name: string;
-    general_id?: string; // Used for general topic identification
-}
+// topic is has an id and a nam
 
 type TopicContextType = {
     topics: Topic[];
