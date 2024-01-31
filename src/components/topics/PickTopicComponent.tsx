@@ -8,6 +8,7 @@ import CustomButton from '../CustomButton';
 import { ChipGroup } from './Chip';
 import { TopicContext } from './TopicContext';
 import { getAllGeneralTopics } from '../../mongo/TopicHandler';
+import { Topic } from '../../game-domain/Topic';
 
 type ModalContentProps = {
     numberOfPlayers: number;
@@ -23,23 +24,25 @@ export const PickTopicComponent = ({ numberOfPlayers, ...props }: ModalContentPr
     const [customEntriesAvailable, setCustomEntriesAvailable] = useState<number>(numberQuestions);
     const [chipDisabled, setChipDisabled] = useState(false);
     const { topics } = useContext(TopicContext);
-    const [generalTopics, setGeneralTopics] = useState<string[]>([]);
+    const [generalTopics, setGeneralTopics] = useState<Topic[]>([]);
 
     useEffect(() => {
         // console.log(`selectedTopics:`, topics);
 
-        // Get number of selected chips. Chips are selected if label is not empty and id is empty.
+        // Get number of selected chips. Chips are selected if general_id is not empty
         const selectedChips = () => {
             let count = 0;
             topics.forEach((topic) => {
-                if (topic.metaphor_id === "") {
+                if (topic.general_id !== undefined &&
+                    topic.general_id !== "") {
                     count++;
                 }
             });
             return count;
         }
 
-        // console.log("selectedChips: ", selectedChips());
+        // console.log("selectedChips: ", topics.length);
+        // console.log("selected topics: ", topics);
 
         //Get count number of occupied entries. entries that contain an id
         function occupiedEntriesNumber() {
@@ -47,7 +50,9 @@ export const PickTopicComponent = ({ numberOfPlayers, ...props }: ModalContentPr
             //iterate through topics and count the number of entries that contain an id
             let count = 0;
             topics.forEach((topic) => {
-                if (topic.metaphor_id !== "") {
+                if (topic === undefined) return;
+                if (topic.metaphor_id !== undefined
+                    && topic.metaphor_id.length > 0) {
                     count++;
                 }
             });
@@ -84,15 +89,11 @@ export const PickTopicComponent = ({ numberOfPlayers, ...props }: ModalContentPr
 
         // Get all general topics labels
         const getAllGeneralTopicsLabels = async () => {
-            const generalTopics = (await getAllGeneralTopics()).map((topic) => topic.name);
-            return generalTopics;
+            const generalTopics = await getAllGeneralTopics();
+            setGeneralTopics(generalTopics);
         }
-        const fetchGeneralTopics = async () => {
-            const topics = await getAllGeneralTopicsLabels();
-            setGeneralTopics(topics);
-        };
 
-        fetchGeneralTopics();
+        getAllGeneralTopicsLabels();
     }, []);
 
     return (

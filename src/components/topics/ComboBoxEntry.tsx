@@ -63,7 +63,6 @@ export function ComboboxEntry({ savedValue }: MyComboboxProps) {
                         combobox.openDropdown();
                     }}
                     onClick={() => combobox.openDropdown()}
-                    onFocus={() => combobox.openDropdown()}
                     onBlur={() => combobox.closeDropdown()}
                     leftSection={
                         <div

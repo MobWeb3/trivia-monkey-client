@@ -35,7 +35,7 @@ export const Chip: React.FC<ChipProps> = ({ label, isSelected, onSelect, color, 
 };
 
 type ChipGroupProps = {
-    options: string[];
+    options: Topic[];
     disabled: boolean;
 };
 
@@ -51,19 +51,19 @@ export const ChipGroup: React.FC<ChipGroupProps> = ({ options, disabled }) => {
         return topicLabelsSelected.includes(option)
     };
         
-    const handleSelect = (option: string) => {
+    const handleSelect = (option: Topic) => {
         // get all the topic labels
         const topicLabelsSelected = topics.map((topic) => topic.name);
-        const isSelected = topicLabelsSelected.includes(option);
+        const isSelected = topicLabelsSelected.includes(option.name);
 
         if (isSelected) {
             // remove the topic from the list to deselect it
-            const newTopics = topics.filter((topic) => topic.name !== option);
+            const newTopics = topics.filter((topic) => topic.name !== option.name);
             setTopics(newTopics);
         } else {
             // add the topic to the list to select it
-            const newTopic = {name: option, metaphor_id: ''} as Topic;
-            setTopics([...topics, newTopic]);
+            // const newTopic = {name: option, metaphor_id: '', general_id:topic. } as Topic;
+            setTopics([...topics, option]);
         }
     };
 
@@ -76,12 +76,12 @@ export const ChipGroup: React.FC<ChipGroupProps> = ({ options, disabled }) => {
         }}>
             {options.map((option, index) => (
                 <Chip
-                    key={option}
-                    label={option}
-                    isSelected={isSelected(option)}
+                    key={option.general_id ?? option.metaphor_id}
+                    label={option.name}
+                    isSelected={isSelected(option.name)}
                     onSelect={() => handleSelect(option)}
                     color={mantineColors[index % mantineColors.length]}
-                    disabled={disabled && !isSelected(option)}
+                    disabled={disabled && !isSelected(option.name)}
                 />
             ))}
         </div>
