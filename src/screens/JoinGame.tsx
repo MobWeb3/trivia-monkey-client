@@ -6,7 +6,7 @@ import { PickTopicComponent } from '../components/topics/PickTopicComponent';
 import { useDisclosure } from '@mantine/hooks';
 import { generateAllQuestions } from '../game-domain/GenerateQuestionsHandler';
 import { SessionPhase } from '../game-domain/SessionPhase';
-import { login } from '../utils/Web3AuthAuthentication';
+import { login } from '../authentication/Login';
 import { SessionData } from './SessionData';
 import useLocalStorageState from 'use-local-storage-state';
 import WaitingScreen from '../components/WaitingScreen';

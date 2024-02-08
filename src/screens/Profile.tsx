@@ -1,11 +1,11 @@
 import { useAccount, useEnsName } from 'wagmi'
 import { useContext, useEffect } from 'react'
 import { SignerContext } from '../components/SignerContext'
-import { getWeb3AuthSigner } from '../evm/Login'
 import { mintNftActive } from '../evm/user-operation/mint'
 import { getProvider } from '../evm/alchemy/Web3AuthSigner'
 import { getNftsFromSmartAccount, providerWithAlchemyEnhancedApis } from '../evm/alchemy/EnhancedApis'
 import { useNavigate } from 'react-router-dom'
+import { getWeb3AuthSigner } from '../authentication/Web3AuthAuthentication'
 
 export function Profile() {
     const { address, isConnected, connector: activeConnector, } = useAccount()

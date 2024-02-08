@@ -6,12 +6,12 @@ import { getNftsFromSmartAccount, providerWithAlchemyEnhancedApis } from '../evm
 import { getProvider } from '../evm/alchemy/Web3AuthSigner';
 import { OwnedNftsResponse } from 'alchemy-sdk';
 import { useEffect, useState } from 'react';
-import { getWeb3AuthSigner } from '../evm/Login';
 import { SelectNetwork } from '../components/nft_wallet/SelectNetwork';
 import { SupportedNetworks } from '../SupportedNetworksConfig';
 import useLocalStorageState from 'use-local-storage-state';
 import { SessionData } from './SessionData';
 import { getNftsForOwner } from '../evm/alchemy/FetchNftsInefficient';
+import { getWeb3AuthSigner } from '../authentication/Web3AuthAuthentication';
 // import { SupportedNetworks } from '../../';
 
 const NftWalletScreen = () => {

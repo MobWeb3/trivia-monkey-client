@@ -10,10 +10,10 @@ import { ActionButton } from '../components/nft_wallet/ActionButton';
 import useLocalStorageState from 'use-local-storage-state';
 import { SessionData } from './SessionData';
 import { MutableNftGameSession } from '../game-domain/ nfts/NftGameSession';
-import { getWeb3AuthSigner } from '../evm/Login';
 import { getProvider } from '../evm/alchemy/Web3AuthSigner';
 import { crossChainMintNftComplete } from '../evm/user-operation/mint';
 import useGameSession from '../mongo/useGameSession';
+import { getWeb3AuthSigner } from '../authentication/Web3AuthAuthentication';
 
 type AvatarPosition = {
     top: number;
