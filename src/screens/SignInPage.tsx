@@ -17,10 +17,10 @@ export const SignInPage = () => {
 
   const handleSignIn = async () => {
     if (web3auth !== null) {
-      const userInfo = await login();
+      const {userInfo, network} = await login();
 
       setSessionData({ ...sessionData, clientId: userInfo.email, name: userInfo.name });
-      setAuthSessionData({ ...authSessionData, userInfo});
+      setAuthSessionData({ ...authSessionData, userInfo, currentNetwork: network});
     }
     navigate('/playlobby');
   }

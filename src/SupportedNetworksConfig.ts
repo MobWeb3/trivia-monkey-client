@@ -1,10 +1,12 @@
+import { SolanaNetwork } from "./solana/SolanaNetwork";
+
 export enum SupportedNetworks {
     Sepolia = 'Sepolia',
     Fuji = 'Fuji',
     Mumbai = 'Mumbai'
 }
 
-export const SolanaDevnet = {
+export const SolanaDevnet: SolanaNetwork = {
     "name": "Solana Devnet",
     "network": "solana-devnet",
     "nativeCurrency": {

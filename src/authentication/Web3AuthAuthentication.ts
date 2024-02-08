@@ -18,7 +18,8 @@ export const getWeb3AuthSigner = async () => {
     }
     else if (blockchainNetwork.name === SolanaDevnet.name) {
         const web3authSigner = await createWeb3AuthSolanaSigner();
-        console.log("Solana current account Address: ", getConnectedSolanaPublicKey(web3authSigner.inner)); // Log the smart account address
+        const publicKey = await getConnectedSolanaPublicKey(web3authSigner.inner);
+        console.log("Solana current account Address: ", publicKey?.toBase58()); // Log the smart account address
         return web3authSigner;
     }
     else {

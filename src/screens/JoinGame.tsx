@@ -99,7 +99,7 @@ const JoinGame = () => {
                 if (gamePhase === SessionPhase.GAME_ACTIVE) {
 
                     // initialize web3auth
-                    const userInfo = await login();
+                    const {userInfo} = await login();
                     localStorage.setItem('userInfo', JSON.stringify(userInfo));
                     if (sessionData) {
                         setSessionData({ ...sessionData, clientId: userInfo.email });
@@ -116,7 +116,7 @@ const JoinGame = () => {
 
     const retryLogin = async () => {
         // initialize web3auth
-        const userInfo = await login();
+        const {userInfo} = await login();
         await mCreatePlayerIfNotExists(userInfo);
         setSessionData({ ...sessionData, clientId: userInfo?.email});
         setAuthSessionData({ ...authSessionData, userInfo});

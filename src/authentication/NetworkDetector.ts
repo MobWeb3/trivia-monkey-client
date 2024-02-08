@@ -4,7 +4,7 @@ import { Chain } from "viem";
 // Given a network, return the proper chain configuration
 export const detectNetwork = async (network: string) => {
 
-    const evmChain = Object.values(chains).find((chain) => chain.network === network);
+    const evmChain = Object.values(chains).find((chain) => chain.network === network) as Chain;
 
     if (evmChain) {
         // console.log('is EVM chain')
