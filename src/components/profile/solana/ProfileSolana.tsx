@@ -1,13 +1,9 @@
-import useLocalStorageState from 'use-local-storage-state';
-import { AuthSessionData } from '../../../game-domain/AuthSessionData';
+import NftWalletScreenSolana from './NftWalletScreenSolana';
 
-export function Profile() {
-    const [authSessionData, setAuthSessionData] = useLocalStorageState<AuthSessionData>('authSessionData', {});
-
-
+export function ProfileSolana() {
     return (
-        <div>
-
+        <div>            
+            <NftWalletScreenSolana />
         </div>
     )
 }

@@ -5,4 +5,5 @@ import { SolanaNetwork } from "../solana/SolanaNetwork";
 export interface AuthSessionData {
     userInfo?: Partial<UserInfo>;
     currentNetwork?: Chain | SolanaNetwork;
+    currentUserPublicKey?: string;
 }
