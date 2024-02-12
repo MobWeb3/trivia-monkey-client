@@ -8,29 +8,31 @@ import { AuthSessionData } from '../../../game-domain/AuthSessionData';
 import { createWeb3AuthSolanaSigner } from '../../../solana/web3auth';
 import { getConnectedSolanaPublicKey } from '../../../authentication/solana/utils';
 import { UserCardImage } from '../UserCardImage';
+import { Loader } from '@mantine/core';
 // import { getAllNFTs } from '../../../solana/metaplex/getNfts';
 
 // fetch from AQYrC2kptkeQ5pVz9FWr4E4c11aDYdfv4SvrLSFbVtJe account
 // import { SupportedNetworks } from '../../';
 
 const NftWalletScreenSolana = () => {
-    const [nfts] = useState<NftGameSession[]>([]);
+    const [nfts, setNfts] = useState<NftGameSession[]>([]);
     const [authSessionData] = useLocalStorageState<AuthSessionData>('authSessionData', {});
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         // current network
         console.log('authSessionData?.currentNetwork: ', authSessionData?.currentNetwork);
 
         // Fetch nft for current solana account
-        const fetchNfts= async () => {
+        const fetchNfts = async () => {
             const web3authSigner = await createWeb3AuthSolanaSigner();
             const publicKey = await getConnectedSolanaPublicKey(web3authSigner.inner);
             console.log('publicKey: ', publicKey?.toBase58());
-            // if (publicKey) {
-            //     const nfts = await getAllNFTs(publicKey.toBase58());
-            //     console.log('nfts: ', nfts);
-            //     setNfts(nfts);
-            // }
+            if (publicKey) {
+                // const nfts = getAllNFTs(publicKey.toBase58());
+                console.log('nfts: ', nfts);
+                // setNfts(nfts);
+            }
         }
 
         fetchNfts();
@@ -58,16 +60,19 @@ const NftWalletScreenSolana = () => {
                         margin: "auto",
                     }}
                 >
-                    <UserCardImage userInfo={authSessionData?.userInfo} />
-                    <Title order={2}
-                        bg={"white"}
-                        style={{
-                            borderRadius: 20,
-                            padding: 10,
-                            opacity: 0.9,
-                        }}
-                    >NFT Game Sessions</Title>
-                    <NftGrid nfts={nfts}></NftGrid>
+                    {loading ? <Loader /> :
+                        <><UserCardImage userInfo={authSessionData?.userInfo} />
+                            <Title order={2}
+                                bg={"white"}
+                                style={{
+                                    borderRadius: 20,
+                                    padding: 10,
+                                    opacity: 0.9,
+                                }}
+                            >NFT Game Sessions</Title>
+                            <NftGrid nfts={nfts}></NftGrid></>
+                    }
+
                 </Flex>
             </div>
         </div>
