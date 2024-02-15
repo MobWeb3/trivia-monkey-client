@@ -6,56 +6,21 @@ import { useNavigate } from 'react-router-dom';
 import monkeyTriviaLogo from '../assets/Screens/signin/monkey-trivia-arched-name-400x200.png';
 import useLocalStorageState from 'use-local-storage-state';
 import { SessionData } from './SessionData';
-import { getWeb3AuthSigner } from '../evm/Login';
 import { AuthSessionData } from '../game-domain/AuthSessionData';
-import { createUser, userExists } from '../mongo/PlayerHandler';
-import { Web3Auth } from '@web3auth/modal';
+import { login } from '../authentication/Login';
 
 export const SignInPage = () => {
-  const { web3auth, setWeb3auth } = useContext(SignerContext);
+  const { web3auth } = useContext(SignerContext);
   const [sessionData, setSessionData] = useLocalStorageState<SessionData>('sessionData', {});
   const [authSessionData, setAuthSessionData] = useLocalStorageState<AuthSessionData>('authSessionData', {});
   const navigate = useNavigate();
 
-  const login = async () => {
-    const isEvmChain = import.meta.env.VITE_APP_EVM_CHAIN === 'true';
-
-    if (isEvmChain) {
-      const web3authSigner = await getWeb3AuthSigner();
-      const web3auth = web3authSigner.inner;
-      await createPlayerIfNotExists(web3auth);
-
-    } else {
-      if (!web3auth) {
-        console.log("web3auth not initialized yet");
-        return {};
-      }
-      await web3auth.connect();
-      await createPlayerIfNotExists(web3auth);
-    }
-  };
-
-  const createPlayerIfNotExists = async (web3authInstance: Web3Auth) => {
-    const userInfo = await web3authInstance.getUserInfo();
-    console.log('userInfo: ', userInfo);
-    const userExist = await userExists(userInfo?.email ?? "");
-    if (!userExist) {
-      console.log('user does not exist, creating user');
-      // create user
-      const createdPlayer = await createUser({
-        email: userInfo.email ?? "",
-        name: userInfo.name ?? ""
-      });
-      console.log('createdPlayer: ', createdPlayer);
-    }
-    setSessionData({ ...sessionData, clientId: userInfo.email, name: userInfo.name });
-    setAuthSessionData({ ...authSessionData, userInfo});
-    setWeb3auth(web3authInstance); // Deprecated
-  }
-
   const handleSignIn = async () => {
     if (web3auth !== null) {
-      await login();
+      const {userInfo, network} = await login();
+
+      setSessionData({ ...sessionData, clientId: userInfo.email, name: userInfo.name });
+      setAuthSessionData({ ...authSessionData, userInfo, currentNetwork: network});
     }
     navigate('/playlobby');
   }
@@ -70,6 +35,8 @@ export const SignInPage = () => {
 interface ControlButtonsProps {
   onSignInClick: () => void;
 }
+
+// get solana network
 
 export const ControlButtons: React.FC<ControlButtonsProps> = ({
   onSignInClick: handlePlayClick,

@@ -6,7 +6,7 @@ import { PickTopicComponent } from '../components/topics/PickTopicComponent';
 import { useDisclosure } from '@mantine/hooks';
 import { generateAllQuestions } from '../game-domain/GenerateQuestionsHandler';
 import { SessionPhase } from '../game-domain/SessionPhase';
-import { login } from '../utils/Web3AuthAuthentication';
+import { login } from '../authentication/Login';
 import { SessionData } from './SessionData';
 import useLocalStorageState from 'use-local-storage-state';
 import WaitingScreen from '../components/WaitingScreen';
@@ -99,7 +99,7 @@ const JoinGame = () => {
                 if (gamePhase === SessionPhase.GAME_ACTIVE) {
 
                     // initialize web3auth
-                    const userInfo = await login();
+                    const {userInfo} = await login();
                     localStorage.setItem('userInfo', JSON.stringify(userInfo));
                     if (sessionData) {
                         setSessionData({ ...sessionData, clientId: userInfo.email });
@@ -116,7 +116,7 @@ const JoinGame = () => {
 
     const retryLogin = async () => {
         // initialize web3auth
-        const userInfo = await login();
+        const {userInfo} = await login();
         await mCreatePlayerIfNotExists(userInfo);
         setSessionData({ ...sessionData, clientId: userInfo?.email});
         setAuthSessionData({ ...authSessionData, userInfo});

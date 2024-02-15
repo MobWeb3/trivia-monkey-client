@@ -13,14 +13,14 @@ import { LightSmartContractAccount, getDefaultLightAccountFactoryAddress } from 
 // const chain = mainnet;
 
 /* Mumbai */
-// const clientId = import.meta.env.VITE_APP_WEB3AUTH_CLIENT_ID_EVM_TESTNET ?? "";
-// const network = import.meta.env.VITE_APP_WEB3AUTH_NETWORK_TESTNET ?? "";
 // const chain = polygonMumbai;
 
 /* Sepolia */
-const clientId = import.meta.env.VITE_APP_WEB3AUTH_CLIENT_ID_EVM_TESTNET ?? "";
-const network = import.meta.env.VITE_APP_WEB3AUTH_NETWORK_TESTNET ?? "";
 const chain = sepolia;
+
+
+const clientId = import.meta.env.VITE_APP_WEB3AUTH_CLIENT_ID_TESTNET ?? "";
+const network = import.meta.env.VITE_APP_WEB3AUTH_NETWORK_TESTNET ?? "";
 
 export const createWeb3AuthSigner = async () => {
   const web3AuthSigner = new Web3AuthSigner({

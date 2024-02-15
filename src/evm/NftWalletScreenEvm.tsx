@@ -1,20 +1,19 @@
 import { Flex, Title } from '@mantine/core';
-import './NftWalletScreen.css'
+import './NftWalletScreenEvm.css'
 import { NftGameSession } from '../game-domain/ nfts/NftGameSession';
 import { NftGrid } from '../components/nft_wallet/NftGrid';
-import { getNftsFromSmartAccount, providerWithAlchemyEnhancedApis } from '../evm/alchemy/EnhancedApis';
-import { getProvider } from '../evm/alchemy/Web3AuthSigner';
+import { getNftsFromSmartAccount, providerWithAlchemyEnhancedApis } from './alchemy/EnhancedApis';
+import { getProvider } from './alchemy/Web3AuthSigner';
 import { OwnedNftsResponse } from 'alchemy-sdk';
 import { useEffect, useState } from 'react';
 import { SelectNetwork } from '../components/nft_wallet/SelectNetwork';
 import { SupportedNetworks } from '../SupportedNetworksConfig';
 import useLocalStorageState from 'use-local-storage-state';
-import { SessionData } from './SessionData';
-import { getNftsForOwner } from '../evm/alchemy/FetchNftsInefficient';
+import { getNftsForOwner } from './alchemy/FetchNftsInefficient';
 import { getWeb3AuthSigner } from '../authentication/Web3AuthAuthentication';
-// import { SupportedNetworks } from '../../';
+import { SessionData } from '../screens/SessionData';
 
-const NftWalletScreen = () => {
+const NftWalletScreenEvm = () => {
     const [nfts, setNfts] = useState<NftGameSession[]>([]);
     const [sessionData] = useLocalStorageState<SessionData>('sessionData');
 
@@ -59,7 +58,7 @@ const NftWalletScreen = () => {
     }, [sessionData?.nftWalletNetwork]);
 
     return (
-        <div className="nftWalletScreen">
+        <div className="nftWalletScreenEvm">
             <Flex
                 mih={50}
                 gap="md"
@@ -95,4 +94,4 @@ const NftWalletScreen = () => {
 
 };
 
-export default NftWalletScreen;
+export default NftWalletScreenEvm;

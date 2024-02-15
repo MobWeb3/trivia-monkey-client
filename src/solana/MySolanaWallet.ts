@@ -1,10 +1,10 @@
 import * as anchor from '@project-serum/anchor';
 import Provider, { Wallet } from "@project-serum/anchor/dist/cjs/provider"
-import { WalletAdapter } from '@metaplex-foundation/js'
+
 import { PublicKey, Transaction, Connection } from '@solana/web3.js';
 import { SolanaWallet } from "@web3auth/solana-provider";
 
-export class MySolanaWallet implements Wallet, WalletAdapter {
+export class MySolanaWallet implements Wallet {
 
     connection: Connection;
   
