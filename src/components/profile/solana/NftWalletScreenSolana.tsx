@@ -9,10 +9,7 @@ import { createWeb3AuthSolanaSigner } from '../../../solana/web3auth';
 import { getConnectedSolanaPublicKey } from '../../../authentication/solana/utils';
 import { UserCardImage } from '../UserCardImage';
 import { Loader } from '@mantine/core';
-// import { getAllNFTs } from '../../../solana/metaplex/getNfts';
-
-// fetch from AQYrC2kptkeQ5pVz9FWr4E4c11aDYdfv4SvrLSFbVtJe account
-// import { SupportedNetworks } from '../../';
+import { getNftsByOwner } from '../../../solana/metaplex/getNftsHandler';
 
 const NftWalletScreenSolana = () => {
     const [nfts, setNfts] = useState<NftGameSession[]>([]);
@@ -29,14 +26,20 @@ const NftWalletScreenSolana = () => {
             const publicKey = await getConnectedSolanaPublicKey(web3authSigner.inner);
             console.log('publicKey: ', publicKey?.toBase58());
             if (publicKey) {
-                // const nfts = getAllNFTs(publicKey.toBase58());
+                const nfts = await getNftsByOwner({
+                    // address: publicKey.toBase58(),
+                    address: 'AQYrC2kptkeQ5pVz9FWr4E4c11aDYdfv4SvrLSFbVtJe',
+                    start: 0,
+                    end: 10
+                });
                 console.log('nfts: ', nfts);
-                // setNfts(nfts);
+                setNfts(nfts);
             }
+            setLoading(false);
         }
 
         fetchNfts();
-    });
+    }, [authSessionData?.currentNetwork]);
 
     return (
         <div className={classes.background}>
