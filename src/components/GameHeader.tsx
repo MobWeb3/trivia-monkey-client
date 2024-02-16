@@ -6,9 +6,10 @@ interface GameHeaderProps {
   onPause?: () => void;
   onResume?: () => void;
   onExit?: () => void;
+  openModal: () => void;
 }
 
-const GameHeader: React.FC<GameHeaderProps> = () => {
+const GameHeader: React.FC<GameHeaderProps> = ({openModal}) => {
     
     return (
           <Affix position={{ top: 20, right: 20 }}>
@@ -17,6 +18,7 @@ const GameHeader: React.FC<GameHeaderProps> = () => {
                 size="xl"
                 aria-label="Gradient action icon"
                 gradient={{ from: 'blue', to: 'cyan', deg: 90 }}
+                onClick={openModal}
             >
                 <PauseIcon />
             </ActionIcon>

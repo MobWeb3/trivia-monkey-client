@@ -23,7 +23,9 @@ import useGameSession from '../mongo/useGameSession';
 import { getQuestion } from '../mongo/QuestionHandler';
 import { MersenneTwister19937, Random } from 'random-js';
 import { Topic } from '../game-domain/Topic';
-import GameHeader from '../components/HeaderActions';
+import GameHeader from '../components/GameHeader';
+import { useDisclosure } from '@mantine/hooks';
+import PauseOptionsModal from '../components/game/PauseOptionsModal';
 
 
 function AIGame() {
@@ -38,6 +40,7 @@ function AIGame() {
     const spacesRef = useRef<Spaces | null>(null);
     const useGameSessionHook = useGameSession();
     const navigate = useNavigate();
+    const [opened, { open, close }] = useDisclosure(false);
 
     useEffect(() => {
         if (!spacesRef.current && sessionData?.clientId) {
@@ -195,7 +198,8 @@ function AIGame() {
     return (
         <Portal>
             <div className='AIGamePage'>
-                <GameHeader />
+                <GameHeader openModal={open} />
+                <PauseOptionsModal opened={opened} closeModal={close} />
                 <Flex
                     className="flex-container"
                     direction='column'
