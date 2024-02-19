@@ -8,7 +8,7 @@ import { SessionData } from './SessionData';
 import useLocalStorageState from 'use-local-storage-state';
 import { Wheel } from 'react-custom-roulette'
 import { WheelData } from 'react-custom-roulette/dist/components/Wheel/types';
-import { Container, Flex } from '@mantine/core';
+import { Container, Flex, Portal } from '@mantine/core';
 import { SpaceProvider, SpacesProvider } from '@ably/spaces/dist/mjs/react';
 import AvatarStack from '../components/avatar_stack/AvatarStack';
 import IgnoranceMonkeyCard from '../components/game/IgnorantMonkeyCard';
@@ -23,6 +23,9 @@ import useGameSession from '../mongo/useGameSession';
 import { getQuestion } from '../mongo/QuestionHandler';
 import { MersenneTwister19937, Random } from 'random-js';
 import { Topic } from '../game-domain/Topic';
+import GameHeader from '../components/GameHeader';
+import { useDisclosure } from '@mantine/hooks';
+import PauseOptionsModal from '../components/game/PauseOptionsModal';
 
 
 function AIGame() {
@@ -37,9 +40,10 @@ function AIGame() {
     const spacesRef = useRef<Spaces | null>(null);
     const useGameSessionHook = useGameSession();
     const navigate = useNavigate();
+    const [opened, { open, close }] = useDisclosure(false);
 
     useEffect(() => {
-        if (!spacesRef.current && sessionData?.clientId){
+        if (!spacesRef.current && sessionData?.clientId) {
             spacesRef.current = getSpacesInstance(sessionData?.clientId);
         }
     }, [sessionData?.clientId]);
@@ -49,8 +53,8 @@ function AIGame() {
         if (sessionData?.sessionId) {
 
             console.log('handle show question button: topic: ', topic);
-            const question: Question = await getQuestion({ sessionId: sessionData?.sessionId,  topic});
-    
+            const question: Question = await getQuestion({ sessionId: sessionData?.sessionId, topic });
+
             // // console.log('question', question);
             setCurrentQuestion(question);
             setChosenTopic(topic);
@@ -92,9 +96,9 @@ function AIGame() {
         function isPlayerTurn(): boolean {
             const { clientId } = sessionData || {};
             const { currentTurnPlayer } = useGameSessionHook || {};
-        
+
             console.log('isPlayerTurn: ', clientId, currentTurnPlayer);
-        
+
             const email = currentTurnPlayer?.email;
 
             return email ? clientId === email : false;
@@ -111,7 +115,7 @@ function AIGame() {
                 const _message = `Waiting for ${useGameSessionHook?.currentTurnPlayer?.email ?? ""} to finish turn..`;
                 setMessage(_message);
 
-                console.log("message: ", _message);                
+                console.log("message: ", _message);
             }
         }
     }, [sessionData, useGameSessionHook]);
@@ -129,13 +133,13 @@ function AIGame() {
                 const isIgnoranceMonkeyWinner = ignoranceMonkey && ignoranceMonkey?.points >= pointsToWin;
 
                 const winner = playerList.find((player) => player.points >= pointsToWin) ??
-                 (isIgnoranceMonkeyWinner ? ignoranceMonkey : undefined);
+                    (isIgnoranceMonkeyWinner ? ignoranceMonkey : undefined);
                 if (winner) {
                     setMessage(`${winner.email} wins!`);
                     setCanSpin(false);
                     // Update game phase to GAME_OVER
-                    updateSession(useGameSessionHook?.sessionId, {gamePhase: SessionPhase.GAME_OVER } as GameSession);
-                    updateSession( useGameSessionHook?.sessionId, { winner } as GameSession);
+                    updateSession(useGameSessionHook?.sessionId, { gamePhase: SessionPhase.GAME_OVER } as GameSession);
+                    updateSession(useGameSessionHook?.sessionId, { winner } as GameSession);
                 }
             }
             else if (gamePhase === 'GAME_OVER') {
@@ -148,7 +152,7 @@ function AIGame() {
 
             }
         }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [useGameSessionHook]);
 
 
@@ -192,59 +196,60 @@ function AIGame() {
     }
 
     return (
-        <div className='AIGamePage'>
-            <Flex
-                className="flex-container"
-                direction='column'
-                align='center'
-                justify='center'
-                gap="md"
-            >
-                {spacesRef.current && (
-                <SpacesProvider client={spacesRef.current}>
-                    <SpaceProvider name="avatar-stack">
-                    <AvatarStack showScoreBadge={true}/>
-                    </SpaceProvider>
-                </SpacesProvider>
-                )}
-
-                <Container bg="linear-gradient(to bottom right, #FDD673, #D5B45B)"
-                    className='messageBox'
+        <Portal>
+            <div className='AIGamePage'>
+                <GameHeader openModal={open} />
+                <PauseOptionsModal opened={opened} closeModal={close} />
+                <Flex
+                    className="flex-container"
+                    direction='column'
+                    align='center'
+                    justify='center'
+                    gap="md"
                 >
-                    {message}
-                </Container>
+                    {spacesRef.current && (
+                        <SpacesProvider client={spacesRef.current}>
+                            <SpaceProvider name="avatar-stack">
+                                <AvatarStack showScoreBadge={true} />
+                            </SpaceProvider>
+                        </SpacesProvider>
+                    )}
 
-                <IgnoranceMonkeyCard 
-                    message={'heyooo.... fdssfd fd fsdfdsf sfsdf sdfdsfdsfds\nsdfdsf'}
-                    score={useGameSessionHook?.ignoranceMonkey?.points ?? 0}
-                />
+                    <Container bg="linear-gradient(to bottom right, #FDD673, #D5B45B)"
+                        className='messageBox'
+                    >
+                        {message}
+                    </Container>
 
-                {data && data.length > 0 && (
+                    <IgnoranceMonkeyCard
+                        message={'heyooo.... fdssfd fd fsdfdsf sfsdf sdfdsfdsfds\nsdfdsf'}
+                        score={useGameSessionHook?.ignoranceMonkey?.points ?? 0} />
 
-                    <Wheel
-                        mustStartSpinning={mustSpin}
-                        prizeNumber={prizeNumber}
-                        fontSize={25}
-                        data={data}
-                        radiusLineColor={'#fff'}
-                        radiusLineWidth={1}
-                        onStopSpinning={async () => {
-                            setMustSpin(false);
-                            const topicSelected = sliceValues[prizeNumber];
-                            await handleShowQuestion(topicSelected)
-                        }}
-                    />
-                )}
-                {canSpin && <CustomButton onClick={handleSpinClick}>SPIN</CustomButton>}
-            </Flex>
-            <QuestionModal
-                open={showQuestionModal}
-                onClose={() => finishTurnAndSaveState()}
-                question={currentQuestion}
-                topic={chosenTopic}
-                onExpire={() => finishTurnAndSaveState()}
-            />
-        </div>
+                    {data && data.length > 0 && (
+
+                        <Wheel
+                            mustStartSpinning={mustSpin}
+                            prizeNumber={prizeNumber}
+                            fontSize={25}
+                            data={data}
+                            radiusLineColor={'#fff'}
+                            radiusLineWidth={1}
+                            onStopSpinning={async () => {
+                                setMustSpin(false);
+                                const topicSelected = sliceValues[prizeNumber];
+                                await handleShowQuestion(topicSelected);
+                            }} />
+                    )}
+                    {canSpin && <CustomButton onClick={handleSpinClick}>SPIN</CustomButton>}
+                </Flex>
+                <QuestionModal
+                    open={showQuestionModal}
+                    onClose={() => finishTurnAndSaveState()}
+                    question={currentQuestion}
+                    topic={chosenTopic}
+                    onExpire={() => finishTurnAndSaveState()} />
+            </div>
+        </Portal>
 
     );
 }

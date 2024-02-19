@@ -1,4 +1,4 @@
-import { Card, Image, Text, Group } from '@mantine/core';
+import { Card, Image, Text, Group, Button } from '@mantine/core';
 import { NftGameSession } from '../../game-domain/ nfts/NftGameSession';
 
 type NftCardProps = {
@@ -26,6 +26,8 @@ export function NftCard({nft}: NftCardProps) {
           src={nft.image ? getCloudflareIpfsUrl(nft.image) : "https://bafybeiahlgcpkogk3rynat27ol4mdi7my3t7ykrrlel5wxnmpcy2fgmxqi.ipfs.nftstorage.link/"}
           height={160}
           alt="Nft image"
+          fit="contain"
+          bg={'dark'}
         />
       </Card.Section>
 
@@ -38,9 +40,9 @@ export function NftCard({nft}: NftCardProps) {
         {nft.description ?? nft.raw?.error}
       </Text>
 
-      {/* <Button color="blue" fullWidth mt="md" radius="md">
-        Book classic tour now
-      </Button> */}
+      <Button color="blue" fullWidth mt="md" radius="md">
+        Start
+      </Button>
     </Card>
   );
 }
