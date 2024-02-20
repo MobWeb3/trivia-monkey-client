@@ -1,0 +1,20 @@
+.card {
+    width: 100%;
+    text-align: center;
+  }
+  
+  .textXl {
+    margin-bottom: 10px;
+    font-family: 'umbrage2';
+    font-weight: 'bold';
+  }
+  
+  .textSm {
+    margin-bottom: 20px;
+    font-family: 'umbrage2';
+  }
+  
+  .button {
+    width: 150px;
+    font-family: 'umbrage2';
+  }

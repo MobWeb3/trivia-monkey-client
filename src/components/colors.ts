@@ -10,4 +10,5 @@ export const colors = {
     // purple - (eg. Option button default bg)
     purple: '#6562DF',
     purple2: '#4340B5',
+    purple_gradient: 'linear-gradient(180deg, #6562DF 0%, #4340B5 100%)',
 };

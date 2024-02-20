@@ -4,9 +4,8 @@ import { getWeb3AuthSigner } from "./Web3AuthAuthentication";
 import { detectNetwork } from './NetworkDetector';
 
 
-export const login = async () => {
-  console.log(`to detect: ${import.meta.env.VITE_DEFAULT_BLOCKCHAIN_NETWORK}`);
-  const detectedNetwork = await detectNetwork(import.meta.env.VITE_DEFAULT_BLOCKCHAIN_NETWORK);
+export const login = async (defaultNetwork: string='solana-devnet') => {
+  const detectedNetwork = await detectNetwork(defaultNetwork);
   
       const web3authSigner = await getWeb3AuthSigner();
       const web3auth = web3authSigner.inner;
