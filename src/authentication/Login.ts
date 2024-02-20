@@ -2,6 +2,7 @@ import { Web3Auth } from "@web3auth/modal";
 import { userExists, createUser } from "../mongo/PlayerHandler";
 import { getWeb3AuthSigner } from "./Web3AuthAuthentication";
 import { detectNetwork } from './NetworkDetector';
+import { getConnectedSolanaPublicKey } from "./solana/utils";
 
 
 export const login = async (defaultNetwork: string='solana-devnet') => {
@@ -12,7 +13,8 @@ export const login = async (defaultNetwork: string='solana-devnet') => {
       await createPlayerIfNotExists(web3auth);
       return {
         userInfo: await web3auth?.getUserInfo(),
-        network: detectedNetwork
+        network: detectedNetwork,
+        currentUserPublicKey: await getConnectedSolanaPublicKey(web3auth)
       };
 };
 

@@ -32,13 +32,18 @@ const PickUserLevelCard: React.FC<PickUserLevelCardProps> = ({ showCard, styles 
                     className={classes.button}
                     onClick={async () => {
                         setIsSigningIn(true);
-                        const { userInfo, network } = await login();
+                        const { userInfo, network, currentUserPublicKey } = await login();
                         if (userInfo !== undefined || userInfo!) {
                             setSessionData({ ...sessionData, clientId: userInfo.email, name: userInfo.name });
-                            setAuthSessionData({ ...authSessionData, userInfo, currentNetwork: network });
+                            setAuthSessionData(
+                                { ...authSessionData, 
+                                    userInfo,
+                                    currentNetwork: network,
+                                    currentUserPublicKey});
                             setIsSigningIn(false);
                             navigate('/playlobby');
                         }
+                        
                     }}
                 >
                     Beginner
