@@ -24,7 +24,6 @@ const PickUserLevelCard: React.FC<PickUserLevelCardProps> = ({ showCard, styles 
     const [isSigningIn, setIsSigningIn] = React.useState(false);
     const navigate = useNavigate();
 
-
     const ButtonOptions = () => {
         return (
             <>
@@ -47,6 +46,7 @@ const PickUserLevelCard: React.FC<PickUserLevelCardProps> = ({ showCard, styles 
                 <Button
                     color={colors.purple}
                     className={classes.button}
+                    disabled={true}
                     onClick={() => navigate('/playlobby')}
                 >
                     Advanced
