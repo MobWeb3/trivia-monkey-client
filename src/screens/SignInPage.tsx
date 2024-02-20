@@ -11,13 +11,6 @@ export const SignInPage = () => {
   const [signInPressed, setSignInPressed] = useState(false);
 
   const advanceToLevelPick = async () => {
-    // if (web3auth !== null) {
-    //   const { userInfo, network } = await login();
-
-    //   setSessionData({ ...sessionData, clientId: userInfo.email, name: userInfo.name });
-    //   setAuthSessionData({ ...authSessionData, userInfo, currentNetwork: network });
-    // }
-    // navigate('/playlobby');
     setSignInPressed(true);
   }
 
