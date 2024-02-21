@@ -23,3 +23,15 @@ export const createUser = async (data: Player) => {
         throw error;
     }
 }
+
+export const getUserFromEmail = async (email: string) => {
+    try {
+        const response = await axios.post(`${BASE_URL}/api/mongo/getUserFromEmail`, {
+            email
+        });
+        return response.data as Player;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+}
