@@ -5,9 +5,9 @@ import { createWeb3AuthSolanaSigner } from "../solana/web3auth";
 import { detectNetwork, isEvmChain } from "./NetworkDetector";
 import { getConnectedSolanaPublicKey } from "./solana/utils";
 
-export const getWeb3AuthSigner = async () => {
+export const getWeb3AuthSigner = async (selectedNetwork: string=SolanaDevnet.network) => {
 
-    const blockchainNetwork = await detectNetwork(import.meta.env.VITE_DEFAULT_BLOCKCHAIN_NETWORK);
+    const blockchainNetwork = await detectNetwork(selectedNetwork);
 
     if (isEvmChain(blockchainNetwork)) {
         const web3authSigner = await createWeb3AuthSigner();

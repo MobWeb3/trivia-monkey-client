@@ -3,10 +3,11 @@ import { userExists, createUser } from "../mongo/PlayerHandler";
 import { getWeb3AuthSigner } from "./Web3AuthAuthentication";
 import { detectNetwork } from './NetworkDetector';
 import { getConnectedSolanaPublicKey } from "./solana/utils";
+import { SolanaDevnet } from "../SupportedNetworksConfig";
 
 
-export const login = async (defaultNetwork: string='solana-devnet') => {
-  const detectedNetwork = await detectNetwork(defaultNetwork);
+export const login = async (selectedNetwork: string=SolanaDevnet.network) => {
+  const detectedNetwork = await detectNetwork(selectedNetwork);
   
       const web3authSigner = await getWeb3AuthSigner();
       const web3auth = web3authSigner.inner;
