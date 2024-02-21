@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "@ably/spaces": "^0.3.0",
-    "@alchemy/aa-accounts": "^1.2.0",
+    "@alchemy/aa-accounts": "^3.0.0",
     "@alchemy/aa-alchemy": "^1.2.0",
     "@alchemy/aa-core": "^2.3.1",
     "@babel/runtime": "^7.23.8",
