@@ -8,6 +8,7 @@ import { mintNft } from '../../solana/MintHandler';
 import { SessionData } from '../../screens/SessionData';
 import { getSession } from '../../mongo/SessionHandler';
 import { getUserFromEmail } from '../../mongo/PlayerHandler';
+import { getSolanaBalance } from '../../solana/helpers';
 
 
 export const ActionOptionsComponent = () => {
@@ -63,9 +64,19 @@ export const ActionOptionsComponent = () => {
         >
             <OptionButton
                 fontSize={"20px"}
-                onClick={() => {
+                onClick={async () => {
                     console.log("Minting session data as NFT...")
-                    mintSession();
+
+                    if (!authSessionData?.currentUserPublicKey) {
+                        console.log('mintSessionData: missing public key')
+                        return;
+                    }
+
+                    // Let's check the balance before minting. For solana is about 0.02 SOL
+                    await getSolanaBalance(authSessionData?.currentUserPublicKey);
+                    
+
+                    // mintSession();
                 }}
                 background={colors.yellow_gradient}
                 color={colors.black}

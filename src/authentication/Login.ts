@@ -15,7 +15,7 @@ export const login = async (selectedNetwork: string=SolanaDevnet.network) => {
       return {
         userInfo: await web3auth?.getUserInfo(),
         network: detectedNetwork,
-        currentUserPublicKey: await getConnectedSolanaPublicKey(web3auth)
+        currentUserPublicKey: (await getConnectedSolanaPublicKey(web3auth))?.toString()
       };
 };
 
