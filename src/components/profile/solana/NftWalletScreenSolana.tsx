@@ -27,7 +27,6 @@ const NftWalletScreenSolana = () => {
             console.log('publicKey: ', publicKey?.toBase58());
             if (publicKey) {
                 const nfts = await getNftsByOwner({
-                    // address: publicKey.toBase58(),
                     address: publicKey.toBase58(),
                     start: 0,
                     end: 10
