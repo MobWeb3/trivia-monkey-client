@@ -22,5 +22,5 @@ export const getConnectedSolanaPublicKey = async (web3auth: Web3Auth) => {
         }
     }
 
-    return null;
+    return undefined;
 }

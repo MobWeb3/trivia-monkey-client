@@ -26,7 +26,7 @@ const CreateGame = () => {
     const [sessionData, setSessionData] = useLocalStorageState<SessionData>('sessionData', {});
     const navigate = useNavigate();
     const [opened, { open, close }] = useDisclosure(false);
-    const { topics } = useContext(TopicContext);
+    const { topics, setTopics } = useContext(TopicContext);
     const [loading, setLoading] = useState(false);
     const [sessionCreated, setSessionCreated] = useState(false);
     const urlRef = useRef('');
@@ -58,6 +58,7 @@ const CreateGame = () => {
         if (!sessionCreated) {
             // lets clear the sessionData.sessionId. Let's have a clean start
             setSessionData({ ...sessionData, sessionId: undefined, channelId: undefined });
+            setTopics([]);
             return;
         } 
 
