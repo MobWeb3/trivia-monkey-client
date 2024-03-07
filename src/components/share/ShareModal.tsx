@@ -1,6 +1,7 @@
 import React from 'react';
 import { FacebookShareButton, TwitterShareButton, WhatsappShareButton, FacebookIcon, TwitterIcon, WhatsappIcon } from 'react-share';
 import './ShareModal.css';
+import warpcastIcon from '../../assets/icons/warpcast-icon.png';
 
 type ShareModalProps = {
     url: string;
@@ -10,6 +11,11 @@ type ShareModalProps = {
 
 const ShareModal: React.FC<ShareModalProps> = ({ url, isOpen, onClose }) => {
   if (!isOpen) return null;
+
+  const handleWarpcastShare = () => {
+    if (url)
+      window.open(url, '_blank');
+  };
 
   return (
     <div className="shareModalBackdrop">
@@ -24,6 +30,10 @@ const ShareModal: React.FC<ShareModalProps> = ({ url, isOpen, onClose }) => {
         <WhatsappShareButton url={url}>
           <WhatsappIcon size={32} round />
         </WhatsappShareButton>
+        <button onClick={handleWarpcastShare} className="customShareButton">
+          <img src={warpcastIcon} alt="Warpcast" width="32" height="32" />
+        </button>
+
         <button onClick={onClose}>Close</button>
       </div>
     </div>
@@ -31,3 +41,15 @@ const ShareModal: React.FC<ShareModalProps> = ({ url, isOpen, onClose }) => {
 };
 
 export default ShareModal;
+
+
+/**
+ * New Farcaster developer utility: 
+
+cast intents  
+
+Using the http://warpast.com/~/compose URL with text and embed parameters will generate a deeplink into Warpcast apps with a pre-populated cast.
+
+https://warpcast.com/~/compose?text=The%20best%20essay%20for%20understanding%20why%20people%20use%20new%20social%20networks&embeds[]=https://trivia-monkey-client.vercel.app/
+
+ */

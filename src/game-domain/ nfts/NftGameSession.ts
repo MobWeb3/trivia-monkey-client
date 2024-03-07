@@ -1,4 +1,5 @@
 import { NftRawMetadata } from "alchemy-sdk";
+import { GameSession } from "../GameSession";
 
 export interface NftGameSession {
     readonly name?: string;
@@ -11,6 +12,7 @@ export interface NftGameSession {
     readonly timestampMint?: string;
     readonly attributes?: readonly Record<string, any>[];
     readonly raw?: NftRawMetadata;
+    readonly session?: GameSession;
 }
 
 export interface MutableNftGameSession {
@@ -24,6 +26,7 @@ export interface MutableNftGameSession {
     timestampMint?: string;
     attributes?: Record<string, any>[];
     raw?: NftRawMetadata;
+    session?: GameSession;
   }
 
 

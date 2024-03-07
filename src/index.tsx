@@ -1,9 +1,9 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import { SignerContext, SignerProvider } from './components/SignerContext';
 import SignInPage from './screens/SignInPage';
-import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
+import { Route, BrowserRouter as Router, Routes, useLocation, useNavigate } from 'react-router-dom';
 import PlayLobby from './screens/PlayLobby';
 import CreateGame from './screens/CreateGame';
 import JoinGame from './screens/JoinGame';
@@ -29,6 +29,23 @@ root.render(
   </SignerProvider>
 );
 
+const NavigationHandler: React.FC = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const page = params.get('page');
+    const channelId = params.get('channelId');
+    const sessionId = params.get('sessionId');
+    if (page === 'join') {
+      navigate(`/joingame?channelId=${channelId}&sessionId=${sessionId}`);
+    }
+  }, [location.search, navigate]);
+
+  return null;
+};
+
 function AppComponent() {
 
   const { web3auth} = useContext(SignerContext);
@@ -40,6 +57,7 @@ function AppComponent() {
             <TopicProvider>
               <WagmiConfig config={getWagmiConfig(web3auth)}>
                 <Router>
+                  <NavigationHandler />
                   <Routes>
                     <Route path="/playlobby" element={<PlayLobby />} />
                     <Route path="*" element={<SignInPage />} />

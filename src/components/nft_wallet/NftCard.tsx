@@ -1,11 +1,14 @@
 import { Card, Image, Text, Group, Button } from '@mantine/core';
 import { NftGameSession } from '../../game-domain/ nfts/NftGameSession';
+import { createWarpcastLink } from '../share/WarpCastLink';
 
 type NftCardProps = {
-    nft: NftGameSession; // Replace Nft with the actual type of your NFTs
+    nft: NftGameSession;
+    setJoinLink?: (link: string) => void;
+    openShareModal?: () => void;
   };
 
-export function NftCard({nft}: NftCardProps) {
+export function NftCard({nft, setJoinLink, openShareModal}: NftCardProps) {
 
   function getIpfsHashFromUrl(url?: string) {
     if (url === undefined) return "";
@@ -40,7 +43,19 @@ export function NftCard({nft}: NftCardProps) {
         {nft.description ?? nft.raw?.error}
       </Text>
 
-      <Button color="blue" fullWidth mt="md" radius="md">
+      <Button color="blue" fullWidth mt="md" radius="md"
+        onClick={() => {
+          console.log('Start game with NFT: ', nft);
+
+          openShareModal && openShareModal();
+          const embed = `${window.location.origin}?page=join&sessionId=${nft.session?.sessionId}&channelId=${nft.session?.channelId}`
+
+          console.log('embed: ', embed);
+          const warpcastUrl = createWarpcastLink("Let's continue playing our game!", [embed]);
+          setJoinLink && setJoinLink(warpcastUrl);
+          console.log('warpcastUrl: ', warpcastUrl);
+        }}
+      >
         Start
       </Button>
     </Card>
