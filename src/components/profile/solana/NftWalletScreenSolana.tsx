@@ -19,7 +19,6 @@ const NftWalletScreenSolana = () => {
     const [joinLink, setJoinLink] = useState('https://warpcast.com/~/compose?text=The%20best%20essay%20for%20understanding%20why%20people%20use%20new%20social%20networks&embeds[]=https://trivia-monkey-client.vercel.app/');
     const [isShareModalOpen, setShareModalOpen] = useState(false);
     const openShareModal = () => {
-        console.log('openShareModal');
         setShareModalOpen(true);
     }
     const closeShareModal = () => setShareModalOpen(false);
@@ -53,21 +52,17 @@ const NftWalletScreenSolana = () => {
             <div className={classes.nftWalletScreenSolana}>
                 <Flex
                     gap="md"
-                    justify="start"
+                    justify="center"
                     align="center"
                     direction="column"
                     wrap="wrap"
                     style={{
                         // add opacity to the background
                         backgroundColor: "rgba(0, 0, 0, 0.5)",
-                        // radius for the whole component
                         borderRadius: 20,
-                        // padding for the whole component
                         padding: 20,
-                        // margin: 20,
-                        top: "10%",
+                        margin: 20,
                         width: "90%",
-                        margin: "auto",
                     }}
                 >
                     {loading ? <Loader /> :
