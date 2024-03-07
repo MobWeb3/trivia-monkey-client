@@ -10,12 +10,20 @@ import { getConnectedSolanaPublicKey } from '../../../authentication/solana/util
 import { UserCardImage } from '../UserCardImage';
 import { Loader } from '@mantine/core';
 import { getNftsByOwner } from '../../../solana/metaplex/getNftsHandler';
+import ShareModal from '../../share/ShareModal';
 
 const NftWalletScreenSolana = () => {
     const [nfts, setNfts] = useState<NftGameSession[]>([]);
     const [authSessionData] = useLocalStorageState<AuthSessionData>('authSessionData', {});
     const [loading, setLoading] = useState(true);
-
+    const [joinLink, setJoinLink] = useState('https://warpcast.com/~/compose?text=The%20best%20essay%20for%20understanding%20why%20people%20use%20new%20social%20networks&embeds[]=https://trivia-monkey-client.vercel.app/');
+    const [isShareModalOpen, setShareModalOpen] = useState(false);
+    const openShareModal = () => {
+        console.log('openShareModal');
+        setShareModalOpen(true);
+    }
+    const closeShareModal = () => setShareModalOpen(false);
+    
     useEffect(() => {
         // current network
         console.log('authSessionData?.currentNetwork: ', authSessionData?.currentNetwork);
@@ -63,7 +71,8 @@ const NftWalletScreenSolana = () => {
                     }}
                 >
                     {loading ? <Loader /> :
-                        <><UserCardImage userInfo={authSessionData?.userInfo} />
+                        <>
+                            <UserCardImage userInfo={authSessionData?.userInfo} />
                             <Title order={2}
                                 bg={"white"}
                                 style={{
@@ -72,9 +81,15 @@ const NftWalletScreenSolana = () => {
                                     opacity: 0.9,
                                 }}
                             >NFT Game Sessions</Title>
-                            <NftGrid nfts={nfts}></NftGrid></>
+                            <NftGrid 
+                                nfts={nfts} 
+                                setJoinLink= {setJoinLink}
+                                openShareModal={openShareModal}
+                            >
+                            </NftGrid>
+                        </>
                     }
-
+                    <ShareModal url={joinLink} isOpen={isShareModalOpen} onClose={closeShareModal} />
                 </Flex>
             </div>
         </div>

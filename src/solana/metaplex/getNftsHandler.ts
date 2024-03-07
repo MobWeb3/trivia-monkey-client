@@ -43,6 +43,7 @@ const parseNftGameSession = async (nft: NftMintData[]) => {
             description: metadata.description,
             image: metadata.image,
             tokenId: nft.mint,
+            session: metadata.session
         } as NftGameSession;
     }));
 
