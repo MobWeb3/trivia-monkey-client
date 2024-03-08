@@ -15,6 +15,8 @@
     "@babel/runtime": "^7.23.8",
     "@mantine/core": "^7.3.0",
     "@mantine/hooks": "^7.0.0",
+    "@moonpay/moonpay-js": "^0.5.0",
+    "@moonpay/moonpay-react": "^1.6.1",
     "@project-serum/anchor": "^0.26.0",
     "@tabler/icons-react": "^2.46.0",
     "@types/node": "^20.11.14",
