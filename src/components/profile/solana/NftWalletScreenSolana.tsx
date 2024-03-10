@@ -93,7 +93,7 @@ const NftWalletScreenSolana = () => {
                         baseCurrencyAmount="100"
                         defaultCurrencyCode="eth"
                         onLogin={() => {
-                            console.log("Customer logged in!");
+                            console.log("Customer logged in! ");
                             return Promise.resolve();
                           }}
                         onCloseOverlay={() => {
