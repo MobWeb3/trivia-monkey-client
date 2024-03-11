@@ -8,13 +8,17 @@ import { mintNft } from '../../solana/MintHandler';
 import { SessionData } from '../../screens/SessionData';
 import { getSession } from '../../mongo/SessionHandler';
 import { getUserFromEmail } from '../../mongo/PlayerHandler';
-import { getSolanaBalance } from '../../solana/helpers';
+import { getUSDCBalance } from '../../solana/helpers';
 
+export interface ActionOptionsComponentProps {
+    setShowBuyCredits?: (show: boolean) => void;
+}
 
-export const ActionOptionsComponent = () => {
+export const ActionOptionsComponent: React.FC<ActionOptionsComponentProps> = ({setShowBuyCredits}) => {
     const navigate = useNavigate();
     const [authSessionData] = useLocalStorageState<AuthSessionData>('authSessionData', {});
     const [sessionData] = useLocalStorageState<SessionData>('sessionData', {});
+    
 
     // mint session data as NFT
     const mintSession = async () => {
@@ -72,11 +76,18 @@ export const ActionOptionsComponent = () => {
                         return;
                     }
 
-                    // Let's check the balance before minting. For solana is about 0.02 SOL
-                    await getSolanaBalance(authSessionData?.currentUserPublicKey);
-                    
+                    // // Let's check the balance before minting. For solana is about 0.02 SOL
+                    // await getSolanaBalance(authSessionData?.currentUserPublicKey);
 
-                    // mintSession();
+                    const balance = await getUSDCBalance(authSessionData?.currentUserPublicKey);
+                    
+                    if (balance && balance < 12.00) {
+                        console.info('mintSessionData: insufficient balance')
+                        setShowBuyCredits && setShowBuyCredits(true);
+                        return;
+                    }
+
+                    // mintSession(); //TODO: uncomment this line. testing payment for now.
                 }}
                 background={colors.yellow_gradient}
                 color={colors.black}
