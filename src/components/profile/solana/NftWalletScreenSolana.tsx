@@ -11,6 +11,7 @@ import { UserCardImage } from '../UserCardImage';
 import { Loader } from '@mantine/core';
 import { getNftsByOwner } from '../../../solana/metaplex/getNftsHandler';
 import ShareModal from '../../share/ShareModal';
+import { MoonPayBuyWidget } from '@moonpay/moonpay-react';
 
 const NftWalletScreenSolana = () => {
     const [nfts, setNfts] = useState<NftGameSession[]>([]);
@@ -18,6 +19,7 @@ const NftWalletScreenSolana = () => {
     const [loading, setLoading] = useState(true);
     const [joinLink, setJoinLink] = useState('https://warpcast.com/~/compose?text=The%20best%20essay%20for%20understanding%20why%20people%20use%20new%20social%20networks&embeds[]=https://trivia-monkey-client.vercel.app/');
     const [isShareModalOpen, setShareModalOpen] = useState(false);
+    const [addFundsPressed, setAddFundsPressed] = useState(false);
     const openShareModal = () => {
         setShareModalOpen(true);
     }
@@ -67,7 +69,7 @@ const NftWalletScreenSolana = () => {
                 >
                     {loading ? <Loader /> :
                         <>
-                            <UserCardImage userInfo={authSessionData?.userInfo} />
+                            <UserCardImage userInfo={authSessionData?.userInfo} setPressedAddFunds={setAddFundsPressed} />
                             <Title order={2}
                                 bg={"white"}
                                 style={{
@@ -85,6 +87,25 @@ const NftWalletScreenSolana = () => {
                         </>
                     }
                     <ShareModal url={joinLink} isOpen={isShareModalOpen} onClose={closeShareModal} />
+                    <MoonPayBuyWidget
+                        variant="overlay"
+                        baseCurrencyCode="usd"
+                        baseCurrencyAmount="100"
+                        defaultCurrencyCode="eth"
+                        onLogin={() => {
+                            console.log("Customer logged in! ");
+                            return Promise.resolve();
+                          }}
+                        onCloseOverlay={() => {
+                            console.log("Overlay closed!");
+                            if (addFundsPressed) {
+                                setAddFundsPressed(false);
+                            }
+                          }
+                        }
+                        
+                        visible={addFundsPressed}
+                    />
                 </Flex>
             </div>
         </div>
