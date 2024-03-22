@@ -21,6 +21,7 @@ export const ActionOptionsComponent: React.FC<ActionOptionsComponentProps> = ({s
     
 
     // mint session data as NFT
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const mintSession = async () => {
         // get network from useLocalStorageState
 
