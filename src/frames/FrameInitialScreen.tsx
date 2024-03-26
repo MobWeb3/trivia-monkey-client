@@ -17,6 +17,7 @@ export const FrameInitialScreen = () => {
     const [opened, { open, close }] = useDisclosure(false);
     const { topics } = useContext(TopicContext);
     const [loading, setLoading] = useState(false);
+    const [frameSessionCreated, setFrameSessionCreated] = useState(false);
 
     const handleCreateFrameSubmitted = async () => {
         setLoading(true);
@@ -27,10 +28,10 @@ export const FrameInitialScreen = () => {
             return;
         }
 
-        console.log('topics: ', topics);
-        console.log('frameTitle: ', frameTitle);
-        console.log('numberQuestions: ', numberQuestions);
-        console.log('topics[0]?.metaphor_id: ', topics[0]?.metaphor_id);
+        // console.log('topics: ', topics);
+        // console.log('frameTitle: ', frameTitle);
+        // console.log('numberQuestions: ', numberQuestions);
+        // console.log('metaphor_id: ', topics[0]?.metaphor_id);
 
         try {
             // Create the frame
@@ -42,8 +43,11 @@ export const FrameInitialScreen = () => {
                     metaphor_id: topics[0]?.metaphor_id
                 }
             })
-            console.log('frame: ', frame);
+            // console.log('frame: ', frame);
             console.log('questions: ', questions);
+            const frameSessionURL = generateFrameSessionURL(frame._id);
+            console.log('frameSessionURL: ', frameSessionURL);
+            setFrameSessionCreated(true);
         }
         catch (error) {
             console.error(error);
@@ -51,6 +55,11 @@ export const FrameInitialScreen = () => {
         }
         setLoading(false)
     };
+
+    // Function to generate a URL for the frame session
+    const generateFrameSessionURL = (frameId: string) => {
+        return `https://trivia-monkey-server.vercel.app/frame/getSession?id=${frameId}`;
+    }
 
     return (
         <div className={styles.main}>
@@ -140,6 +149,7 @@ export const FrameInitialScreen = () => {
                     />
                 </Modal></> : null}
             {loading ? <Loader color={colors.yellow} /> : null}
+            {frameSessionCreated ? <div>Frame session created</div> : null}
         </div>
     );
 }

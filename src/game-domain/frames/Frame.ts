@@ -1,4 +1,5 @@
 export interface MutableFrame {
+    id?: string;
     name: string;
     metaphor_id: string;
     numberOfQuestions: number;
