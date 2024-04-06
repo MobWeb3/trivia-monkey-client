@@ -75,7 +75,7 @@
     "rollup-plugin-node-builtins": "^2.1.2",
     "rollup-plugin-node-polyfills": "^0.2.1",
     "typescript": "^5.3.2",
-    "vite": "^5.0.12",
+    "vite": "^5.0.13",
     "vite-plugin-babel": "^1.2.0",
     "vite-plugin-checker": "^0.6.2",
     "vite-plugin-pwa": "^0.17.4",
