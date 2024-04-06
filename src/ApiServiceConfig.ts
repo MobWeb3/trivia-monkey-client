@@ -10,3 +10,9 @@ export const BASE_URL = isDev ? DEV_BASE_URL : import.meta.env.VITE_PROD_MT_SERV
 export const DEV_MENG_URL = 'http://127.0.0.1:8000'
 
 export const MENG_URL = isDev ? DEV_MENG_URL : import.meta.env.VITE_PROD_MENG_URL;
+
+export const DEV_FRAMES_URL = 'http://localhost:3000';
+
+export const isDev_Frames = import.meta.env.MODE === 'prod-service-dev-frame' ? true : false;
+
+export const FRAMES_URL = isDev ? DEV_FRAMES_URL : import.meta.env.VITE_PROD_FRAMES_URL;

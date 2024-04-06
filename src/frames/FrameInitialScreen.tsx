@@ -9,6 +9,7 @@ import { TopicContext } from '../components/topics/TopicContext';
 import { colors } from '../components/colors';
 import ChooseTopicComponent from './components/ChooseTopicComponent';
 import { createFrame } from '../mongo/FrameHandler';
+import { FRAMES_URL } from '../ApiServiceConfig';
 
 export const FrameInitialScreen = () => {
 
@@ -58,7 +59,7 @@ export const FrameInitialScreen = () => {
 
     // Function to generate a URL for the frame session
     const generateFrameSessionURL = (frameId: string) => {
-        return `https://trivia-monkey-server.vercel.app/frame/getSession?id=${frameId}`;
+        return `${FRAMES_URL}/frame/getSession?id=${frameId}`;
     }
 
     return (
