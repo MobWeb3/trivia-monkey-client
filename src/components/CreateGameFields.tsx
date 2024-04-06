@@ -7,6 +7,7 @@ import CustomButton from './CustomButton';
 import './CreateGameFields.css';
 import SelectedTopicEntries from './topics/SelectedTopicEntries';
 import { TopicContext } from './topics/TopicContext';
+import { colors } from './colors';
 
 interface CreateGameFormProps {
     setNickname: (nickname: string) => void;
@@ -114,7 +115,7 @@ const CreateGameForm: React.FC<CreateGameFormProps> = ({
                 radius={'xl'}
                 withCloseButton={false}
                 styles={{
-                    body: { backgroundColor: '#1AB2C7' },
+                    body: { backgroundColor: colors.blue_turquoise },
                 }}
             >
                 <PickTopicComponent
@@ -122,7 +123,7 @@ const CreateGameForm: React.FC<CreateGameFormProps> = ({
                     closeModal={closeModal}
                     style={
                         {
-                            backgroundColor: '#1AB2C7',
+                            backgroundColor: colors.blue_turquoise,
                         }
                     }
                 />

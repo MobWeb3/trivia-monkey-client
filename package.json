@@ -89,6 +89,7 @@
     "serve": "vite preview",
     "start-dev-service": "vite --mode dev-service",
     "start-prod-service": "vite --mode prod-service",
+    "start-prod-service-dev-frame": "vite --mode prod-service-dev-frame",
     "test": "vitest run"
   },
   "eslintConfig": {

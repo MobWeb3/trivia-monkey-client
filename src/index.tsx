@@ -20,6 +20,7 @@ import { getWagmiConfig } from './evm/WagmiConnector';
 import { Profile } from './screens/Profile';
 import NftWalletScreen from './screens/NftWalletScreen';
 import { MoonPayProvider } from '@moonpay/moonpay-react';
+import FrameInitialScreen from './frames/FrameInitialScreen';
 
 const container = document.getElementById('root') as HTMLElement;
 const root = ReactDOM.createRoot(container);
@@ -74,6 +75,7 @@ function AppComponent() {
                   <Route path="/scoretree" element={<ScoreScreen />} />
                   <Route path="/profile" element={<Profile />} />
                   <Route path="/wallet" element={<NftWalletScreen />} />
+                  <Route path="/frames" element={<FrameInitialScreen />} />
                   {/* other routes... */}
                 </Routes>
                 {/* <Bootstrap /> */}
