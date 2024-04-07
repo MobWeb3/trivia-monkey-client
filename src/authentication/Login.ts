@@ -6,6 +6,7 @@ import { getConnectedSolanaPublicKey } from "./solana/utils";
 import { SolanaDevnet } from "../SupportedNetworksConfig";
 
 
+
 export const login = async (selectedNetwork: string=SolanaDevnet.network) => {
   const detectedNetwork = await detectNetwork(selectedNetwork);
   
@@ -15,13 +16,20 @@ export const login = async (selectedNetwork: string=SolanaDevnet.network) => {
       return {
         userInfo: await web3auth?.getUserInfo(),
         network: detectedNetwork,
-        currentUserPublicKey: (await getConnectedSolanaPublicKey(web3auth))?.toString()
+        currentUserPublicKey: (await getConnectedSolanaPublicKey(web3auth))?.toString(),
+        web3auth
       };
 };
 
 const createPlayerIfNotExists = async (web3authInstance: Web3Auth) => {
     const userInfo = await web3authInstance.getUserInfo();
     console.log('userInfo: ', userInfo);
+
+    if (!userInfo || !userInfo.email) {
+      console.error('No user info found');
+      return;
+    }
+
     const userExist = await userExists(userInfo?.email ?? "");
     if (!userExist) {
       console.log('user does not exist, creating user');
@@ -33,3 +41,5 @@ const createPlayerIfNotExists = async (web3authInstance: Web3Auth) => {
       console.log('createdPlayer: ', createdPlayer);
     }
 }
+
+
