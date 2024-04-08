@@ -3,7 +3,8 @@ import styles from '../frames/FrameInitialScreen.module.css'
 import { CustomButton } from '../components/CustomButton';
 import { Card, Container, FileInput, Flex, Input, Loader,
      Modal, SegmentedControl, Image, Group, Text, 
-     Badge} from '@mantine/core';
+     Badge,
+     Textarea} from '@mantine/core';
 import { IconPacman } from '@tabler/icons-react';
 import SelectedTopicEntries from '../components/topics/SelectedTopicEntries';
 import { useDisclosure } from '@mantine/hooks';
@@ -28,12 +29,8 @@ import { mplTokenMetadata } from '@metaplex-foundation/mpl-token-metadata';
 import React from 'react';
 const endpoint = 'https://api.devnet.solana.com';
 
-
 export const FrameInitialScreenUIComponent = () => {
     const { wallets } = useWallet();
-
-    // console.log(wallets);
-
     const [frameTitle, setFrameTitle] = useState("");
     const [collectionName, setCollectionName] = useState("");
     const [numberQuestions, setNumberQuestions] = useState('1');
@@ -44,13 +41,20 @@ export const FrameInitialScreenUIComponent = () => {
     const [frameSessionCreated, setFrameSessionCreated] = useState(false);
     const [web3auth, setWeb3auth] = useState<Web3Auth>();
     const [selectedImage, setSelectedImage] = useState<File | null>(null);
+    const [description, setDescription] = useState('');
 
+    // console.log('topics: ', topics);
     const handleFileSelect = (file: any) => {
         console.log('file: ', file);
         if (file) {
           setSelectedImage(file);
         }
-      };
+    };
+
+    const onDescriptionChange = async (e: any) => {
+        setDescription(e.currentTarget.value);
+        console.log('description: ', e.currentTarget.value);
+    }
 
     const handleCreateFrameSubmitted = async () => {
         setLoading(true);
@@ -123,10 +127,6 @@ export const FrameInitialScreenUIComponent = () => {
                 .use(mplTokenMetadata());
 
             await createNftCollection(umi);
-            // 
-            // // const message = 'Sign this message';
-            // // const signature = await wallet.signAndSendTransaction(message);
-            // // console.log('signature: ', signature);
         }
 
     }
@@ -135,9 +135,14 @@ export const FrameInitialScreenUIComponent = () => {
         opened: boolean;
         close: () => void;
         open: () => void;
+        handleFileSelect: (file: any) => void;
     }
 
-    const BuildNftComponent = ({ opened: o, close }: BuildComponentProps) => {
+    const BuildNftComponent = ({ 
+        opened: o, 
+        close, 
+        handleFileSelect,
+    }: BuildComponentProps) => {
         return (
             <Modal
                 yOffset={'5dvh'}
@@ -180,23 +185,47 @@ export const FrameInitialScreenUIComponent = () => {
                         style: { 
                             color: colors.black,
                             fontFamily: 'umbrage2',
-                            fontSize: '2rem',
+                            fontSize: '1rem',
                         } 
                     }}
                     withAsterisk
-                    descriptionProps={{style: {
-                        color: colors.black,
-                        fontFamily: 'umbrage2',
-                        fontSize: '0.7rem'
-                    }}}
+                    // descriptionProps={{style: {
+                    //     color: colors.black,
+                    //     fontFamily: 'umbrage2',
+                    //     fontSize: '1rem'
+                    // }}}
                     value={selectedImage}
                     onChange={handleFileSelect}
-                    description="This image will be used for all your NFTs in this collection"
+                    // description="This image will be used for all your NFTs in this collection"
                     placeholder="Collection Image (PNG, JPEG)"
+                />
+                <Textarea
+                    label="Description"
+                    placeholder="Description of the collection"
+                    labelProps={{
+                        style: {
+                            color: colors.black,
+                            fontFamily: 'umbrage2',
+                            fontSize: '1rem',
+                        }
+                    }}
+                    style={{
+                        marginTop: '1rem',
+                        marginBottom: '1rem',
+                    
+                    }}
+                
+                    // value={description}
+                    defaultValue={description}
+                    onBlur={(e) => setDescription(e.currentTarget.value)}
+                    // autosize
+                    minRows={2}
+                    maxRows={4}
                 />
                 <NftPreviewCard 
                     imageUri={selectedImage ? URL.createObjectURL(selectedImage) : undefined}
-                    name={collectionName}
+                    // name={collectionName}
+                    // description={description}
                     style={{
                         marginTop: '2rem',
                         marginBottom: '2rem',
@@ -208,26 +237,18 @@ export const FrameInitialScreenUIComponent = () => {
 
     type NftPreviewCardProps = {
         imageUri?: string;
-        name?: string;
-        description?: string;
+        // name?: string;
+        // description?: string;
         style?: React.CSSProperties;
     };
 
-    const ImageComponent = React.memo(({ bg, src, height, fit, alt }: any) => (
-        <Image
-          bg={bg}
-          src={src}
-          height={height}
-          fit={fit}
-          alt={alt}
-        />
-      ));
-
-    function NftPreviewCard({style, imageUri, name}: NftPreviewCardProps) {
+    function NftPreviewCard({style, imageUri,
+        //  name, description:descr
+    }: NftPreviewCardProps) {
         return (
           <Card shadow="sm" padding="lg" radius="md" withBorder style={style}>
             <Card.Section component="a" href="https://mantine.dev/">
-              <ImageComponent
+              <Image
                 bg={'darkGray'}
                 src={ imageUri ?? "https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/images/bg-8.png"}
                 height={160}
@@ -237,13 +258,13 @@ export const FrameInitialScreenUIComponent = () => {
             </Card.Section>
       
             <Group justify="space-between" mt="md" mb="xs">
-              <Text fw={500}>{name && name.length > 0 ? name : "Collection Name"}</Text>
+              <Text fw={500}>{collectionName && collectionName.length > 0 ? collectionName : "Collection Name"}</Text>
               <Badge color="pink">On Sale</Badge>
             </Group>
       
             <Text size="sm" c="dimmed">
-              With Fjord Tours you can explore more of the magical fjord landscapes with tours and
-              activities on and around the fjords of Norway
+              {description && description.length > 0 ? description : `With Fjord Tours you can explore more of the magical fjord landscapes with tours and
+              activities on and around the fjords of Norway`}
             </Text>
       
             {/* <Button color="blue" fullWidth mt="md" radius="md">
@@ -362,7 +383,12 @@ export const FrameInitialScreenUIComponent = () => {
                         }
                     />
                 </Modal>
-                <BuildNftComponent opened={buildNftOpened} close={buildNftClose} open={buildNftOpen} />
+                <BuildNftComponent 
+                    opened={buildNftOpened} 
+                    close={buildNftClose} 
+                    open={buildNftOpen}
+                    handleFileSelect={handleFileSelect}
+                />
             </> : null}
 
             {loading ? <Loader color={colors.yellow} /> : null}
