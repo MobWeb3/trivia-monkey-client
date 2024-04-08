@@ -7,14 +7,17 @@ interface FrameInitialHeaderProps {
     onResume?: () => void;
     onExit?: () => void;
     openModal?: () => void;
+    isConnected?: boolean;
 }
 
-const FrameInitiaHeader: React.FC<FrameInitialHeaderProps> = ({ onConnect }) => {
+const FrameInitiaHeader: React.FC<FrameInitialHeaderProps> = ({ onConnect, isConnected }) => {
 
     return (
 
         <Affix position={{ top: 20, right: 20 }}>
-            <OptionButton fontSize='1rem' onClick={onConnect}>Connect Wallet</OptionButton>
+            <OptionButton fontSize='1rem' onClick={onConnect}>
+                {isConnected ? 'Connected' : 'Connect Wallet'}
+            </OptionButton>
         </Affix>
     );
 };

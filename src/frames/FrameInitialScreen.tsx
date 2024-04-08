@@ -28,6 +28,8 @@ import React from 'react';
 import { uploadFile } from '../authentication/solana/metaplex';
 import { createNftCollection } from '../solana/metaplex';
 import { createFrame } from '../mongo/FrameHandler';
+import { WaitingScreen } from './components';
+import { createWarpcastLink } from '../components/share/WarpCastLink';
 const endpoint = 'https://api.devnet.solana.com';
 
 export const FrameInitialScreenUIComponent = () => {
@@ -44,6 +46,8 @@ export const FrameInitialScreenUIComponent = () => {
     const [selectedImage, setSelectedImage] = useState<File | null>(null);
     const [description, setDescription] = useState('');
     const [sellerBasisPoints, setSellerBasisPoints] = useState(5);
+    const [connected, setConnected] = useState(false);
+    const [urlFrame, setUrlFrame] = useState('');
 
     const [scoreToWin, setScoreToWin] = useState('50');
 
@@ -70,7 +74,7 @@ export const FrameInitialScreenUIComponent = () => {
         setLoading(true);
 
         if (topics.length === 0 || !topics[0]?.metaphor_id) {
-            alert('Please select a topic');
+            // alert('Please select a topic');
             setLoading(false);
             return;
         }
@@ -107,12 +111,16 @@ export const FrameInitialScreenUIComponent = () => {
             // console.log('frame: ', frame);
             console.log('questions: ', questions);
             const frameSessionURL = generateFrameSessionURL(frame._id);
-            console.log('frameSessionURL: ', frameSessionURL);
+            // console.log('frameSessionURL: ', frameSessionURL);
+
+            console.log('embed: ', frameSessionURL);
+            const warpcastUrl = createWarpcastLink("Play a game with Monkey Trivia!", [frameSessionURL]);
+            setUrlFrame(warpcastUrl);
             setFrameSessionCreated(true);
         }
         catch (error) {
             console.error(error);
-            alert('An error occurred while creating the frame');
+            // alert('An error occurred while creating the frame');
         }
         setLoading(false)
     };
@@ -126,14 +134,15 @@ export const FrameInitialScreenUIComponent = () => {
         const { currentUserPublicKey, web3auth } = await login();
         console.log('currentUserPublicKey: ', currentUserPublicKey);
 
-        if (currentUserPublicKey) {
-            alert(`Coonnected to wallet: ${currentUserPublicKey}`);
-        }
+        // if (currentUserPublicKey) {
+            // alert(`Coonnected to wallet: ${currentUserPublicKey}`);
+        // }
 
         if (web3auth) {
             setWeb3auth(web3auth);
             console.log('web3auth set!');
-
+            console.log('connected: ', web3auth.connected);
+            setConnected(web3auth.connected);
             console.log('connected wallet[0]:', wallets[0].adapter.name);
             // console.log('connected wallet[1]:', wallets[1].adapter.name);
         }
@@ -155,7 +164,8 @@ export const FrameInitialScreenUIComponent = () => {
     const uploadImage = async () => {
 
         if (!web3auth) {
-            alert('Please connect your wallet first');
+            // alert('Please connect your wallet first');
+            console.error('Please connect your wallet first');
             return;
         }
 
@@ -351,8 +361,10 @@ export const FrameInitialScreenUIComponent = () => {
 
     return (
         <div className={styles.main}>
-            <FrameInitiaHeader onConnect={onConnectWalletClicked} />
-            {!loading ? <><Flex
+            <FrameInitiaHeader onConnect={onConnectWalletClicked} isConnected={connected} />
+            {!loading && !frameSessionCreated ? 
+            <>
+            <Flex
                 gap="sm"
                 justify="center"
                 align="center"
@@ -456,37 +468,38 @@ export const FrameInitialScreenUIComponent = () => {
                     }}
                 >Sign Message
                 </CustomButton> */}
+            
             </Flex>
-                <Modal
-                    yOffset={'5dvh'}
-                    opened={opened}
-                    onClose={close}
-                    radius={'xl'}
-                    withCloseButton={false}
-                    styles={{
-                        body: { backgroundColor: colors.blue_turquoise },
-                    }}
-                >
-                    <ChooseTopicComponent
-                        numberOfQuestions={parseInt(numberQuestions)}
-                        closeModal={close}
-                        style={
-                            {
-                                backgroundColor: colors.blue_turquoise,
-                            }
-                        }
-                    />
-                </Modal>
-                <BuildNftComponent 
-                    opened={buildNftOpened} 
-                    close={buildNftClose} 
-                    open={buildNftOpen}
-                    handleFileSelect={handleFileSelect}
-                />
+            <Modal
+                yOffset={'5dvh'}
+                opened={opened}
+                onClose={close}
+                radius={'xl'}
+                withCloseButton={false}
+                styles={{
+                    body: { backgroundColor: colors.blue_turquoise },
+                }}
+            >
+            <ChooseTopicComponent
+                numberOfQuestions={parseInt(numberQuestions)}
+                closeModal={close}
+                style={
+                    {
+                        backgroundColor: colors.blue_turquoise,
+                    }
+                }
+            />
+            </Modal>
+            <BuildNftComponent 
+                opened={buildNftOpened} 
+                close={buildNftClose} 
+                open={buildNftOpen}
+                handleFileSelect={handleFileSelect}
+            />
             </> : null}
 
             {loading ? <Loader color={colors.yellow} /> : null}
-            {frameSessionCreated ? <div>Frame session created</div> : null}
+            {frameSessionCreated ? <WaitingScreen url={urlFrame}/> : null}
         </div>
     );
 }
