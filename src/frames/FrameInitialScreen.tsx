@@ -4,7 +4,8 @@ import { CustomButton } from '../components/CustomButton';
 import { Card, Container, FileInput, Flex, Input, Loader,
      Modal, SegmentedControl, Image, Group, Text, 
      Badge,
-     Textarea} from '@mantine/core';
+     Textarea,
+     NumberInput} from '@mantine/core';
 import { IconPacman } from '@tabler/icons-react';
 import SelectedTopicEntries from '../components/topics/SelectedTopicEntries';
 import { useDisclosure } from '@mantine/hooks';
@@ -42,6 +43,7 @@ export const FrameInitialScreenUIComponent = () => {
     const [web3auth, setWeb3auth] = useState<Web3Auth>();
     const [selectedImage, setSelectedImage] = useState<File | null>(null);
     const [description, setDescription] = useState('');
+    const [sellerBasisPoints, setSellerBasisPoints] = useState(5);
 
     // console.log('topics: ', topics);
     const handleFileSelect = (file: any) => {
@@ -51,9 +53,15 @@ export const FrameInitialScreenUIComponent = () => {
         }
     };
 
-    const onDescriptionChange = async (e: any) => {
-        setDescription(e.currentTarget.value);
-        console.log('description: ', e.currentTarget.value);
+    // set solana metaplex seller basis points
+    const onSellerBasisPointsChange = (percent: number ) => {
+
+        console.log('percent: ', percent);
+        // Multiply by 100 to convert to basis points
+        
+        setSellerBasisPoints(percent);
+
+        console.log('sellerBasisPoints: ', percent);
     }
 
     const handleCreateFrameSubmitted = async () => {
@@ -110,6 +118,19 @@ export const FrameInitialScreenUIComponent = () => {
         }
     }
 
+    const onDoneInBuildNftCollection = () => {
+        console.log(`
+            collectionName: ${collectionName}
+            numberQuestions: ${numberQuestions}
+            description: ${description}
+            sellerBasisPoints: ${sellerBasisPoints}
+            selectedImage: ${selectedImage?.name}
+        `);
+        
+        // close build nft modal
+        buildNftClose();
+    }
+
     const onSignMessageClicked = async () => {
 
         if (!web3auth) {
@@ -156,9 +177,14 @@ export const FrameInitialScreenUIComponent = () => {
                     }
                 }}
             >
-                <div style={{
-                    margin: '1rem',
-                }}>
+                <Flex
+                    gap="sm"
+                    justify="center"
+                    align="center"
+                    direction="column"
+                    w="100%"
+                    p={'xl'}
+                >
                 <Input
                     leftSection={<IconPacman />}
                     placeholder="Collection Name"
@@ -198,6 +224,9 @@ export const FrameInitialScreenUIComponent = () => {
                     onChange={handleFileSelect}
                     // description="This image will be used for all your NFTs in this collection"
                     placeholder="Collection Image (PNG, JPEG)"
+                    style={{
+                        width: '100%'
+                    }}
                 />
                 <Textarea
                     label="Description"
@@ -210,8 +239,7 @@ export const FrameInitialScreenUIComponent = () => {
                         }
                     }}
                     style={{
-                        marginTop: '1rem',
-                        marginBottom: '1rem',
+                        width: '100%',
                     
                     }}
                 
@@ -227,11 +255,11 @@ export const FrameInitialScreenUIComponent = () => {
                     // name={collectionName}
                     // description={description}
                     style={{
-                        marginTop: '2rem',
-                        marginBottom: '2rem',
+                        width: '100%',
                     }}
                 />
-                </div>
+                <CustomButton fontSize='1.5rem' onClick={onDoneInBuildNftCollection}> Done </CustomButton>
+                </Flex>
             </Modal>)
     }
 
@@ -259,13 +287,36 @@ export const FrameInitialScreenUIComponent = () => {
       
             <Group justify="space-between" mt="md" mb="xs">
               <Text fw={500}>{collectionName && collectionName.length > 0 ? collectionName : "Collection Name"}</Text>
-              <Badge color="pink">On Sale</Badge>
+              <Badge color="pink">{sellerBasisPoints ? `${sellerBasisPoints}%` : `5%`}</Badge>
             </Group>
       
             <Text size="sm" c="dimmed">
               {description && description.length > 0 ? description : `With Fjord Tours you can explore more of the magical fjord landscapes with tours and
               activities on and around the fjords of Norway`}
             </Text>
+
+            <NumberInput
+                label="Seller royalties"
+                placeholder="Percents"
+                suffix="%"
+                // defaultValue={5}
+                max={100}
+                value={sellerBasisPoints}
+                onBlur={(value) => {
+                    const percent = value.currentTarget.value.replace('%', '')
+                    console.log('value: ', percent);
+                    onSellerBasisPointsChange(Number(percent))}
+                }
+                onChange={
+                    (value) => {
+                        // const percent = value.currentTarget.value.replace('%', '')
+                    console.log('value: ', value);
+                    onSellerBasisPointsChange(Number(value))
+                }
+                    
+                }
+                mt="md"
+            />
       
             {/* <Button color="blue" fullWidth mt="md" radius="md">
               Book classic tour now
