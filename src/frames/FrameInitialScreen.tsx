@@ -1,7 +1,9 @@
 import { useContext, useMemo, useState } from 'react';
 import styles from '../frames/FrameInitialScreen.module.css'
 import { CustomButton } from '../components/CustomButton';
-import { Container, Flex, Input, Loader, Modal, SegmentedControl } from '@mantine/core';
+import { Card, Container, FileInput, Flex, Input, Loader,
+     Modal, SegmentedControl, Image, Group, Text, 
+     Badge} from '@mantine/core';
 import { IconPacman } from '@tabler/icons-react';
 import SelectedTopicEntries from '../components/topics/SelectedTopicEntries';
 import { useDisclosure } from '@mantine/hooks';
@@ -29,11 +31,13 @@ const endpoint = 'https://api.devnet.solana.com';
 export const FrameInitialScreenUIComponent = () => {
     const { wallets } = useWallet();
 
-    console.log(wallets);
+    // console.log(wallets);
 
-    const [frameTitle, setFrameTitle] = useState("")
+    const [frameTitle, setFrameTitle] = useState("");
+    const [collectionName, setCollectionName] = useState("");
     const [numberQuestions, setNumberQuestions] = useState('1');
     const [opened, { open, close }] = useDisclosure(false);
+    const [buildNftOpened, { open: buildNftOpen, close: buildNftClose }] = useDisclosure(false);
     const { topics } = useContext(TopicContext);
     const [loading, setLoading] = useState(false);
     const [frameSessionCreated, setFrameSessionCreated] = useState(false);
@@ -47,11 +51,6 @@ export const FrameInitialScreenUIComponent = () => {
             setLoading(false);
             return;
         }
-
-        // console.log('topics: ', topics);
-        // console.log('frameTitle: ', frameTitle);
-        // console.log('numberQuestions: ', numberQuestions);
-        // console.log('metaphor_id: ', topics[0]?.metaphor_id);
 
         try {
             // Create the frame
@@ -123,6 +122,111 @@ export const FrameInitialScreenUIComponent = () => {
 
     }
 
+    type BuildComponentProps = {
+        opened: boolean;
+        close: () => void;
+        open: () => void;
+    }
+
+    const BuildNftComponent = ({ opened: o, close }: BuildComponentProps) => {
+        return (
+            <Modal
+                yOffset={'5dvh'}
+                opened={o}
+                onClose={close}
+                radius={'xl'}
+                withCloseButton={false}
+                styles={{
+                    body: { 
+                        backgroundColor: colors.blue_turquoise
+                    }
+                }}
+            >
+                <div style={{
+                    margin: '1rem',
+                }}>
+                <Input
+                    leftSection={<IconPacman />}
+                    placeholder="Collection Name"
+                    radius="md"
+                    value={collectionName}
+                    styles={{
+                        input: {
+                            textAlign: 'center',
+                            width: '100%',  // Ensure the input field takes up the full width of the div
+                            background: '#DAD5D5',
+                            opacity: 1,
+                            fontFamily: 'umbrage2',
+                            fontSize: '32px',
+                        },
+                    }}
+                    onChange={(e) => setCollectionName(e.currentTarget.value)}
+                />
+
+                <FileInput
+                    size="lg"
+                    radius="md"
+                    label="Collection Image"
+                    labelProps={{ 
+                        style: { 
+                            color: colors.black,
+                            fontFamily: 'umbrage2',
+                            fontSize: '2rem',
+                        } 
+                    }}
+                    withAsterisk
+                    descriptionProps={{style: {
+                        color: colors.black,
+                        fontFamily: 'umbrage2',
+                        fontSize: '0.7rem'
+                    }}}
+                    
+                    description="This image will be used for all your NFTs in this collection"
+                    placeholder="Collection Image (PNG, JPEG)"
+                />
+                <NftPreviewCard style={{
+                    marginTop: '2rem',
+                    marginBottom: '2rem',
+                }}/>
+                </div>
+            </Modal>)
+    }
+
+    type NftPreviewCardProps = {
+        imageUri?: string;
+        name?: string;
+        description?: string;
+        style?: React.CSSProperties;
+    };
+
+    function NftPreviewCard({style}: NftPreviewCardProps) {
+        return (
+          <Card shadow="sm" padding="lg" radius="md" withBorder style={style}>
+            <Card.Section component="a" href="https://mantine.dev/">
+              <Image
+                src="https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/images/bg-8.png"
+                height={160}
+                alt="Norway"
+              />
+            </Card.Section>
+      
+            <Group justify="space-between" mt="md" mb="xs">
+              <Text fw={500}>Norway Fjord Adventures</Text>
+              <Badge color="pink">On Sale</Badge>
+            </Group>
+      
+            <Text size="sm" c="dimmed">
+              With Fjord Tours you can explore more of the magical fjord landscapes with tours and
+              activities on and around the fjords of Norway
+            </Text>
+      
+            {/* <Button color="blue" fullWidth mt="md" radius="md">
+              Book classic tour now
+            </Button> */}
+          </Card>
+        );
+      }
+
 
     return (
         <div className={styles.main}>
@@ -183,6 +287,17 @@ export const FrameInitialScreenUIComponent = () => {
                 <SelectedTopicEntries
                     entrySize={topics.length}
                 />
+
+                <CustomButton
+                    fontSize={"24px"}
+                    onClick={buildNftOpen}
+                    background='linear-gradient(to bottom right, #FDD673, #D5B45B)'
+                    color='#2B2C21'
+                >Build Nft Collection
+                </CustomButton>
+                <SelectedTopicEntries
+                    entrySize={topics.length}
+                />
                 <CustomButton
                     onClick={handleCreateFrameSubmitted}
                     style={{
@@ -220,7 +335,10 @@ export const FrameInitialScreenUIComponent = () => {
                             }
                         }
                     />
-                </Modal></> : null}
+                </Modal>
+                <BuildNftComponent opened={buildNftOpened} close={buildNftClose} open={buildNftOpen} />
+            </> : null}
+
             {loading ? <Loader color={colors.yellow} /> : null}
             {frameSessionCreated ? <div>Frame session created</div> : null}
         </div>
@@ -230,7 +348,7 @@ export const FrameInitialScreenUIComponent = () => {
 export const FrameInitialScreen = () => {
 
     // devnet endpoint
-    
+
 
     // const endpoint = 'https://api.mainnet-beta.solana.com';
 
