@@ -12,7 +12,6 @@ import { useDisclosure } from '@mantine/hooks';
 import { TopicContext } from '../components/topics/TopicContext';
 import { colors } from '../components/colors';
 import ChooseTopicComponent from './components/ChooseTopicComponent';
-import { createFrame } from '../mongo/FrameHandler';
 import { FRAMES_URL } from '../ApiServiceConfig';
 import FrameInitiaHeader from './FrameHeader';
 import { login } from '../authentication/Login';
@@ -20,14 +19,15 @@ import { Web3Auth } from '@web3auth/modal';
 // import { PhantomWalletAdapter } from '@solana/wallet-adapter-wallets';
 import { createUmi } from '@metaplex-foundation/umi-bundle-defaults';
 import { walletAdapterIdentity } from '@metaplex-foundation/umi-signer-wallet-adapters';
-import { createNftCollection } from '../authentication/solana/metaplex/createNftCollection';
 import { bundlrUploader } from "@metaplex-foundation/umi-uploader-bundlr";
 import {
     PhantomWalletAdapter,
 } from "@solana/wallet-adapter-wallets";
 import { ConnectionProvider, useWallet, WalletProvider } from '@solana/wallet-adapter-react';
-import { mplTokenMetadata } from '@metaplex-foundation/mpl-token-metadata';
 import React from 'react';
+import { uploadFile } from '../authentication/solana/metaplex';
+import { createNftCollection } from '../solana/metaplex';
+import { createFrame } from '../mongo/FrameHandler';
 const endpoint = 'https://api.devnet.solana.com';
 
 export const FrameInitialScreenUIComponent = () => {
@@ -44,6 +44,8 @@ export const FrameInitialScreenUIComponent = () => {
     const [selectedImage, setSelectedImage] = useState<File | null>(null);
     const [description, setDescription] = useState('');
     const [sellerBasisPoints, setSellerBasisPoints] = useState(5);
+
+    const [scoreToWin, setScoreToWin] = useState('50');
 
     // console.log('topics: ', topics);
     const handleFileSelect = (file: any) => {
@@ -74,6 +76,23 @@ export const FrameInitialScreenUIComponent = () => {
         }
 
         try {
+            console.log("wallets: ", wallets);
+            // Upload the image to the bundlr
+            const fileUrl =  await uploadImage();
+
+            // Create the collection on solana
+            const collectionMintReceipt = await createNftCollection(
+                {
+                    name: collectionName,
+                    description: description ?? "Collection description",
+                    imageUri: fileUrl ?? "https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/images/bg-8.png",
+                    sellerFeeBasisPoints: sellerBasisPoints,
+                    symbol: "MNTN"
+                }
+            )
+
+            console.log('collectionMintReceipt: ', collectionMintReceipt);
+
             // Create the frame
             const { frame, questions } = await createFrame({
                 name: frameTitle,
@@ -81,7 +100,9 @@ export const FrameInitialScreenUIComponent = () => {
                 topic: {
                     name: topics[0]?.name,
                     metaphor_id: topics[0]?.metaphor_id
-                }
+                },
+                scoreToPass: parseInt(scoreToWin),
+                collectionMint: collectionMintReceipt.collectionMint,
             })
             // console.log('frame: ', frame);
             console.log('questions: ', questions);
@@ -121,7 +142,7 @@ export const FrameInitialScreenUIComponent = () => {
     const onDoneInBuildNftCollection = () => {
         console.log(`
             collectionName: ${collectionName}
-            numberQuestions: ${numberQuestions}
+            scoreToWin: ${scoreToWin}
             description: ${description}
             sellerBasisPoints: ${sellerBasisPoints}
             selectedImage: ${selectedImage?.name}
@@ -131,7 +152,7 @@ export const FrameInitialScreenUIComponent = () => {
         buildNftClose();
     }
 
-    const onSignMessageClicked = async () => {
+    const uploadImage = async () => {
 
         if (!web3auth) {
             alert('Please connect your wallet first');
@@ -145,9 +166,11 @@ export const FrameInitialScreenUIComponent = () => {
             const umi = createUmi(endpoint)
                 .use(walletAdapterIdentity(wallets[0].adapter))
                 .use(bundlrUploader())
-                .use(mplTokenMetadata());
+                // .use(mplTokenMetadata());
 
-            await createNftCollection(umi);
+            const fileUri = await uploadFile(umi, selectedImage as File);
+            console.log('fileUri: ', fileUri);
+            return fileUri;
         }
 
     }
@@ -372,6 +395,26 @@ export const FrameInitialScreenUIComponent = () => {
 
                     style={{ fontFamily: 'umbrage2', marginBottom: '10px' }}
                 />
+                <Container fluid bg="#FDD673" w="100%" className='container-number-players'>
+                    Score requirement to win
+                </Container>
+                <SegmentedControl w='100%'
+                    fullWidth size="xl"
+                    color="gray"
+                    value={scoreToWin}
+                    data={[
+                        { value: '50', label: '50' },
+                        { value: '60', label: '60' },
+                        { value: '70', label: '70' },
+                        { value: '80', label: '80' },
+                        { value: '90', label: '90' }
+                    ]}
+                    onChange={(value) => {
+                        setScoreToWin(value);
+                    }}
+
+                    style={{ fontFamily: 'umbrage2', marginBottom: '10px' }}
+                />
                 <CustomButton
                     fontSize={"24px"}
                     onClick={open}
@@ -405,14 +448,14 @@ export const FrameInitialScreenUIComponent = () => {
                 >Create Frame
                 </CustomButton>
 
-                <CustomButton
+                {/* <CustomButton
                     onClick={onSignMessageClicked}
                     style={{
                         marginTop: '5%',
                         marginBottom: '5%',
                     }}
                 >Sign Message
-                </CustomButton>
+                </CustomButton> */}
             </Flex>
                 <Modal
                     yOffset={'5dvh'}

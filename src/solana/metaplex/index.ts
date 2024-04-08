@@ -1,0 +1,1 @@
+export {createNftCollection} from './collection'

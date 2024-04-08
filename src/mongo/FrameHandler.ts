@@ -8,6 +8,8 @@ interface FrameData {
         name: string;
         metaphor_id: string;
     }
+    scoreToPass: number;
+    collectionMint: string;
 }
 
 export const createFrame = async (data: FrameData) => {
