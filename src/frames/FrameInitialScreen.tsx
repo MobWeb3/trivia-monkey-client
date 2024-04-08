@@ -127,7 +127,7 @@ export const FrameInitialScreenUIComponent = () => {
 
     // Function to generate a URL for the frame session
     const generateFrameSessionURL = (frameId: string) => {
-        return `${FRAMES_URL}/frame/getSession?id=${frameId}`;
+        return `${FRAMES_URL}/triva/session/${frameId}`;
     }
 
     const onConnectWalletClicked = async () => {
