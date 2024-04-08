@@ -25,6 +25,7 @@ import {
 } from "@solana/wallet-adapter-wallets";
 import { ConnectionProvider, useWallet, WalletProvider } from '@solana/wallet-adapter-react';
 import { mplTokenMetadata } from '@metaplex-foundation/mpl-token-metadata';
+import React from 'react';
 const endpoint = 'https://api.devnet.solana.com';
 
 
@@ -42,6 +43,14 @@ export const FrameInitialScreenUIComponent = () => {
     const [loading, setLoading] = useState(false);
     const [frameSessionCreated, setFrameSessionCreated] = useState(false);
     const [web3auth, setWeb3auth] = useState<Web3Auth>();
+    const [selectedImage, setSelectedImage] = useState<File | null>(null);
+
+    const handleFileSelect = (file: any) => {
+        console.log('file: ', file);
+        if (file) {
+          setSelectedImage(file);
+        }
+      };
 
     const handleCreateFrameSubmitted = async () => {
         setLoading(true);
@@ -180,14 +189,19 @@ export const FrameInitialScreenUIComponent = () => {
                         fontFamily: 'umbrage2',
                         fontSize: '0.7rem'
                     }}}
-                    
+                    value={selectedImage}
+                    onChange={handleFileSelect}
                     description="This image will be used for all your NFTs in this collection"
                     placeholder="Collection Image (PNG, JPEG)"
                 />
-                <NftPreviewCard style={{
-                    marginTop: '2rem',
-                    marginBottom: '2rem',
-                }}/>
+                <NftPreviewCard 
+                    imageUri={selectedImage ? URL.createObjectURL(selectedImage) : undefined}
+                    name={collectionName}
+                    style={{
+                        marginTop: '2rem',
+                        marginBottom: '2rem',
+                    }}
+                />
                 </div>
             </Modal>)
     }
@@ -199,19 +213,31 @@ export const FrameInitialScreenUIComponent = () => {
         style?: React.CSSProperties;
     };
 
-    function NftPreviewCard({style}: NftPreviewCardProps) {
+    const ImageComponent = React.memo(({ bg, src, height, fit, alt }: any) => (
+        <Image
+          bg={bg}
+          src={src}
+          height={height}
+          fit={fit}
+          alt={alt}
+        />
+      ));
+
+    function NftPreviewCard({style, imageUri, name}: NftPreviewCardProps) {
         return (
           <Card shadow="sm" padding="lg" radius="md" withBorder style={style}>
             <Card.Section component="a" href="https://mantine.dev/">
-              <Image
-                src="https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/images/bg-8.png"
+              <ImageComponent
+                bg={'darkGray'}
+                src={ imageUri ?? "https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/images/bg-8.png"}
                 height={160}
+                fit={'contain'}
                 alt="Norway"
               />
             </Card.Section>
       
             <Group justify="space-between" mt="md" mb="xs">
-              <Text fw={500}>Norway Fjord Adventures</Text>
+              <Text fw={500}>{name && name.length > 0 ? name : "Collection Name"}</Text>
               <Badge color="pink">On Sale</Badge>
             </Group>
       
