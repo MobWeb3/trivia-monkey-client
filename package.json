@@ -15,10 +15,16 @@
     "@babel/runtime": "^7.23.8",
     "@mantine/core": "^7.3.0",
     "@mantine/hooks": "^7.0.0",
+    "@metaplex-foundation/mpl-token-metadata": "^3.2.1",
+    "@metaplex-foundation/umi-bundle-defaults": "^0.9.1",
+    "@metaplex-foundation/umi-signer-wallet-adapters": "^0.9.1",
+    "@metaplex-foundation/umi-uploader-bundlr": "^0.9.1",
     "@moonpay/moonpay-js": "^0.5.0",
     "@moonpay/moonpay-react": "^1.6.1",
     "@project-serum/anchor": "^0.26.0",
     "@solana/spl-token": "^0.4.1",
+    "@solana/wallet-adapter-react": "^0.15.35",
+    "@solana/wallet-adapter-wallets": "^0.19.32",
     "@tabler/icons-react": "^2.46.0",
     "@types/node": "^20.11.14",
     "@types/react": "^18.2.37",
@@ -53,6 +59,7 @@
     "root": "github:alchemyplatform/aa-sdk#a1376c4ad38a62517092ebdd8c87557712c4aecc",
     "use-local-storage-state": "^19.1.0",
     "viem": "^1.19.11",
+    "vite-plugin-node-polyfills": "^0.21.0",
     "wagmi": "^1.4.10"
   },
   "devDependencies": {
@@ -90,6 +97,7 @@
     "start-dev-service": "vite --mode dev-service",
     "start-prod-service": "vite --mode prod-service",
     "start-prod-service-dev-frame": "vite --mode prod-service-dev-frame",
+    "start-dev-service-dev-frame": "vite --mode dev-service-dev-frame",
     "test": "vitest run"
   },
   "eslintConfig": {
