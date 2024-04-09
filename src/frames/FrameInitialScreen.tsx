@@ -109,11 +109,9 @@ export const FrameInitialScreenUIComponent = () => {
                 collectionMint: collectionMintReceipt.collectionMint,
             })
             // console.log('frame: ', frame);
-            console.log('questions: ', questions);
+            // console.log('questions: ', questions);
             const frameSessionURL = generateFrameSessionURL(frame._id);
-            // console.log('frameSessionURL: ', frameSessionURL);
 
-            console.log('embed: ', frameSessionURL);
             const warpcastUrl = createWarpcastLink("Play a game with Monkey Trivia!", [frameSessionURL]);
             setUrlFrame(warpcastUrl);
             setFrameSessionCreated(true);
@@ -127,16 +125,13 @@ export const FrameInitialScreenUIComponent = () => {
 
     // Function to generate a URL for the frame session
     const generateFrameSessionURL = (frameId: string) => {
-        return `${FRAMES_URL}/triva/session/${frameId}`;
+        return `${FRAMES_URL}/trivia/session/${frameId}`;
     }
 
     const onConnectWalletClicked = async () => {
         const { currentUserPublicKey, web3auth } = await login();
         console.log('currentUserPublicKey: ', currentUserPublicKey);
 
-        // if (currentUserPublicKey) {
-            // alert(`Coonnected to wallet: ${currentUserPublicKey}`);
-        // }
 
         if (web3auth) {
             setWeb3auth(web3auth);
