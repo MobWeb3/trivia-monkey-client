@@ -98,7 +98,7 @@ export const FrameInitialScreenUIComponent = () => {
             console.log('collectionMintReceipt: ', collectionMintReceipt);
 
             // Create the frame
-            const { frame, questions } = await createFrame({
+            const { frame } = await createFrame({
                 name: frameTitle,
                 numberOfQuestions: parseInt(numberQuestions),
                 topic: {
@@ -443,9 +443,6 @@ export const FrameInitialScreenUIComponent = () => {
                     color='#2B2C21'
                 >Build Nft Collection
                 </CustomButton>
-                <SelectedTopicEntries
-                    entrySize={topics.length}
-                />
                 <CustomButton
                     onClick={handleCreateFrameSubmitted}
                     style={{
