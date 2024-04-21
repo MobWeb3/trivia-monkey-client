@@ -12,7 +12,7 @@ type NftCollection = {
 }
 export const createNftCollection = async (data: NftCollection) => {
     try {
-        const response = await axios.post(`${BASE_URL}/api/bubblegum/createNftCollection`, data);
+        const response = await axios.post(`${BASE_URL}/api/bubblegum/createNftCollection`, data, {timeout: 10000});
         return response.data;
     } catch (error) {
         console.error(error);
@@ -22,7 +22,7 @@ export const createNftCollection = async (data: NftCollection) => {
 
 export const uploadCollectionMetadata = async (data: any) => {
     try {
-        const response = await axios.post(`${BASE_URL}/api/bubblegum/uploadCollectionMetadata`, data);
+        const response = await axios.post(`${BASE_URL}/api/bubblegum/uploadCollectionMetadata`, data, {timeout: 10000});
         return response.data;
     } catch (error) {
         console.error(error);
