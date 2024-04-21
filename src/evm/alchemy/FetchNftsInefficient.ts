@@ -10,7 +10,7 @@ import { avalancheFuji } from 'viem/chains';
 import { createWeb3AuthSigner, getProvider } from './Web3AuthSigner';
 import { MutableNftGameSession, NftGameSession } from '../../game-domain/ nfts/NftGameSession';
 
-export const publicClient: any = createPublicClient({
+export const publicClient = createPublicClient({
     chain: avalancheFuji,
     transport: http()
   })
