@@ -13,9 +13,6 @@
       "require": "./dist/monkey-trivia.cjs.js"
     }
   },
-  "files": [
-    "dist"
-  ],
   "dependencies": {
     "@ably/spaces": "^0.3.0",
     "@alchemy/aa-accounts": "^1.2.0",

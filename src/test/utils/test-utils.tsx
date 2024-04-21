@@ -5,7 +5,7 @@ afterEach(() => {
   cleanup()
 })
 
-function customRender(ui: React.ReactElement, options = {}) {
+function customRender(ui: React.ReactElement, options = {}): any {
   return render(ui, {
     // wrap provider(s) here if needed
     wrapper: ({ children }) => children,
