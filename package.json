@@ -4,18 +4,9 @@
   "private": true,
   "homepage": "./",
   "type": "module",
-  "main": "dist/monkey-trivia.cjs.js",
-  "module": "dist/monkey-trivia.es.js",
-  "types": "dist/index.d.ts",
   "exports": {
-    ".": {
-      "import": "./dist/monkey-trivia.es.js",
-      "require": "./dist/monkey-trivia.cjs.js"
-    }
+    ".": "./src/index.js"
   },
-  "files": [
-    "dist"
-  ],
   "dependencies": {
     "@ably/spaces": "^0.3.0",
     "@alchemy/aa-accounts": "^1.2.0",
@@ -94,7 +85,6 @@
     "vite": "^5.0.12",
     "vite-plugin-babel": "^1.2.0",
     "vite-plugin-checker": "^0.6.2",
-    "vite-plugin-dts": "^3.8.3",
     "vite-plugin-pwa": "^0.17.4",
     "vite-plugin-svgr": "^4.2.0",
     "vite-tsconfig-paths": "^4.2.1",
