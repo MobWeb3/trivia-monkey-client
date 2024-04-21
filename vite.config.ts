@@ -4,6 +4,7 @@ import checker from 'vite-plugin-checker';
 import { VitePWA } from 'vite-plugin-pwa'
 import { NodeGlobalsPolyfillPlugin } from '@esbuild-plugins/node-globals-polyfill'
 import { nodePolyfills } from 'vite-plugin-node-polyfills'
+import dts from 'vite-plugin-dts';
 
 let faviconURL = '/favicon.ico'
 
@@ -13,6 +14,9 @@ export default defineConfig(({ command, mode }) => {
     return {
         base: './',
         plugins: [
+            dts({
+                // Options for the dts plugin
+              }),
             react(),
             checker({
                 overlay: { initialIsOpen: false },
@@ -104,6 +108,20 @@ export default defineConfig(({ command, mode }) => {
             },
             minify: false,
             sourcemap: false, // uncomment this line to debug source maps
+            lib: {
+                entry: 'src/index.tsx', // Assuming your entry file is a .tsx file
+                name: 'MonkeyTrivia', // This is used to name the global variable for UMD/IIFE format
+                formats: ['es', 'cjs'],
+                fileName: (format) => `monkey-trivia.${format}.js`
+            },
+            rollupOptions: {
+                external: ['react'], // Specify external dependencies
+                output: {
+                  globals: {
+                    react: 'React'
+                  }
+                }
+            }
         },
         test: {
             globals: true,

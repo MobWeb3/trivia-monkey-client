@@ -14,7 +14,9 @@ interface FrameData {
 
 export const createFrame = async (data: FrameData) => {
     try {
-        const response = await axios.post(`${BASE_URL}/api/frames/createFrame`, data);
+        const response = await axios.post(`${BASE_URL}/api/frames/createFrame`, data, {
+            timeout: 15000,
+        });
         return response.data;
     } catch (error) {
         console.error(error);
