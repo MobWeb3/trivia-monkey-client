@@ -102,8 +102,8 @@ export default defineConfig(({ command, mode }) => {
             commonjsOptions: {
                 transformMixedEsModules: true
             },
-            // minify: true,
-            // sourcemap: false, // uncomment this line to debug source maps
+            minify: false,
+            sourcemap: false, // uncomment this line to debug source maps
         },
         test: {
             globals: true,
