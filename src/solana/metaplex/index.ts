@@ -1,1 +1,1 @@
-export {createNftCollection} from './collection'
+export { createNftCollection, uploadCollectionMetadata} from './collection'

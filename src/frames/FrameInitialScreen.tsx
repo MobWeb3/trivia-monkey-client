@@ -20,13 +20,10 @@ import { Web3Auth } from '@web3auth/modal';
 import { createUmi } from '@metaplex-foundation/umi-bundle-defaults';
 import { walletAdapterIdentity } from '@metaplex-foundation/umi-signer-wallet-adapters';
 import { bundlrUploader } from "@metaplex-foundation/umi-uploader-bundlr";
-import {
-    PhantomWalletAdapter,
-} from "@solana/wallet-adapter-wallets";
 import { ConnectionProvider, useWallet, WalletProvider } from '@solana/wallet-adapter-react';
 import React from 'react';
 import { uploadFile } from '../authentication/solana/metaplex';
-import { createNftCollection } from '../solana/metaplex';
+import { createNftCollection, uploadCollectionMetadata } from '../solana/metaplex';
 import { createFrame } from '../mongo/FrameHandler';
 import { WaitingScreen } from './components';
 import { createWarpcastLink } from '../components/share/WarpCastLink';
@@ -84,6 +81,29 @@ export const FrameInitialScreenUIComponent = () => {
             // Upload the image to the bundlr
             const fileUrl =  await uploadImage();
 
+            const currentWalletPublicKey = wallets[0].adapter.publicKey?.toString();
+            if (!currentWalletPublicKey) {
+                console.error('Please connect your wallet first');
+                setLoading(false);
+                return;
+            }
+
+            const metadata = {
+                name: collectionName,
+                description: description ?? "Collection description",
+                imageUri: fileUrl ?? "https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/images/bg-8.png",
+                symbol: "MNTN"
+            }
+
+            //Upload collection metadata to arweave
+            const collectionMetadataUri = await uploadCollectionMetadata(metadata);
+
+            if (!collectionMetadataUri && !collectionMetadataUri.collectionUri) {
+                console.error('An error occurred while uploading the collection metadata');
+                setLoading(false);
+                return;
+            }
+
             // Create the collection on solana
             const collectionMintReceipt = await createNftCollection(
                 {
@@ -91,7 +111,9 @@ export const FrameInitialScreenUIComponent = () => {
                     description: description ?? "Collection description",
                     imageUri: fileUrl ?? "https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/images/bg-8.png",
                     sellerFeeBasisPoints: sellerBasisPoints,
-                    symbol: "MNTN"
+                    symbol: "MNTN",
+                    tokenOwner: currentWalletPublicKey,
+                    uri: collectionMetadataUri.collectionUri
                 }
             )
 
@@ -505,7 +527,7 @@ export const FrameInitialScreen = () => {
 
     const wallets = useMemo(
         () => [
-            new PhantomWalletAdapter(),
+            // new PhantomWalletAdapter(),
         ],
         []
     );
@@ -520,3 +542,6 @@ export const FrameInitialScreen = () => {
 }
 
 export default FrameInitialScreen;
+
+
+// https://warpcast.com/~/compose?text=Play%20a%20game%20with%20Monkey%20Trivia!&embeds[]=http://localhost:3000/trivia/session/66246bcf6d706c32793fa04b

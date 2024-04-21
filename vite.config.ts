@@ -50,6 +50,7 @@ export default defineConfig(({ command, mode }) => {
         define: {
             VITE_PUBLIC_URL: JSON.stringify(env.VITE_PUBLIC_URL),
             'process.env': process.env,
+            'global.setTimeout': 'window.setTimeout'
         },
         resolve: {
             alias: {
