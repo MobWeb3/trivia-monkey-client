@@ -89,7 +89,7 @@ const CreateGame = () => {
             return;
         }
 
-        const url = `${window.location.origin}/joingame?sessionId=${useGameSessionHook.sessionId}&channelId=${useGameSessionHook.channelId}`;
+        const url = `${window.location.origin}/joingame?page=join&sessionId=${useGameSessionHook.sessionId}&channelId=${useGameSessionHook.channelId}`;
         urlRef.current = url;
         qrCode.update({
             data: url,
